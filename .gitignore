@@ -1,0 +1,95 @@
+# === .NET / Visual Studio ===
+
+## Build results
+bin/
+obj/
+*.dll
+*.exe
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider & VS Code
+.idea/
+.vscode/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Publish output
+publish/
+
+## Entity Framework Migrations snapshots (optional)
+**/*ModelSnapshot.cs
+
+## Local secrets
+secrets.json
+*.pfx
+
+# === Node.js / Frontend ===
+
+## Node dependencies
+node_modules/
+
+## Build outputs
+build/
+dist/
+
+## Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+## dotenv files
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+## Frontend tools
+.cache/
+.next/
+out/
+.nuxt/
+.svelte-kit/
+
+# === OS and Editor Junk ===
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# === Misc ===
+
+# Coverage tools
+coverage/
+.nyc_output/
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Ignore Visual Studio and build folders
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.log
+*.vsidx
+*.db
+*.db-shm
+*.db-wal

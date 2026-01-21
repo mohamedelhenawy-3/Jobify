@@ -1,0 +1,6 @@
+﻿Project
+│
+├─ Domain       ← Only entities, enums, interfaces, business logic
+├─ Infrastructure ← DbContext, EF Core configurations, migrations
+├─ Application  ← Services, DTOs, business logic
+├─ Web/API      ← Controllers, UI, DI, startup
