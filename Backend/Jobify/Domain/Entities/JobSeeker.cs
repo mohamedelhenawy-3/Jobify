@@ -12,15 +12,13 @@ namespace Domain.Entities
         public int Id { get; set; }
         public string UserId { get; set; }
         public AppUser User { get; set; }
-        public string FullName { get; set; }
-        public string PhoneNumber { get; set; }
-        public string ResumeUrl { get; set; }
-        public string Location { get; set; }
-        public ProfileImage ProfileImage { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? ResumeUrl { get; set; }
+        public string? Location { get; set; }
+        public ProfileImage? ProfileImage { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public ICollection<JobApplication> Applications { get; set; }
+     
+        public ICollection<JobApplication>? Applications { get; set; }
 
 
     }

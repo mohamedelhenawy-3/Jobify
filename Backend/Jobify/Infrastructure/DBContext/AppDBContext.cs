@@ -45,9 +45,14 @@ namespace Infrastructure.DBContext
             ========================== */
             builder.Entity<AppUser>(entity =>
             {
-                entity.Property(u => u.CreatedAt)
+                entity.Property(ep => ep.FullName)
                       .HasDefaultValueSql("GETUTCDATE()");
 
+                entity.Property(ep => ep.CreatedAt)
+                      .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(ep => ep.UpdatedAt)
+                      .HasDefaultValueSql("GETUTCDATE()");
                 // Optional navigation configuration (not strictly needed)
                 entity.HasOne(u => u.JobSeeker)
                       .WithOne(js => js.User)
@@ -69,10 +74,6 @@ namespace Infrastructure.DBContext
 
                 entity.HasKey(js => js.Id);
 
-                entity.Property(js => js.FullName)
-                      .IsRequired()
-                      .HasMaxLength(200);
-
                 entity.Property(js => js.PhoneNumber)
                       .HasMaxLength(20);
 
@@ -82,11 +83,6 @@ namespace Infrastructure.DBContext
                 entity.Property(js => js.Location)
                       .HasMaxLength(200);
 
-                entity.Property(js => js.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
-
-                entity.Property(js => js.UpdatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
 
                 entity.HasOne(js => js.User)
                       .WithOne(u => u.JobSeeker)
@@ -116,11 +112,7 @@ namespace Infrastructure.DBContext
                 entity.Property(ep => ep.Location)
                       .HasMaxLength(200);
 
-                entity.Property(ep => ep.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
-
-                entity.Property(ep => ep.UpdatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                
 
                 entity.HasOne(ep => ep.User)
                       .WithOne(u => u.EmployerProfile)

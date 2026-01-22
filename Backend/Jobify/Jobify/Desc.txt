@@ -4,3 +4,22 @@
 ├─ Infrastructure ← DbContext, EF Core configurations, migrations
 ├─ Application  ← Services, DTOs, business logic
 ├─ Web/API      ← Controllers, UI, DI, startup
+
+
+
+Solution
+│
+├── Domain
+│   ├── Entities
+│   └── Identity
+│
+├── Application
+│   ├── Auth
+│   └── (DTOs, Interfaces)
+│
+├── Infrastructure
+│   ├── Data
+│   └── Repositories
+│
+└── API
+    └── Controllers

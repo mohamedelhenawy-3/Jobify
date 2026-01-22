@@ -13,13 +13,11 @@ namespace Domain.Entities
         public string UserId { get; set; }
         public AppUser User { get; set; }
         public string CompanyName { get; set; }
-        public string CompanyWebsite { get; set; }
-        public string Description { get; set; }
-        public string Location { get; set; }
+        public string? CompanyWebsite { get; set; }
+        public string? Description { get; set; }
+        public string? Location { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public ProfileImage ProfileImage { get; set; }
+        public ProfileImage? ProfileImage { get; set; }
 
         public ICollection<JobPost> JobPosts { get; set; }
     }
