@@ -1,10 +1,11 @@
 ﻿using Application.DTOs.Auth;
 using Application.DTOs.Auth.AuthResponse;
 using Application.Interfaces.Auth;
-
+using Application.Interfaces.Token;
 using Domain.Entities;
 using Domain.Identity;
 using Infrastructure.DBContext;
+using Infrastructure.Reposoitory.AuthRepository.Interface;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,8 @@ namespace Infrastructure.Implementation.AuthService
         private readonly IConfiguration _config;
         private readonly IJobSeeker _jobSeekerRepo;
         private readonly IEmployeer _employerRepo;
+        private readonly IAuthRepository _authrepo;
+        private readonly ITokenService _jwtService;
 
 
 
@@ -32,7 +35,8 @@ namespace Infrastructure.Implementation.AuthService
             RoleManager<IdentityRole> roleManager,
             AppDBContext context
             , IJobSeeker jobSeekerRepo, IEmployeer employerRepo,
-
+            IAuthRepository authrepo,
+            ITokenService jwtService,
             IConfiguration config)
         {
             _jobSeekerRepo = jobSeekerRepo;
@@ -41,7 +45,31 @@ namespace Infrastructure.Implementation.AuthService
             _roleManager = roleManager;
             _context = context;
             _config = config;
+            _authrepo = authrepo;
+            _jwtService = jwtService;
         }
+
+        public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
+        {
+            var user = await _authrepo.GetUserByEmail(dto.Email);
+            if (user == null)
+                throw new Exception("Invalid credentials");
+            var validPassword = await _authrepo.CheckPasswordAsync(user, dto.Password);
+            if (!validPassword)
+                throw new Exception("Invalid credentials");
+
+
+            var token = await _jwtService.GenerateToken(user, dto.DeviceId);
+            
+
+
+            return new LoginResponseDto
+            {
+                AccessToken = token.AccessToken,
+                RefreshToken = token.RefreshToken
+            };
+        }
+
         public async Task<SuccessResponseDto> RegisterAsync(RegisterDto dto)
         {
             if (!await _roleManager.RoleExistsAsync(dto.Role))
@@ -92,7 +120,8 @@ namespace Infrastructure.Implementation.AuthService
 
 
         }
-        
+
+      
     }
 
      

@@ -17,7 +17,7 @@ namespace Infrastructure.DBContext
         {
 
         }
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         // =========================
         // Identity & Users
         // =========================

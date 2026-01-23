@@ -13,6 +13,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Application.Interfaces.Token;
+using Infrastructure.Implementation.TokenServices;
+using Infrastructure.Reposoitory.RefreshTokenRepository.Interface;
+using Infrastructure.Reposoitory.RefreshTokenRepository.Implementation;
+using Infrastructure.Reposoitory.AuthRepository.Interface;
+using Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +46,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IJobSeeker, JobSeekerRepository>();
 builder.Services.AddScoped<IEmployeer, EmployerRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<JwtGenerator>();
+
 
 
 builder.Services.AddAuthentication(options =>

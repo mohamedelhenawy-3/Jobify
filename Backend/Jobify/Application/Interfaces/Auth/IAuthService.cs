@@ -11,6 +11,7 @@ namespace Application.Interfaces.Auth
     public interface IAuthService
     {
         Task<SuccessResponseDto> RegisterAsync(RegisterDto dto);
-       
+        Task<LoginResponseDto> LoginAsync(LoginDto dto);
+
     }
 }

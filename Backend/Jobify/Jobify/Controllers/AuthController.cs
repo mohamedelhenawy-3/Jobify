@@ -1,6 +1,9 @@
 ﻿using Application.DTOs.Auth;
 using Application.Interfaces.Auth;
+using Application.Interfaces.Token;
+using Infrastructure.Implementation.AuthService;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobify.Controllers
@@ -11,10 +14,11 @@ namespace Jobify.Controllers
     {
 
         private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        private readonly ITokenService _tokenservice;
+        public AuthController(IAuthService authService, ITokenService tokenservice) 
         {
             _authService = authService;
+            _tokenservice = tokenservice;
         }
 
         [HttpPost("register")]
@@ -23,6 +27,24 @@ namespace Jobify.Controllers
             await _authService.RegisterAsync(dto);
             return Ok("Registered successfully");
         }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginreq)
+        {
 
+            var result = await _authService.LoginAsync(loginreq);
+            return Ok(result);
+        }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
+        {
+            await _tokenservice.RefreshToken(dto.RefreshToken, dto.DeviceId);
+            return Ok("Registered successfully");
+        }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshRequestDto dto)
+        {
+            var result = await _tokenservice.Logout(dto.RefreshToken, dto.DeviceId);
+            return Ok(result);
+        }
     }
 }
