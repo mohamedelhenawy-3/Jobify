@@ -1,0 +1,87 @@
+﻿using Application.DTOs.JobPost;
+using Application.Interfaces.Company;
+using Application.Interfaces.Job;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace Jobify.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    //[Authorize(Roles = "Employer")]
+
+    public class JobController : ControllerBase
+    {
+        private readonly IJobService _jobService;
+
+        public JobController(
+            IJobService jobService)
+        {
+            _jobService = jobService;
+        }
+
+        public  async Task<IActionResult> CreateJob([FromBody] CreateJob createjob)
+        {
+            var result = await _jobService.CreateJob(createjob);
+            return Ok(result);
+
+        }
+    
+      
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetJobById(int id)
+        {
+            var job = await _jobService.GetJobById(id);
+            if (job == null)
+                return NotFound("Job not found");
+
+            return Ok(job);
+        }
+
+       
+        [HttpGet]
+        public async Task<IActionResult> GetAllJobs()
+        {
+            var jobs = await _jobService.AllJobs();
+            return Ok(jobs);
+        }
+
+       
+        [Authorize(Roles = "Employer")]
+        [HttpGet("my-jobs")]
+        public async Task<IActionResult> GetMyJobs()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
+            // You already resolve employerId inside the service in other methods,
+            // but here you expect employerId, so we reuse that pattern
+            var employerJobs = await _jobService.AllJobsOfEmployer(
+                int.Parse(User.FindFirst("EmployerProfileId")?.Value ?? "0")
+            );
+
+            return Ok(employerJobs);
+        }
+
+        // DELETE JOB (Owner only)
+        [Authorize(Roles = "Employer")]
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteJob(int id)
+        {
+            var result = await _jobService.DeleteJob(id);
+            return Ok(result);
+        }
+        // Update JOB (Owner only)
+        [Authorize(Roles = "Employer")]
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateJob([FromBody]UpdateJobDto dto, int id)
+        {
+            var result = await _jobService.UpdateJob(dto,id);
+            return Ok(result);
+        }
+    }
+}

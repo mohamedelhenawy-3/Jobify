@@ -19,6 +19,11 @@ using Infrastructure.Reposoitory.RefreshTokenRepository.Interface;
 using Infrastructure.Reposoitory.RefreshTokenRepository.Implementation;
 using Infrastructure.Reposoitory.AuthRepository.Interface;
 using Infrastructure.Security;
+using Application.Interfaces.Company;
+using Infrastructure.Implementation.CompanyService;
+using Infrastructure.Implementation.CLoudinary;
+using Application.Interfaces.Job;
+using Infrastructure.Implementation.JobService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +55,12 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<JwtGenerator>();
+builder.Services.AddScoped<IEmployerService, EmployerService>();
+builder.Services.AddScoped<IJobService, JobService>();
 
+builder.Services.AddScoped<CloudinaryService>();
+
+builder.Services.AddHttpContextAccessor();
 
 
 builder.Services.AddAuthentication(options =>

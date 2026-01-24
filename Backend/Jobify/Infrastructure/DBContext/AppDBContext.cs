@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -320,6 +321,32 @@ namespace Infrastructure.DBContext
                       .HasForeignKey(n => n.CreatedByUserId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+            builder.Entity<JobIndustry>().HasData(
+    new JobIndustry { Id = 1, IndustryName = "IT & Software" },
+    new JobIndustry { Id = 2, IndustryName = "Finance" },
+    new JobIndustry { Id = 3, IndustryName = "Healthcare" },
+    new JobIndustry { Id = 4, IndustryName = "Education" },
+    new JobIndustry { Id = 5, IndustryName = "Marketing" },
+    new JobIndustry { Id = 6, IndustryName = "Construction" },
+    new JobIndustry { Id = 7, IndustryName = "Retail" },
+    new JobIndustry { Id = 8, IndustryName = "Manufacturing" },
+    new JobIndustry { Id = 9, IndustryName = "Transportation" },
+    new JobIndustry { Id = 10, IndustryName = "Hospitality" }
+);
+            builder.Entity<EmploymentType>().HasData(
+    new EmploymentType { Id = 1, TypeName = "Full-time" },
+    new EmploymentType { Id = 2, TypeName = "Part-time" },
+    new EmploymentType { Id = 3, TypeName = "Contract" },
+    new EmploymentType { Id = 4, TypeName = "Internship" },
+    new EmploymentType { Id = 5, TypeName = "Remote" }
+);
+            builder.Entity<JobStatus>().HasData(
+    new JobStatus { Id = 1, StatusName = "Draft" },
+    new JobStatus { Id = 2, StatusName = "Published" },
+    new JobStatus { Id = 3, StatusName = "Closed" }
+);
+
+
         }
 
     }

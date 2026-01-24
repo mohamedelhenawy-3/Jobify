@@ -25,6 +25,6 @@ namespace Domain.Entities
 
         public DateTime AppliedAt { get; set; }
 
-        public ICollection<JobApplicationNote> Notes { get; set; }
+        public ICollection<JobApplicationNote> ? Notes { get; set; }
     }
 }
