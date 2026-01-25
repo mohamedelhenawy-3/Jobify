@@ -1,0 +1,61 @@
+<div class="landing-container text-center">
+  <div class="HeadWelcome mb-12">
+    <h1>Welcome to Jobify</h1>
+    <p class="lead">Connect with opportunities that match your ambitions
+
+
+</p>
+  </div>
+
+  <div class="cards-container">
+    <!-- Job Seeker Card -->
+
+
+   <div class="card" (click)="navigateTo('job-seeker')">
+  <img
+    src="assets/LandImag/programmer.png"
+    class="card-icon"
+    alt="Job Seeker"
+  />
+
+  <h2>I'm a Job Seeker</h2>
+  <p>Find your dream job and apply with ease
+    Find your dream job and apply with ease
+  </p>
+
+    <a class="card-btn" href="#">Get Started</a>
+</div>
+
+<div class="card" (click)="navigateTo('employer')">
+  <img
+    src="assets/LandImag/computer-worker.png"
+    class="card-icon"
+    alt="Employer"
+  />
+
+  <h2>I'm an Employer</h2>
+  <p>Post jobs and manage applicants efficiently
+    Post jobs and manage applicants efficiently
+  </p>
+
+  <a class="card-btn" href="#">Get Started</a>
+  </div>   
+  
+ </div>
+<!-- Sign in prompt -->
+<div class="signin-section">
+  <p>
+    Already have an account?
+    <a class="signin-link" (click)="navigateTo('login')">Sign in</a>
+  </p>
+</div>
+</div>
+
+
+
+<div class="footer">
+  <!-- Footer -->
+<footer class="landing-footer">
+  <p>© 2024 Jobify. All rights reserved.</p>
+</footer>
+</div>

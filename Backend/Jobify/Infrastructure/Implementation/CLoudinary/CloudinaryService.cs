@@ -71,7 +71,7 @@ namespace Infrastructure.Implementation.CLoudinary
             {
                 File = new FileDescription(pdffile.FileName, stream),
                 Folder = "Resume",
-                ResourceType = "raw" // explicitly tell Cloudinary it's a PDF/raw file
+
 
             };
 
