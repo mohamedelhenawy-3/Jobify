@@ -2,6 +2,7 @@
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Implementation.CLoudinary
@@ -56,5 +57,28 @@ namespace Infrastructure.Implementation.CLoudinary
             var deletionParams = new DeletionParams(publicId);
             await _cloudinary.DestroyAsync(deletionParams);
         }
+
+
+
+        public async Task<(string Url, string PublicId)> UploadPdfAsync(IFormFile pdffile)
+        {
+            if (pdffile == null || pdffile.Length == 0)
+                throw new Exception("No file provided or file is empty");
+
+            using var stream = pdffile.OpenReadStream();
+
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(pdffile.FileName, stream),
+                Folder = "Resume",
+                ResourceType = "raw" // explicitly tell Cloudinary it's a PDF/raw file
+
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            return (uploadResult.SecureUrl.AbsoluteUri.ToString(),uploadResult.PublicId); // return PDF URL
+        }
+
     }
 }

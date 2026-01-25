@@ -24,6 +24,9 @@ using Infrastructure.Implementation.CompanyService;
 using Infrastructure.Implementation.CLoudinary;
 using Application.Interfaces.Job;
 using Infrastructure.Implementation.JobService;
+using Application.Interfaces.JobSeeker;
+using Domain.Entities;
+using Infrastructure.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +60,8 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<JwtGenerator>();
 builder.Services.AddScoped<IEmployerService, EmployerService>();
 builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IJobSeekerService, JobSeekerService>();
+
 
 builder.Services.AddScoped<CloudinaryService>();
 

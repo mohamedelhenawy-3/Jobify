@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,8 @@ namespace Application.DTOs.JobSeeker
     public class UpdateMyProfile
     {
         public string? PhoneNumber { get; set; }
-        public string? ResumeUrl { get; set; }
         public string? Location { get; set; }
-        public ProfileImage? ProfileImage { get; set; }
+        public IFormFile? ProfileImage { get; set; }
 
     }
 }

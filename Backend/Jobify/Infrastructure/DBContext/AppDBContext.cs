@@ -30,6 +30,7 @@ namespace Infrastructure.DBContext
         public DbSet<JobSeeker> JobSeekers { get; set; }
         public DbSet<EmployerProfile> EmployerProfiles { get; set; }
         public DbSet<ProfileImage> ProfileImages { get; set; }
+        public DbSet<Pdf> Pdfs { get; set; }
 
         // =========================
         // Jobs & Applications
@@ -84,11 +85,15 @@ namespace Infrastructure.DBContext
                 entity.Property(js => js.Location)
                       .HasMaxLength(200);
 
-
                 entity.HasOne(js => js.User)
                       .WithOne(u => u.JobSeeker)
                       .HasForeignKey<JobSeeker>(js => js.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(js => js.Resume) // one-to-one Resume
+                      .WithOne(p => p.JobSeeker)
+                      .HasForeignKey<Pdf>(p => p.JobSeekerId) // ✅ FK is on Pdf
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             /* =========================
@@ -151,6 +156,26 @@ namespace Infrastructure.DBContext
                           .HasForeignKey<ProfileImage>(pi => pi.EmployerProfileId)
                           .OnDelete(DeleteBehavior.Restrict);
                 
+
+            });
+
+
+            //Pdf
+            builder.Entity<Pdf>(entity =>
+            {
+                entity.ToTable("Pdfs");
+
+                entity.HasKey(pi => pi.Id);
+
+                entity.Property(pi => pi.PdfUrl)
+                      .IsRequired()
+                      .HasMaxLength(500);
+
+                entity.Property(pi => pi.PublicId)
+                      .HasMaxLength(300);
+
+                entity.Property(pi => pi.CreatedAt)
+                      .HasDefaultValueSql("GETUTCDATE()");
 
             });
 

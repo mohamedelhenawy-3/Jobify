@@ -17,7 +17,7 @@ namespace Domain.Entities
         public string? Location { get; set; }
         public ProfileImage? ProfileImage { get; set; }
 
-     
+         public Pdf? Resume { get; set; }
         public ICollection<JobApplication>? Applications { get; set; }
 
 

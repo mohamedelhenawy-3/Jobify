@@ -22,6 +22,8 @@ namespace Jobify.Controllers
             _jobService = jobService;
         }
 
+        [HttpPost]
+
         public  async Task<IActionResult> CreateJob([FromBody] CreateJob createjob)
         {
             var result = await _jobService.CreateJob(createjob);

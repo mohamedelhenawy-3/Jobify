@@ -15,7 +15,7 @@ namespace Domain.Entities
 
         public DateTime CreatedAt { get; set; }
 
-        // Optional FK (ONLY ONE will be used)
+     
         public int? JobSeekerId { get; set; }
         public JobSeeker JobSeeker { get; set; }
 
