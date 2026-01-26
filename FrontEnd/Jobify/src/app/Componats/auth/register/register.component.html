@@ -9,58 +9,79 @@
     <!-- Switch Buttons -->
     <div class="switch">
       <button 
-        [class.active]="userType === 'jobseeker'"
-        (click)="switch('jobseeker')">
+        [class.active]="userType === 'JobSeeker'"
+        (click)="switch('JobSeeker')">
         Job Seeker
       </button>
 
       <button 
-        [class.active]="userType === 'employer'"
-        (click)="switch('employer')">
+        [class.active]="userType === 'Employer'"
+        (click)="switch('Employer')">
         Employer
       </button>
     </div>
 
     <!-- TITLE -->
-    <h3 *ngIf="userType === 'jobseeker'">Job Seeker Register</h3>
-    <h3 *ngIf="userType === 'employer'">Employer Register</h3>
+    <h3 *ngIf="userType === 'JobSeeker'">Job Seeker Register</h3>
+    <h3 *ngIf="userType === 'Employer'">Employer Register</h3>
 
-    <form>
-      <div class="registercard">
+ <form [formGroup]="registerForm" (ngSubmit)="submit()">
+  <div class="registercard">
 
-        <!-- COMMON FIELDS -->
-        <label>Full Name</label>
-        <input type="text" placeholder="Enter your full name">
+    <!-- Job Seeker -->
+    <label *ngIf="userType === 'JobSeeker'">Full Name</label>
+    <input
+      *ngIf="userType === 'JobSeeker'"
+      type="text"
+      formControlName="fullName"
+      placeholder="Enter your full name"
+    />
 
-        <label>Email</label>
-        <input type="email" placeholder="Enter your email">
+    <!-- Email -->
+    <label>Email</label>
+    <input
+      type="email"
+      formControlName="email"
+      placeholder="Enter your email"
+    />
+    <small *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+      Valid email is required
+    </small>
 
-        <label>Password</label>
-        <input type="password" placeholder="Enter password">
+    <!-- Password -->
+    <label>Password</label>
+    <input
+      type="password"
+      formControlName="password"
+      placeholder="Enter password"
+    />
 
-        <!-- JOB SEEKER FIELDS -->
-        <div class="role-section" *ngIf="userType === 'jobseeker'">
-          <label>Skills</label>
-          <input type="text" placeholder="e.g. Angular, .NET">
-        </div>
+    <!-- Employer Fields -->
+    <div *ngIf="userType === 'Employer'">
+      <label>Company Name</label>
+      <input
+        type="text"
+        formControlName="companyName"
+        placeholder="Company name"
+      />
 
-        <!-- EMPLOYER FIELDS -->
-        <div class="role-section" *ngIf="userType === 'employer'">
-          <label>Company Name</label>
-          <input type="text" placeholder="Company name">
+      <label>Company Website</label>
+      <input
+        type="text"
+        formControlName="companyWebsite"
+        placeholder="https://company.com"
+      />
+    </div>
 
-          <label>Company Website</label>
-          <input type="text" placeholder="https://company.com">
-        </div>
+    <div class="btn">
+      <button type="submit" [disabled]="loading">
+        Register as {{ userType }}
+      </button>
+    </div>
 
-        <div class="btn">
-          <button type="submit">
-            Register as {{ userType === 'employer' ? 'Employer' : 'Job Seeker' }}
-          </button>
-        </div>
+  </div>
+</form>
 
-      </div>
-    </form>
 
     <!-- Sign In Link -->
     <div class="signin-section">

@@ -30,6 +30,24 @@ using Infrastructure.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+
+builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularApp",
+    policy =>
+    {
+        policy.SetIsOriginAllowed(origin => true)
+      .AllowAnyHeader()
+      .AllowAnyMethod()
+      .AllowCredentials();
+
+    });
+
+            });
+
+
 // Add services to the container.
 // 1. Add DbContext
 builder.Services.AddDbContext<AppDBContext>(options =>
@@ -110,6 +128,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAngularApp"); // Use CORS middleware here, AFTER Build
 
 app.UseAuthentication();
 app.UseAuthorization();
