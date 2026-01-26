@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f4f6f9;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.Conatiner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.EmployerCard {
+  background: #fff;
+  width: 380px;
+  padding: 32px;
+  border-radius: 22px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+}
+
+.EmployerCard h3 {
+  text-align: center;
+  margin-bottom: 6px;
+  font-size: 24px;
+  color: #222;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.registercard {
+  display: flex;
+  flex-direction: column;
+}
+
+.registercard label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.registercard input {
+  padding: 11px 12px;
+  margin-bottom: 16px;
+  border-radius: 22px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+    border-color: #dcdfdd;
+
+}
+
+.registercard input:focus {
+  outline: none;
+  border-color: #afe4b7;
+}
+
+.options {
+  text-align: right;
+  margin-bottom: 18px;
+}
+
+.options a {
+  font-size: 13px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.options a:hover {
+  text-decoration: underline;
+}
+
+.btn button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius:22px;
+  background: #347c40;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn button:hover {
+  background: #347c40;}
+
+
+.signin-section {
+  margin-left: 4rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.signin-link {
+  margin-left: 0.1rem;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.signin-link:hover {
+  text-decoration: none;
+}

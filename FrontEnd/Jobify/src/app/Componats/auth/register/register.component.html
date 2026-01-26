@@ -1,0 +1,74 @@
+<div class="Conatiner">
+  <div class="EmployerCard">
+
+    <!-- Back button -->
+    <div class="back-btn" onclick="history.back()">
+      ← Back
+    </div>
+
+    <!-- Switch Buttons -->
+    <div class="switch">
+      <button 
+        [class.active]="userType === 'jobseeker'"
+        (click)="switch('jobseeker')">
+        Job Seeker
+      </button>
+
+      <button 
+        [class.active]="userType === 'employer'"
+        (click)="switch('employer')">
+        Employer
+      </button>
+    </div>
+
+    <!-- TITLE -->
+    <h3 *ngIf="userType === 'jobseeker'">Job Seeker Register</h3>
+    <h3 *ngIf="userType === 'employer'">Employer Register</h3>
+
+    <form>
+      <div class="registercard">
+
+        <!-- COMMON FIELDS -->
+        <label>Full Name</label>
+        <input type="text" placeholder="Enter your full name">
+
+        <label>Email</label>
+        <input type="email" placeholder="Enter your email">
+
+        <label>Password</label>
+        <input type="password" placeholder="Enter password">
+
+        <!-- JOB SEEKER FIELDS -->
+        <div class="role-section" *ngIf="userType === 'jobseeker'">
+          <label>Skills</label>
+          <input type="text" placeholder="e.g. Angular, .NET">
+        </div>
+
+        <!-- EMPLOYER FIELDS -->
+        <div class="role-section" *ngIf="userType === 'employer'">
+          <label>Company Name</label>
+          <input type="text" placeholder="Company name">
+
+          <label>Company Website</label>
+          <input type="text" placeholder="https://company.com">
+        </div>
+
+        <div class="btn">
+          <button type="submit">
+            Register as {{ userType === 'employer' ? 'Employer' : 'Job Seeker' }}
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- Sign In Link -->
+    <div class="signin-section">
+      <p>
+        Already have an account?
+        <a class="signin-link" routerLink="/login">Sign in</a>
+      </p>
+    </div>
+
+  </div>
+</div>

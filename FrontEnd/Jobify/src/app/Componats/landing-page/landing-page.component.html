@@ -11,7 +11,7 @@
     <!-- Job Seeker Card -->
 
 
-   <div class="card" (click)="navigateTo('job-seeker')">
+   <div class="card">
   <img
     src="assets/LandImag/programmer.png"
     class="card-icon"
@@ -23,10 +23,10 @@
     Find your dream job and apply with ease
   </p>
 
-    <a class="card-btn" href="#">Get Started</a>
+    <a class="card-btn"  routerLink="/register">Get Started</a>
 </div>
 
-<div class="card" (click)="navigateTo('employer')">
+<div class="card" >
   <img
     src="assets/LandImag/computer-worker.png"
     class="card-icon"
@@ -34,11 +34,11 @@
   />
 
   <h2>I'm an Employer</h2>
-  <p>Post jobs and manage applicants efficiently
-    Post jobs and manage applicants efficiently
+    <p>Find your dream job and apply with ease
+    Find your dream job and apply with ease
   </p>
 
-  <a class="card-btn" href="#">Get Started</a>
+  <a class="card-btn"  routerLink="/register">Get Started</a>
   </div>   
   
  </div>
@@ -46,7 +46,7 @@
 <div class="signin-section">
   <p>
     Already have an account?
-    <a class="signin-link" (click)="navigateTo('login')">Sign in</a>
+    <a class="signin-link" routerLink="/login">Sign in</a>
   </p>
 </div>
 </div>
