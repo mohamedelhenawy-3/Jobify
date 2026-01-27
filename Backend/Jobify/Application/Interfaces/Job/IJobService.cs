@@ -1,4 +1,5 @@
-﻿using Application.DTOs.JobPost;
+﻿using Application.DTOs.industry;
+using Application.DTOs.JobPost;
 using Application.DTOs.SuccefullOp;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
@@ -19,6 +20,10 @@ namespace Application.Interfaces.Job
         Task<IEnumerable<JobDto>> AllJobs();
         Task<SuccessResponse> UpdateJob(UpdateJobDto updatejob, int id);
         Task<SuccessResponse> DeleteJob(int Id);
+
+        Task<IndustryDto> JobWithIndustry(int id);
+        Task<IEnumerable<IndustryDto>> Industries();
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Auth.AuthResponse;
+using Application.DTOs.industry;
 using Application.DTOs.JobPost;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Job;
@@ -170,6 +171,43 @@ namespace Infrastructure.Implementation.JobService
                   .ToListAsync();
 
             return jobs;
+        }
+
+        public async Task<IndustryDto?> JobWithIndustry(int id)
+        {
+            var result = await _db.JobPosts
+                .Where(j => j.IndustryId == id)  // filter by industry id
+                .GroupBy(j => j.IndustryId)
+                .Select(g => new IndustryDto
+                {
+                    industryName = _db.JobIndustries
+                                       .Where(i => i.Id == g.Key)
+                                       .Select(i => i.IndustryName)
+                                       .FirstOrDefault(),
+                    industrycount = g.Count()
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
+        }
+
+        public async  Task<IEnumerable<IndustryDto>> Industries()
+        {
+            var result = await _db.JobIndustries
+                    .GroupJoin(
+                        _db.JobPosts,
+                        industry => industry.Id,       // Key from Industry
+                        job => job.IndustryId,         // Key from JobPost
+                        (industry, jobs) => new IndustryDto
+                        {
+                            industryName = industry.IndustryName,
+                            industrycount = jobs.Count()  // Count jobs for this industry
+                        }
+                    )
+                    .ToListAsync();
+
+            return result; ;
+
         }
     }
 }

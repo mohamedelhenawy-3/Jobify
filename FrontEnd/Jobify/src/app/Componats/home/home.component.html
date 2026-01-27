@@ -13,8 +13,15 @@
   </div>
 </div>
 
-<section class="Top-Categories">
- <div>
-  His Categroies
- </div>
+<section class="top-categories">
+  <h2>Top Industries</h2>
+  <div class="industries-grid">
+    <div *ngFor="let ind of indstries" class="industry-card">
+      <!-- Use image instead of Font Awesome -->
+      <img [src]="getIcon(ind.industryName)" class="industry-icon" alt="{{ind.industryName}} icon">
+      <h4>{{ ind.industryName }}</h4>
+      <p>{{ ind.industrycount }} Jobs</p>
+    </div>
+  </div>
 </section>
+

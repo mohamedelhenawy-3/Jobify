@@ -30,8 +30,23 @@ namespace Jobify.Controllers
             return Ok(result);
 
         }
-    
-      
+        [HttpGet("JobsIndustry/{id:int}")]
+        public async Task<IActionResult> IndustryWithJobs(int id )
+        {
+            var result = await _jobService.JobWithIndustry(id);
+            return Ok(result);
+
+        }
+        [HttpGet("GetAllIndustriesWithJobCount")]
+        public async Task<IActionResult> IndustriesWithJobs()
+        {
+            var result = await _jobService.Industries();
+            return Ok(result);
+
+        }
+
+
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetJobById(int id)
         {

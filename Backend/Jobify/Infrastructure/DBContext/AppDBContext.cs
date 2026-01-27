@@ -38,6 +38,7 @@ namespace Infrastructure.DBContext
         public DbSet<JobPost> JobPosts { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<JobApplicationNote> JobApplicationNotes { get; set; }
+        public DbSet<JobIndustry> JobIndustries { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
