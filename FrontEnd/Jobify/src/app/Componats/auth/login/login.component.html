@@ -3,13 +3,26 @@
     <h3>Welcome Back</h3>
     <p class="subtitle">Login to continue to Jobify</p>
 
-    <form>
+    <form [formGroup]="loginform" (ngSubmit)="login()">
       <div class="registercard">
-        <label>Email</label>
-        <input type="email" placeholder="Enter your email">
+      <label>Email</label>
+    <input
+      type="email"
+      formControlName="email"
+      placeholder="Enter your email"
+    />
+    <small *ngIf="loginform.get('email')?.touched && loginform.get('email')?.invalid">
+      Valid email is required
+    </small>
 
-        <label>Password</label>
-        <input type="password" placeholder="Enter your password">
+    <!-- Password -->
+    <label>Password</label>
+    <input
+      type="password"
+      formControlName="password"
+      placeholder="Enter password"
+    />
+
 
         <div class="options">
           <a href="#">Forgot password?</a>
