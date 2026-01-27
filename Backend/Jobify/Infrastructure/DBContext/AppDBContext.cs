@@ -356,7 +356,30 @@ namespace Infrastructure.DBContext
     new JobIndustry { Id = 7, IndustryName = "Retail" },
     new JobIndustry { Id = 8, IndustryName = "Manufacturing" },
     new JobIndustry { Id = 9, IndustryName = "Transportation" },
-    new JobIndustry { Id = 10, IndustryName = "Hospitality" }
+    new JobIndustry { Id = 10, IndustryName = "Hospitality" },
+
+
+    new JobIndustry { Id = 11, IndustryName = "Telecommunications" },
+    new JobIndustry { Id = 12, IndustryName = "Real Estate" },
+    new JobIndustry { Id = 13, IndustryName = "Banking" },
+    new JobIndustry { Id = 14, IndustryName = "Insurance" },
+    new JobIndustry { Id = 15, IndustryName = "Energy & Utilities" },
+    new JobIndustry { Id = 16, IndustryName = "Oil & Gas" },
+    new JobIndustry { Id = 17, IndustryName = "Pharmaceuticals" },
+    new JobIndustry { Id = 18, IndustryName = "Biotechnology" },
+    new JobIndustry { Id = 19, IndustryName = "Logistics & Supply Chain" },
+    new JobIndustry { Id = 20, IndustryName = "Aviation" },
+
+    new JobIndustry { Id = 21, IndustryName = "Automotive" },
+    new JobIndustry { Id = 22, IndustryName = "E-Commerce" },
+    new JobIndustry { Id = 23, IndustryName = "Customer Support" },
+    new JobIndustry { Id = 24, IndustryName = "Human Resources" },
+    new JobIndustry { Id = 25, IndustryName = "Legal Services" },
+    new JobIndustry { Id = 26, IndustryName = "Government & Public Sector" },
+    new JobIndustry { Id = 27, IndustryName = "Defense & Military" },
+    new JobIndustry { Id = 28, IndustryName = "Media & Entertainment" },
+    new JobIndustry { Id = 29, IndustryName = "Advertising" },
+    new JobIndustry { Id = 30, IndustryName = "Public Relations" }
 );
             builder.Entity<EmploymentType>().HasData(
     new EmploymentType { Id = 1, TypeName = "Full-time" },

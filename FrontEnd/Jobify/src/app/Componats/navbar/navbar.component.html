@@ -1,0 +1,40 @@
+<nav class="navbar">
+  <!-- Logo -->
+  <div class="brand">
+    <img src="assets/Logo/Jobify.png" alt="Jobify Logo" class="logo" />
+    <span class="brand-name">Jobify</span>
+  </div>
+
+  <!-- Menu -->
+  <ul class="menu">
+    <li class="item"><a routerLink="/home">Home</a></li>
+      <ng-container *ngIf="isLoggedIn">
+    <li class="item"><a href="#">Browse</a></li>
+    <li class="item"><a href="#">Jobs</a></li>
+    <li class="item"><a href="#">Blog</a></li>
+       </ng-container>
+  </ul>
+
+  <!-- Right Side Icons -->
+    <ul class="right-actions">
+        <!-- Logged in -->
+      <ng-container *ngIf="isLoggedIn">
+      <img
+    src="assets/LandImag/computer-worker.png"
+    class="card-icon"
+    alt="Employer"
+  />
+    
+
+        <li><a class="logout-link" (click)="logout()">Logout</a></li>
+      </ng-container>
+
+      <!-- Not logged in -->
+      <ng-container *ngIf="!isLoggedIn">
+        <li><a routerLink="/login">Login</a></li>
+        <li><a routerLink="/register">Register</a></li>
+      </ng-container>
+
+    </ul>
+  
+</nav>
