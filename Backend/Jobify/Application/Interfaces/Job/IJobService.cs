@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.industry;
 using Application.DTOs.JobPost;
+using Application.DTOs.Pagenation;
 using Application.DTOs.SuccefullOp;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
@@ -25,7 +26,7 @@ namespace Application.Interfaces.Job
         Task<IEnumerable<IndustryDto>> Industries();
 
 
-        Task<IEnumerable<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto);
+       Task<PageDto<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto, int pagesize = 10, int pagenumber = 1);
 
 
     }

@@ -1,0 +1,21 @@
+.job-page {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Left sidebar (fixed width) */
+
+
+/* Right content (fills remaining space) */
+.right {
+  flex: 1;               /* ❗ take all remaining width */
+  min-width: 0;          /* ❗ fixes overflow issues */
+}
+.left {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 70px; /* height of navbar */
+  height: fit-content;
+}

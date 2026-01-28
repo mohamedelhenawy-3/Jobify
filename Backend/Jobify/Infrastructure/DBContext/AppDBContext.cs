@@ -40,6 +40,7 @@ namespace Infrastructure.DBContext
         public DbSet<JobApplicationNote> JobApplicationNotes { get; set; }
         public DbSet<JobIndustry> JobIndustries { get; set; }
         public DbSet<WorkMode> WorkModes { get; set; }
+        public DbSet<EmploymentType> EmploymentTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -5,6 +5,8 @@ import { JobseekerregisterComponent } from './Componats/auth/jobseeker/jobseeker
 import { LoginComponent } from './Componats/auth/login/login.component';
 import { RegisterComponent } from './Componats/auth/register/register.component';
 import { HomeComponent } from './Componats/home/home.component';
+import { JobListPageComponentComponent } from './Componats/JobComponents/job-list-page-component/job-list-page-component.component';
+import { JobspagesComponent } from './Componats/JobComponents/jobspages/jobspages.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -13,5 +15,6 @@ export const routes: Routes = [
     { path: 'register', component: RegisterComponent },
     { path: 'login', component: LoginComponent },
     { path: 'home', component: HomeComponent },
+       { path: 'findjob', component: JobspagesComponent },
 
 ];

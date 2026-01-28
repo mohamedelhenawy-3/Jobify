@@ -227,14 +227,15 @@ namespace Infrastructure.Implementation.JobService
             if (!string.IsNullOrEmpty(jobfiltereddto.Keyword))
                 query = query.Where(j => j.Title.Contains(jobfiltereddto.Keyword));
 
-            if (jobfiltereddto.IndustryId.HasValue)
-                query = query.Where(x => x.IndustryId == jobfiltereddto.IndustryId);
+            if (jobfiltereddto.IndustryIds != null && jobfiltereddto.IndustryIds.Any())
+                query = query.Where(x => jobfiltereddto.IndustryIds.Contains(x.IndustryId));
 
-            if (jobfiltereddto.EmploymentTypeId.HasValue)
-                query = query.Where(x => x.EmploymentTypeId == jobfiltereddto.EmploymentTypeId);
+            if (jobfiltereddto.EmploymentTypeIds != null && jobfiltereddto.EmploymentTypeIds.Any())
+                query = query.Where(x => jobfiltereddto.EmploymentTypeIds.Contains(x.EmploymentTypeId));
 
-            if (jobfiltereddto.WorkModeId.HasValue)
-                query = query.Where(x => x.WorkModeId == jobfiltereddto.WorkModeId);
+            if (jobfiltereddto.WorkModeIds != null && jobfiltereddto.WorkModeIds.Any())
+                query = query.Where(x => jobfiltereddto.WorkModeIds.Contains(x.WorkModeId));
+
 
             if (jobfiltereddto.PostedWithinDays.HasValue)
             {
