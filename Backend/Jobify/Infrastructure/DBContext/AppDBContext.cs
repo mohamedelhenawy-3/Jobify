@@ -39,6 +39,8 @@ namespace Infrastructure.DBContext
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<JobApplicationNote> JobApplicationNotes { get; set; }
         public DbSet<JobIndustry> JobIndustries { get; set; }
+        public DbSet<WorkMode> WorkModes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -282,6 +284,10 @@ namespace Infrastructure.DBContext
                       .WithMany()
                       .HasForeignKey(j => j.StatusId);
 
+                entity.HasOne(j => j.WorkMode)
+                      .WithMany()
+                      .HasForeignKey(j => j.WorkModeId);
+
                 entity.HasOne(j => j.CreatedByUser)
                       .WithMany()
                       .HasForeignKey(j => j.CreatedByUserId)
@@ -357,43 +363,28 @@ namespace Infrastructure.DBContext
     new JobIndustry { Id = 7, IndustryName = "Retail" },
     new JobIndustry { Id = 8, IndustryName = "Manufacturing" },
     new JobIndustry { Id = 9, IndustryName = "Transportation" },
-    new JobIndustry { Id = 10, IndustryName = "Hospitality" },
+    new JobIndustry { Id = 10, IndustryName = "Hospitality" }
 
 
-    new JobIndustry { Id = 11, IndustryName = "Telecommunications" },
-    new JobIndustry { Id = 12, IndustryName = "Real Estate" },
-    new JobIndustry { Id = 13, IndustryName = "Banking" },
-    new JobIndustry { Id = 14, IndustryName = "Insurance" },
-    new JobIndustry { Id = 15, IndustryName = "Energy & Utilities" },
-    new JobIndustry { Id = 16, IndustryName = "Oil & Gas" },
-    new JobIndustry { Id = 17, IndustryName = "Pharmaceuticals" },
-    new JobIndustry { Id = 18, IndustryName = "Biotechnology" },
-    new JobIndustry { Id = 19, IndustryName = "Logistics & Supply Chain" },
-    new JobIndustry { Id = 20, IndustryName = "Aviation" },
-
-    new JobIndustry { Id = 21, IndustryName = "Automotive" },
-    new JobIndustry { Id = 22, IndustryName = "E-Commerce" },
-    new JobIndustry { Id = 23, IndustryName = "Customer Support" },
-    new JobIndustry { Id = 24, IndustryName = "Human Resources" },
-    new JobIndustry { Id = 25, IndustryName = "Legal Services" },
-    new JobIndustry { Id = 26, IndustryName = "Government & Public Sector" },
-    new JobIndustry { Id = 27, IndustryName = "Defense & Military" },
-    new JobIndustry { Id = 28, IndustryName = "Media & Entertainment" },
-    new JobIndustry { Id = 29, IndustryName = "Advertising" },
-    new JobIndustry { Id = 30, IndustryName = "Public Relations" }
+   
 );
             builder.Entity<EmploymentType>().HasData(
     new EmploymentType { Id = 1, TypeName = "Full-time" },
     new EmploymentType { Id = 2, TypeName = "Part-time" },
     new EmploymentType { Id = 3, TypeName = "Contract" },
-    new EmploymentType { Id = 4, TypeName = "Internship" },
-    new EmploymentType { Id = 5, TypeName = "Remote" }
+    new EmploymentType { Id = 4, TypeName = "Internship" }
+ 
 );
             builder.Entity<JobStatus>().HasData(
     new JobStatus { Id = 1, StatusName = "Draft" },
     new JobStatus { Id = 2, StatusName = "Published" },
     new JobStatus { Id = 3, StatusName = "Closed" }
 );
+            builder.Entity<WorkMode>().HasData(
+       new WorkMode { Id = 1, Name = "OnSite" },
+       new WorkMode { Id = 2, Name = "Remote" },
+       new WorkMode { Id = 3, Name = "Hybrid" }
+   );
 
 
         }

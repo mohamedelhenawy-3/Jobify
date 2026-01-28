@@ -51,6 +51,7 @@ namespace Infrastructure.Implementation.JobService
                 EmploymentTypeId = createjobdto.EmploymentTypeId,
                 StatusId = createjobdto.StatusId,
                 EmployerProfileId = employerProfile.Id,
+                WorkModeId=createjobdto.WorkModeId,
                 CreatedByUserId = user,
                 CreatedAt = DateTime.UtcNow
             };
@@ -79,6 +80,7 @@ namespace Infrastructure.Implementation.JobService
                 StatusId = job.StatusId,
                 IndustryId = job.IndustryId,
                 EmploymentTypeId = job.EmploymentTypeId
+                ,WorkModeId=job.WorkModeId
             };
             
         }
@@ -97,6 +99,7 @@ namespace Infrastructure.Implementation.JobService
                     IndustryId = j.IndustryId,
                     EmploymentTypeId = j.EmploymentTypeId,
                     StatusId = j.StatusId
+                    ,WorkModeId=j.WorkModeId
                 })
                 .ToListAsync();
         }
@@ -166,7 +169,8 @@ namespace Infrastructure.Implementation.JobService
                       MaxSalary = j.MaxSalary,
                       IndustryId = j.IndustryId,
                       EmploymentTypeId = j.EmploymentTypeId,
-                      StatusId = j.StatusId
+                      StatusId = j.StatusId,
+                      WorkModeId=j.WorkModeId
                   })
                   .ToListAsync();
 
@@ -208,6 +212,43 @@ namespace Infrastructure.Implementation.JobService
 
             return result; ;
 
+        }
+
+        public async Task<IEnumerable<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto)
+        {
+            var query =_db.JobPosts.AsQueryable();
+
+            if (!string.IsNullOrEmpty(jobfiltereddto.Keyword))
+            {
+                query = query.Where(j => j.Title.Contains(jobfiltereddto.Keyword));
+            }
+            if (jobfiltereddto.IndustryId.HasValue)
+            {
+                query = query.Where(x => x.IndustryId == jobfiltereddto.IndustryId);
+            }
+            if (jobfiltereddto.EmploymentTypeId.HasValue)
+            {
+                query = query.Where(x => x.EmploymentTypeId == jobfiltereddto.EmploymentTypeId);
+            }
+            if (jobfiltereddto.WorkModeId.HasValue)
+            {
+                query = query.Where(x => x.WorkModeId == jobfiltereddto.WorkModeId);
+            }
+            if (jobfiltereddto.PostedWithinDays.HasValue)
+            {
+                var date = DateTime.UtcNow.AddDays(-jobfiltereddto.PostedWithinDays.Value);
+                query = query.Where(j => j.CreatedAt >= date);
+            }
+
+            return await query
+              .Select(j => new JobDto { Id = j.Id, Title = j.Title,
+                  IndustryId=j.IndustryId,
+                  EmploymentTypeId=j.EmploymentTypeId,
+                  Description=j.Description,
+              MaxSalary=j.MaxSalary,
+              MinSalary=j.MinSalary,
+              Location=j.Location})
+              .ToListAsync();  
         }
     }
 }

@@ -25,5 +25,8 @@ namespace Application.Interfaces.Job
         Task<IEnumerable<IndustryDto>> Industries();
 
 
+        Task<IEnumerable<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto);
+
+
     }
 }

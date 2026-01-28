@@ -33,7 +33,8 @@ namespace Domain.Entities
 
         public string CreatedByUserId { get; set; }
         public AppUser CreatedByUser { get; set; }
-
+        public int WorkModeId { get; set; } = 1;
+        public WorkMode WorkMode { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
 
         public ICollection<JobApplication> Applications { get; set; }
