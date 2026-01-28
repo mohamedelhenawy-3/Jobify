@@ -46,12 +46,12 @@ namespace Jobify.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchJobs([FromQuery] JobFilterDto filters)
+        public async Task<IActionResult> SearchJobs([FromQuery] JobFilterDto filters,  int pageSize = 10, int page = 1)
         {
             try
             {
-                var jobs = await _jobService.FilteredJobs(filters);
-                return Ok(jobs);
+                var result = await  _jobService.FilteredJobs(filters, pageSize, page );
+                return Ok(result);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Auth.AuthResponse;
 using Application.DTOs.industry;
 using Application.DTOs.JobPost;
+using Application.DTOs.Pagenation;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Job;
 using Domain.Entities;
@@ -16,11 +17,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Implementation.JobService
 {
-    public class JobService :IJobService
+    public class JobService : IJobService
     {
         private readonly AppDBContext _db;
         private readonly IHttpContextAccessor _httpaccessor;
-        public JobService(AppDBContext db,IHttpContextAccessor http)
+        public JobService(AppDBContext db, IHttpContextAccessor http)
         {
             _db = db;
             _httpaccessor = http;
@@ -33,7 +34,7 @@ namespace Infrastructure.Implementation.JobService
         }
 
 
-        public async   Task<SuccessResponse> CreateJob(CreateJob createjobdto)
+        public async Task<SuccessResponse> CreateJob(CreateJob createjobdto)
         {
             var user = GetCurrentUserId();
             if (user == null) throw new Exception("User Null");
@@ -51,7 +52,7 @@ namespace Infrastructure.Implementation.JobService
                 EmploymentTypeId = createjobdto.EmploymentTypeId,
                 StatusId = createjobdto.StatusId,
                 EmployerProfileId = employerProfile.Id,
-                WorkModeId=createjobdto.WorkModeId,
+                WorkModeId = createjobdto.WorkModeId,
                 CreatedByUserId = user,
                 CreatedAt = DateTime.UtcNow
             };
@@ -67,7 +68,7 @@ namespace Infrastructure.Implementation.JobService
 
         public async Task<JobDto> GetJobById(int id)
         {
-            var job =  _db.JobPosts.FirstOrDefault(x => x.Id == id);
+            var job = _db.JobPosts.FirstOrDefault(x => x.Id == id);
             if (job == null) return null;
             return new JobDto
             {
@@ -80,9 +81,10 @@ namespace Infrastructure.Implementation.JobService
                 StatusId = job.StatusId,
                 IndustryId = job.IndustryId,
                 EmploymentTypeId = job.EmploymentTypeId
-                ,WorkModeId=job.WorkModeId
+                ,
+                WorkModeId = job.WorkModeId
             };
-            
+
         }
 
         public async Task<IEnumerable<JobDto>> AllJobs()
@@ -99,7 +101,8 @@ namespace Infrastructure.Implementation.JobService
                     IndustryId = j.IndustryId,
                     EmploymentTypeId = j.EmploymentTypeId,
                     StatusId = j.StatusId
-                    ,WorkModeId=j.WorkModeId
+                    ,
+                    WorkModeId = j.WorkModeId
                 })
                 .ToListAsync();
         }
@@ -125,7 +128,7 @@ namespace Infrastructure.Implementation.JobService
             job.EmploymentTypeId = updatejob.EmploymentTypeId;
 
 
-           await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             return new SuccessResponse
             {
                 Message = "Update Succefully"
@@ -170,7 +173,7 @@ namespace Infrastructure.Implementation.JobService
                       IndustryId = j.IndustryId,
                       EmploymentTypeId = j.EmploymentTypeId,
                       StatusId = j.StatusId,
-                      WorkModeId=j.WorkModeId
+                      WorkModeId = j.WorkModeId
                   })
                   .ToListAsync();
 
@@ -195,7 +198,7 @@ namespace Infrastructure.Implementation.JobService
             return result;
         }
 
-        public async  Task<IEnumerable<IndustryDto>> Industries()
+        public async Task<IEnumerable<IndustryDto>> Industries()
         {
             var result = await _db.JobIndustries
                     .GroupJoin(
@@ -214,41 +217,58 @@ namespace Infrastructure.Implementation.JobService
 
         }
 
-        public async Task<IEnumerable<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto)
+        public async Task<PageDto<JobDto>> FilteredJobs(
+           JobFilterDto jobfiltereddto,
+           int pagesize = 10,
+           int pagenumber = 1)
         {
-            var query =_db.JobPosts.AsQueryable();
+            var query = _db.JobPosts.AsQueryable();
 
             if (!string.IsNullOrEmpty(jobfiltereddto.Keyword))
-            {
                 query = query.Where(j => j.Title.Contains(jobfiltereddto.Keyword));
-            }
+
             if (jobfiltereddto.IndustryId.HasValue)
-            {
                 query = query.Where(x => x.IndustryId == jobfiltereddto.IndustryId);
-            }
+
             if (jobfiltereddto.EmploymentTypeId.HasValue)
-            {
                 query = query.Where(x => x.EmploymentTypeId == jobfiltereddto.EmploymentTypeId);
-            }
+
             if (jobfiltereddto.WorkModeId.HasValue)
-            {
                 query = query.Where(x => x.WorkModeId == jobfiltereddto.WorkModeId);
-            }
+
             if (jobfiltereddto.PostedWithinDays.HasValue)
             {
                 var date = DateTime.UtcNow.AddDays(-jobfiltereddto.PostedWithinDays.Value);
                 query = query.Where(j => j.CreatedAt >= date);
             }
 
-            return await query
-              .Select(j => new JobDto { Id = j.Id, Title = j.Title,
-                  IndustryId=j.IndustryId,
-                  EmploymentTypeId=j.EmploymentTypeId,
-                  Description=j.Description,
-              MaxSalary=j.MaxSalary,
-              MinSalary=j.MinSalary,
-              Location=j.Location})
-              .ToListAsync();  
+            var totalJobs = await query.CountAsync();
+
+            var jobs = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((pagenumber - 1) * pagesize)
+                .Take(pagesize)
+                .Select(j => new JobDto
+                {
+                    Id = j.Id,
+                    Title = j.Title,
+                    IndustryId = j.IndustryId,
+                    EmploymentTypeId = j.EmploymentTypeId,
+                    Description = j.Description,
+                    MaxSalary = j.MaxSalary,
+                    MinSalary = j.MinSalary,
+                    Location = j.Location
+                })
+                .ToListAsync();
+
+            return new PageDto<JobDto>
+            {
+                currentpage = pagenumber,
+                pagesize = pagesize,
+                totaljobs = totalJobs,
+                items = jobs
+            };
         }
+
     }
 }
