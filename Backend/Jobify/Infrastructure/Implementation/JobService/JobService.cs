@@ -258,7 +258,8 @@ namespace Infrastructure.Implementation.JobService
                     Description = j.Description,
                     MaxSalary = j.MaxSalary,
                     MinSalary = j.MinSalary,
-                    Location = j.Location
+                    Location = j.Location,
+                    WorkModeId=j.WorkModeId
                 })
                 .ToListAsync();
 

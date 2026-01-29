@@ -22,7 +22,7 @@ namespace Jobify.Controllers
             _jobService = jobService;
         }
 
-        [HttpPost]
+        [HttpPost("CreateJob")]
 
         public  async Task<IActionResult> CreateJob([FromBody] CreateJob createjob)
         {

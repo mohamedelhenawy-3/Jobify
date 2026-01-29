@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { industrieswithjobcount } from '../../Models/Industries/industrieswithjobcount';
 import { Observable } from 'rxjs';
 import { JobResponse } from '../../Models/Job/jobres';
+import { createjob } from '../../Models/Job/createjob';
 
 @Injectable({
   providedIn: 'root'
@@ -43,4 +44,8 @@ private apiUrl = 'https://localhost:44309/api/Job';
 
     return this.HttpClient.get<JobResponse>(`${this.apiUrl}/search`, { params });
   }
+  //    Createjob(data: createjob):Observable<>{
+  //   return this.HttpClient.post<>(`https://localhost:44309/api/Job/CreateJob`)
+  // }
+  
 }

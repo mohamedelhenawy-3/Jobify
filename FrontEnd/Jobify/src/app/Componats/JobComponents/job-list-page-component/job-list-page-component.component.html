@@ -1,32 +1,66 @@
 <div class="job-list">
   <div *ngFor="let job of jobs" class="job-card">
-    
+
+    <!-- HEADER -->
     <div class="job-header">
-      <h3 class="job-title">{{ job.title }}</h3>
-      <span class="job-location">{{ job.location }}</span>
+
+      <!-- ICON -->
+      <div class="job-icon">
+        <i [class]="getJobIcon(job)"></i>
+      </div>
+
+      <!-- TITLE + LOCATION -->
+      <div class="job-info">
+        <h3 class="job-title">{{ job.title }}</h3>
+        <span class="job-location">
+          <i class="fas fa-map-marker-alt"></i>
+          {{ job.location }}
+        </span>
+      </div>
+
     </div>
+<!--  -->
 
-    <p class="job-description">
-      {{ job.description }}
-    </p>
+   <!-- META -->
+<div class="job-meta">
 
-    <div class="job-meta">
-      <span>💼 Industry: {{ job.industryId }}</span>
-      <span>📄 Type: {{ job.employmentTypeId }}</span>
-    </div>
+  <span class="badge industry">
+    <i class="fas fa-industry"></i>
+    {{ getIndustryName(job.industryId) }}
+  </span>
 
+  <span
+    class="badge"
+    [ngClass]="getWorkModeClass(job.workModeId)">
+    {{ getWorkModeName(job.workModeId) }}
+  </span>
+
+  <span
+    class="badge"
+    [ngClass]="getEmploymentTypeClass(job.employmentTypeId)">
+    {{ getEmploymentTypeName(job.employmentTypeId) }}
+  </span>
+
+</div>
+
+
+    <!-- FOOTER -->
     <div class="job-footer">
       <span class="salary">
+        <i class="fas fa-money-bill-wave"></i>
         {{ job.minSalary | number }} - {{ job.maxSalary | number }} EGP
       </span>
 
-      <button class="apply-btn">Apply</button>
+      <button class="apply-btn">
+        <i class="fas fa-paper-plane"></i>
+        Apply
+      </button>
     </div>
 
   </div>
 </div>
 
-<!-- Pagination -->
+<!-- PAGINATION -->
 <div class="pagination">
   <button (click)="changePage(page - 1)" [disabled]="page === 1">
     Prev
