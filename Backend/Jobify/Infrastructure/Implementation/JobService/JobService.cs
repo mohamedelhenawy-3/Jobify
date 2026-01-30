@@ -66,11 +66,19 @@ namespace Infrastructure.Implementation.JobService
 
         }
 
-        public async Task<JobDto> GetJobById(int id)
+        public async Task<ReturnedJobDto> GetJobById(int id)
         {
-            var job = _db.JobPosts.FirstOrDefault(x => x.Id == id);
-            if (job == null) return null;
-            return new JobDto
+            var job = await _db.JobPosts
+             .Include(j => j.WorkMode)
+             .Include(j => j.Industry)
+             .Include(j => j.EmploymentType)
+             .Include(j => j.Status)
+             .FirstOrDefaultAsync(j => j.Id == id);
+
+            if (job == null)
+                throw new KeyNotFoundException("Job not found");
+
+            return new ReturnedJobDto
             {
                 Id = job.Id,
                 Title = job.Title,
@@ -78,14 +86,14 @@ namespace Infrastructure.Implementation.JobService
                 Location = job.Location,
                 MinSalary = job.MinSalary,
                 MaxSalary = job.MaxSalary,
-                StatusId = job.StatusId,
-                IndustryId = job.IndustryId,
-                EmploymentTypeId = job.EmploymentTypeId
-                ,
-                WorkModeId = job.WorkModeId
-            };
 
+                WorkMode = job.WorkMode.Name,
+                Industry = job.Industry.IndustryName,
+                EmploymentType = job.EmploymentType.TypeName,
+                Status = job.Status.StatusName
+            };
         }
+        
 
         public async Task<IEnumerable<JobDto>> AllJobs()
         {
@@ -158,13 +166,13 @@ namespace Infrastructure.Implementation.JobService
 
         }
 
-        public async Task<IEnumerable<JobDto>> AllJobsOfEmployer()
+        public async Task<IEnumerable<ReturnedJobDto>> AllJobsOfEmployer()
         {
             var userid = GetCurrentUserId();
             var employer =  _db.EmployerProfiles.FirstOrDefault(x => x.UserId == userid);
             var jobs = await _db.JobPosts
                   .Where(j => j.EmployerProfileId == employer.Id)
-                  .Select(j => new JobDto
+                  .Select(j => new ReturnedJobDto
                   {
                       Id = j.Id,
                       Title = j.Title,
@@ -172,10 +180,10 @@ namespace Infrastructure.Implementation.JobService
                       Location = j.Location,
                       MinSalary = j.MinSalary,
                       MaxSalary = j.MaxSalary,
-                      IndustryId = j.IndustryId,
-                      EmploymentTypeId = j.EmploymentTypeId,
-                      StatusId = j.StatusId,
-                      WorkModeId = j.WorkModeId
+                      Industry = j.Industry.IndustryName,
+                      EmploymentType = j.EmploymentType.TypeName,
+                      Status = j.Status.StatusName,
+                      WorkMode = j.WorkMode.Name
                   })
                   .ToListAsync();
 

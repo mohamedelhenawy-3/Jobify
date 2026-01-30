@@ -1,0 +1,137 @@
+/* Page Layout */
+.job-page {
+  max-width: 1300px;
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 2rem;
+  font-family: Arial, sans-serif;
+}
+
+/* LEFT MAIN */
+.job-main {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* HEADER */
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.job-title h1 {
+  font-size: 2.3rem;
+  margin: 0;
+}
+
+.icon {
+  font-size: 2.5rem;
+}
+
+/* STATUS */
+.job-status {
+  padding: 0.4rem 0.9rem;
+  border-radius: 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.job-status.open {
+  background: #d4edda;
+  color: #155724;
+}
+
+.job-status.closed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.job-location {
+  margin-top: 0.8rem;
+  color: gray;
+  font-size: 1.1rem;
+}
+
+/* DESCRIPTION */
+.job-description {
+  margin-top: 2rem;
+}
+
+.job-description h2 {
+  margin-bottom: 1rem;
+}
+
+.job-description p {
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+/* ACTION */
+.job-actions {
+  margin-top: 2.5rem;
+}
+
+.apply-btn {
+  background: #007bff;
+  color: #fff;
+  padding: 0.8rem 2.5rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.apply-btn:hover {
+  background: #0056b3;
+}
+
+/* RIGHT SIDEBAR */
+.job-sidebar {
+  background: #f9fafb;
+  padding: 1.8rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  height: fit-content;
+}
+
+.job-sidebar h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+/* SIDEBAR ITEMS */
+.sidebar-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+}
+
+.sidebar-item span {
+  color: gray;
+  margin-bottom: 0.3rem;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  margin-top: 5rem;
+  font-size: 1.5rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .job-page {
+    grid-template-columns: 1fr;
+  }
+}

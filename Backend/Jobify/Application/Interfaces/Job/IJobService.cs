@@ -15,8 +15,8 @@ namespace Application.Interfaces.Job
     public interface IJobService
     {
         Task <SuccessResponse> CreateJob(CreateJob createjobdto);
-        Task<JobDto> GetJobById(int id);
-        Task<IEnumerable<JobDto>> AllJobsOfEmployer();
+        Task<ReturnedJobDto> GetJobById(int id);
+        Task<IEnumerable<ReturnedJobDto>> AllJobsOfEmployer();
 
         Task<IEnumerable<JobDto>> AllJobs();
         Task<SuccessResponse> UpdateJob(UpdateJobDto updatejob, int id);

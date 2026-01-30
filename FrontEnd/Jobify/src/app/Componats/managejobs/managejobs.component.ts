@@ -3,6 +3,8 @@ import { Job } from '../../Models/Job/job';
 import { JobService } from '../../Services/JobService/job.service';
 import { CommonModule } from '@angular/common';
 import { LookupService } from '../../Services/LookUpService/lookup.service';
+import { Router } from '@angular/router';
+import { jobdetails } from '../../Models/Job/dteailsjob';
 
 @Component({
   selector: 'app-managejobs',
@@ -12,11 +14,11 @@ import { LookupService } from '../../Services/LookUpService/lookup.service';
   styleUrl: './managejobs.component.css'
 })
 export class ManagejobsComponent implements OnInit {
-jobs:Job[] =[];
+jobs:jobdetails[] =[];
   industries: any[] = [];
 employmentTypes: any[] = [];
 workmode: any[] = [];
-constructor(private jobservice:JobService,private lookupsService:LookupService){
+constructor(private jobservice:JobService,private lookupsService:LookupService,private router:Router){
 
 }
 
@@ -103,8 +105,8 @@ deleteJob(){
 editJob(){
 
 }
-viewJob(){
-
+viewJob(id:number){
+return this.router.navigate(['/details',id]);
 }
 }
 

@@ -10,6 +10,7 @@
 
       <div class="job-info">
         <h3 class="job-title">{{ job.title }}</h3>
+
         <span class="job-location">
           <i class="fas fa-map-marker-alt"></i>
           {{ job.location }}
@@ -22,15 +23,15 @@
 
       <span class="badge industry">
         <i class="fas fa-industry"></i>
-        {{ getIndustryName(job.industryId) }}
+        {{ job.industry}}
       </span>
 
-      <span class="badge" [ngClass]="getWorkModeClass(job.workModeId)">
-        {{ getWorkModeName(job.workModeId) }}
+      <span class="badge" >
+        {{ job.workMode }}
       </span>
 
-      <span class="badge" [ngClass]="getEmploymentTypeClass(job.employmentTypeId)">
-        {{ getEmploymentTypeName(job.employmentTypeId) }}
+      <span class="badge">
+        {{ job.employmentType }}
       </span>
 
     </div>
@@ -44,7 +45,7 @@
 
     <!-- ACTIONS -->
     <div class="job-actions">
-      <a class="btn view" (click)="viewJob()">
+      <a class="btn view" (click)="viewJob(job.id)">
         <i class="fas fa-eye"></i> Details
       </a>
 

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { JobResponse } from '../../Models/Job/jobres';
 import { createjob } from '../../Models/Job/createjob';
 import { Job } from '../../Models/Job/job';
+import { jobdetails } from '../../Models/Job/dteailsjob';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +49,11 @@ private apiUrl = 'https://localhost:44309/api/Job';
   createJob(job: createjob): Observable<any> {
     return this.HttpClient.post(`${this.apiUrl}/CreateJob`, job);
   }
-    EmployerJobs():Observable<Job[]>{
-    return this.HttpClient.get<Job[]>(`https://localhost:44309/api/Job/my-jobs`)
+    EmployerJobs():Observable<jobdetails[]>{
+    return this.HttpClient.get<jobdetails[]>(`https://localhost:44309/api/Job/my-jobs`)
   }
+  getJobDetails(id: number) {
+  return this.HttpClient.get<jobdetails>(`https://localhost:44309/api/Job/${id}`);
+}
+
 }

@@ -4,6 +4,7 @@ import { JobFilter } from '../../../Models/Job/jobfilter';
 import { CommonModule } from '@angular/common';
 import { Job } from '../../../Models/Job/job';
 import { LookupService } from '../../../Services/LookUpService/lookup.service';
+import { ActivatedRoute, Router, RouterConfigurationFeature } from '@angular/router';
 
 @Component({
   selector: 'app-job-list-page-component',
@@ -25,7 +26,7 @@ employmentTypes: any[] = [];
 workmode: any[] = [];
 
 jobbs: any[] = [];
-constructor(private lookupsService:LookupService){}
+constructor(private lookupsService:LookupService ,private router:Router){}
   ngOnInit(): void {
  this.loadLookups();
  }
@@ -70,6 +71,9 @@ getWorkModeClass(modeId: number): string {
     case 3: return 'badge-hybrid';
     default: return 'badge-default';
   }
+}
+viewJob(id:number){
+return this.router.navigate(['/details',id]);
 }
 
 
