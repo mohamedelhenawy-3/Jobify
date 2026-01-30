@@ -76,6 +76,20 @@
   color: gray;
   font-size: 0.95rem;
 }
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill {
+  background: #e9f2ff;
+  color: #0056b3;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
 
 /* RESPONSIVE */
 @media (max-width: 900px) {

@@ -1,16 +1,16 @@
-<div class="profile-page">
+<div class="profile-page" *ngIf="!loading && profile">
 
   <!-- HEADER -->
   <div class="profile-header">
     <img
       class="profile-image"
-      [src]="'assets/default-user.png'"
+      [src]="profile.profileImage || 'assets/default-user.png'"
       alt="Profile Image"
     />
 
     <div class="profile-info">
-      <h1> jobSeeker.user.fullName </h1>
-      <p class="location">📍  'Location not set' </p>
+      <h1>{{ profile.headline || 'Job Seeker' }}</h1>
+      <p class="location">📍 {{ profile.location || 'Location not set' }}</p>
     </div>
   </div>
 
@@ -24,16 +24,30 @@
       <div class="card">
         <h2>About Me</h2>
         <p>
-          Motivated job seeker actively looking for new opportunities.
-          Passionate about learning and professional growth.
+          {{ profile.summary || 'No summary added yet.' }}
+        </p>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="card">
+        <h2>Skills</h2>
+
+        <div class="skills">
+          <span class="skill"
+                *ngFor="let skill of profile.skills">
+            {{ skill.name }}
+          </span>
+        </div>
+
+        <p *ngIf="profile.skills.length === 0" class="muted">
+          No skills added yet.
         </p>
       </div>
 
       <!-- CONTACT -->
       <div class="card">
         <h2>Contact Information</h2>
-        <p><strong>Phone:</strong> Phone Name</p>
-        <p><strong>Email:</strong> Email</p>
+        <p><strong>Phone:</strong> {{ profile.phoneNumber || 'Not provided' }}</p>
       </div>
 
     </div>
@@ -45,11 +59,14 @@
       <div class="card">
         <h2>Resume</h2>
 
-        <div >
-          <a  target="_blank" class="btn">
+        <ng-container *ngIf="profile.resumeUrl; else noResume">
+          <a
+            [href]="profile.resumeUrl"
+            target="_blank"
+            class="btn">
             📄 View Resume
           </a>
-        </div>
+        </ng-container>
 
         <ng-template #noResume>
           <p class="muted">No resume uploaded yet.</p>
@@ -61,9 +78,9 @@
       <div class="card">
         <h2>Job Applications</h2>
 
-        <div >
-          <!-- Future list -->
-        </div>
+        <ng-container *ngIf="profile.applications.length > 0; else noApps">
+          <!-- future list -->
+        </ng-container>
 
         <ng-template #noApps>
           <p class="muted">You haven’t applied to any jobs yet.</p>
@@ -73,4 +90,9 @@
 
     </div>
   </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading" *ngIf="loading">
+  Loading profile...
 </div>

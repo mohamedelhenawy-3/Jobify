@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs.Skills;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Application.DTOs.JobSeeker
         public string? ProfileImage { get; set; }
         public string? Headline { get; set; }
         public string? Summary { get; set; }
-        public List<string> Skills { get; set; } = new();
+        public List<MySkills> Skills { get; set; } = new();
 
         public ICollection<JobApplication>? Applications { get; set; }
 

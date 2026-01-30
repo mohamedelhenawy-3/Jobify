@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Auth.AuthResponse;
 using Application.DTOs.JobSeeker;
+using Application.DTOs.Skills;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.JobSeeker;
 using CloudinaryDotNet;
@@ -82,7 +83,13 @@ namespace Infrastructure.Implementation
                 Applications = jobSeeker.Applications,
                 Headline = jobSeeker.Headline,
                 Summary = jobSeeker.Summary,
-                Skills = jobSeeker.Skills.Select(s => s.Name).ToList()
+                Skills = jobSeeker.Skills
+                .Select(s => new MySkills
+                {
+                    Id = s.Id,
+                    Name = s.Name
+                })
+                .ToList()
             };
 
 
