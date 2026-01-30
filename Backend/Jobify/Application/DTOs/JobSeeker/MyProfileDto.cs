@@ -12,8 +12,10 @@ namespace Application.DTOs.JobSeeker
         public string? PhoneNumber { get; set; }
         public string? ResumeUrl { get; set; }
         public string? Location { get; set; }
-        public ProfileImage? ProfileImage { get; set; }
-
+        public string? ProfileImage { get; set; }
+        public string? Headline { get; set; }
+        public string? Summary { get; set; }
+        public List<string> Skills { get; set; } = new();
 
         public ICollection<JobApplication>? Applications { get; set; }
 

@@ -41,7 +41,7 @@ namespace Infrastructure.DBContext
         public DbSet<JobIndustry> JobIndustries { get; set; }
         public DbSet<WorkMode> WorkModes { get; set; }
         public DbSet<EmploymentType> EmploymentTypes { get; set; }
-
+        public DbSet<Skill> Skills { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -82,6 +82,12 @@ namespace Infrastructure.DBContext
 
                 entity.Property(js => js.PhoneNumber)
                       .HasMaxLength(20);
+
+                entity.HasMany(x => x.Skills)
+                   .WithOne(s => s.JobSeeker)
+                   .HasForeignKey(s => s.JobSeekerId)
+                   .OnDelete(DeleteBehavior.Cascade); // or Restrict (see note below)
+
 
                 entity.Property(js => js.ResumeUrl)
                       .HasMaxLength(500);
@@ -182,7 +188,22 @@ namespace Infrastructure.DBContext
                       .HasDefaultValueSql("GETUTCDATE()");
 
             });
+            builder.Entity<Skill>(entity =>
+            {
+                entity.ToTable("Skills");
 
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Name)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.HasOne(x => x.JobSeeker)
+                      .WithMany(js => js.Skills)
+                      .HasForeignKey(x => x.JobSeekerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+            });
             /* =========================
                JobIndustry (Lookup)
             ========================== */

@@ -27,6 +27,7 @@ using Infrastructure.Implementation.JobService;
 using Application.Interfaces.JobSeeker;
 using Domain.Entities;
 using Infrastructure.Implementation;
+using Application.Interfaces.Skills;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +80,7 @@ builder.Services.AddScoped<JwtGenerator>();
 builder.Services.AddScoped<IEmployerService, EmployerService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IJobSeekerService, JobSeekerService>();
+builder.Services.AddScoped<ISkillsService, SkillsService>();
 
 
 builder.Services.AddScoped<CloudinaryService>();

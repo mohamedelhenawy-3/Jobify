@@ -10,6 +10,7 @@ import { JobspagesComponent } from './Componats/JobComponents/jobspages/jobspage
 import { CreatejobComponent } from './Componats/createjob/createjob.component';
 import { ManagejobsComponent } from './Componats/managejobs/managejobs.component';
 import { JobdetailsComponent } from './Componats/jobdetails/jobdetails.component';
+import { SeekerprofileComponent } from './Componats/JoobSeeker/seekerprofile/seekerprofile.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -21,7 +22,9 @@ export const routes: Routes = [
     { path: 'findjob', component: JobspagesComponent },
     { path: 'createjob', component: CreatejobComponent },
     { path: 'managejobs', component: ManagejobsComponent },
-    {path:'details/:id',component:JobdetailsComponent}
+    {path:'details/:id',component:JobdetailsComponent},
+    {path:'seeker',component:SeekerprofileComponent}
+
 
 
 ];

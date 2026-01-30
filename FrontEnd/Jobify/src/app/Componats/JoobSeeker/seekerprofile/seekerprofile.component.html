@@ -1,0 +1,76 @@
+<div class="profile-page">
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <img
+      class="profile-image"
+      [src]="'assets/default-user.png'"
+      alt="Profile Image"
+    />
+
+    <div class="profile-info">
+      <h1> jobSeeker.user.fullName </h1>
+      <p class="location">📍  'Location not set' </p>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="profile-content">
+
+    <!-- LEFT -->
+    <div class="profile-left">
+
+      <!-- ABOUT -->
+      <div class="card">
+        <h2>About Me</h2>
+        <p>
+          Motivated job seeker actively looking for new opportunities.
+          Passionate about learning and professional growth.
+        </p>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="card">
+        <h2>Contact Information</h2>
+        <p><strong>Phone:</strong> Phone Name</p>
+        <p><strong>Email:</strong> Email</p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="profile-right">
+
+      <!-- RESUME -->
+      <div class="card">
+        <h2>Resume</h2>
+
+        <div >
+          <a  target="_blank" class="btn">
+            📄 View Resume
+          </a>
+        </div>
+
+        <ng-template #noResume>
+          <p class="muted">No resume uploaded yet.</p>
+          <button class="btn-outline">Upload Resume</button>
+        </ng-template>
+      </div>
+
+      <!-- APPLICATIONS -->
+      <div class="card">
+        <h2>Job Applications</h2>
+
+        <div >
+          <!-- Future list -->
+        </div>
+
+        <ng-template #noApps>
+          <p class="muted">You haven’t applied to any jobs yet.</p>
+          <button class="btn">Browse Jobs</button>
+        </ng-template>
+      </div>
+
+    </div>
+  </div>
+</div>

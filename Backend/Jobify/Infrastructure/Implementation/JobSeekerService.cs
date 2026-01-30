@@ -70,6 +70,7 @@ namespace Infrastructure.Implementation
             var jobSeeker = await _db.JobSeekers
                 .Include(js => js.Applications)
                 .Include(js => js.ProfileImage)
+                .Include(js => js.Skills)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
             return new MyProfileDto
@@ -77,9 +78,11 @@ namespace Infrastructure.Implementation
                 PhoneNumber = jobSeeker.PhoneNumber,
                 ResumeUrl = jobSeeker.ResumeUrl,
                 Location = jobSeeker.Location,
-                ProfileImage = jobSeeker.ProfileImage,
-                Applications = jobSeeker.Applications
-
+                ProfileImage = jobSeeker.ProfileImage.ImageUrl,
+                Applications = jobSeeker.Applications,
+                Headline = jobSeeker.Headline,
+                Summary = jobSeeker.Summary,
+                Skills = jobSeeker.Skills.Select(s => s.Name).ToList()
             };
 
 
@@ -102,6 +105,9 @@ namespace Infrastructure.Implementation
             // Update fields if provided
             if (!string.IsNullOrEmpty(updateprofiledto.PhoneNumber)) profile.PhoneNumber = updateprofiledto.PhoneNumber;
             if (!string.IsNullOrEmpty(updateprofiledto.Location)) profile.Location = updateprofiledto.Location;
+
+            if (!string.IsNullOrEmpty(updateprofiledto.Headline)) profile.Headline = updateprofiledto.Headline;
+            if (!string.IsNullOrEmpty(updateprofiledto.Summary)) profile.Summary = updateprofiledto.Summary;
 
             // Handle profile image
             if (updateprofiledto.ProfileImage != null)
@@ -138,7 +144,7 @@ namespace Infrastructure.Implementation
 
             return new SuccessResponse
             {
-                Message = "Company profile updated successfully."
+                Message = "user profile updated successfully."
             };
         }
 
