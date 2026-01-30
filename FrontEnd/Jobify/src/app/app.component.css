@@ -17,7 +17,7 @@ app-navbar {
 /* Give space for content below navbar */
 main, router-outlet, .content {
     display: block;
-    margin-top: 80px; /* height of your navbar */
+    margin-top: 120px; /* height of your navbar */
     
 }
 

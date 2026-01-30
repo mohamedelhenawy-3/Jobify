@@ -1,0 +1,62 @@
+<div class="job-grid">
+
+  <div *ngFor="let job of jobs" class="job-card">
+
+    <!-- HEADER -->
+    <div class="job-header">
+      <div class="job-icon">
+        <i [class]="getJobIcon(job)"></i>
+      </div>
+
+      <div class="job-info">
+        <h3 class="job-title">{{ job.title }}</h3>
+        <span class="job-location">
+          <i class="fas fa-map-marker-alt"></i>
+          {{ job.location }}
+        </span>
+      </div>
+    </div>
+
+    <!-- META BADGES -->
+    <div class="job-meta">
+
+      <span class="badge industry">
+        <i class="fas fa-industry"></i>
+        {{ getIndustryName(job.industryId) }}
+      </span>
+
+      <span class="badge" [ngClass]="getWorkModeClass(job.workModeId)">
+        {{ getWorkModeName(job.workModeId) }}
+      </span>
+
+      <span class="badge" [ngClass]="getEmploymentTypeClass(job.employmentTypeId)">
+        {{ getEmploymentTypeName(job.employmentTypeId) }}
+      </span>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="job-footer">
+      <span class="salary">
+        {{ job.minSalary | number }} - {{ job.maxSalary | number }} EGP
+      </span>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="job-actions">
+      <a class="btn view" (click)="viewJob()">
+        <i class="fas fa-eye"></i> Details
+      </a>
+
+      <a class="btn edit" (click)="editJob()">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+
+      <a class="btn delete" (click)="deleteJob()">
+        <i class="fas fa-trash"></i> Delete
+      </a>
+    </div>
+
+  </div>
+
+</div>

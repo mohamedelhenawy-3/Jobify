@@ -85,16 +85,9 @@ namespace Jobify.Controllers
         [HttpGet("my-jobs")]
         public async Task<IActionResult> GetMyJobs()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
-                return Unauthorized();
-
-            // You already resolve employerId inside the service in other methods,
-            // but here you expect employerId, so we reuse that pattern
-            var employerJobs = await _jobService.AllJobsOfEmployer(
-                int.Parse(User.FindFirst("EmployerProfileId")?.Value ?? "0")
-            );
+            var employerJobs = await _jobService.AllJobsOfEmployer();
+           
 
             return Ok(employerJobs);
         }

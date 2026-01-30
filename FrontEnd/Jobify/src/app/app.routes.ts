@@ -7,6 +7,8 @@ import { RegisterComponent } from './Componats/auth/register/register.component'
 import { HomeComponent } from './Componats/home/home.component';
 import { JobListPageComponentComponent } from './Componats/JobComponents/job-list-page-component/job-list-page-component.component';
 import { JobspagesComponent } from './Componats/JobComponents/jobspages/jobspages.component';
+import { CreatejobComponent } from './Componats/createjob/createjob.component';
+import { ManagejobsComponent } from './Componats/managejobs/managejobs.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -16,5 +18,8 @@ export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'home', component: HomeComponent },
        { path: 'findjob', component: JobspagesComponent },
+         { path: 'createjob', component: CreatejobComponent },
+                  { path: 'managejobs', component: ManagejobsComponent },
+
 
 ];

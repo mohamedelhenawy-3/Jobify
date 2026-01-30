@@ -10,8 +10,8 @@
     <li class="item"><a routerLink="/home">Home</a></li>
      <li class="item"><a routerLink="/findjob">Find Job</a></li>
       <ng-container *ngIf="isLoggedIn">
-    <li class="item"><a href="#">Browse</a></li>
-    <li class="item"><a href="#">Jobs</a></li>
+    <li class="item"><a routerLink="/managejobs">ManageJobs</a></li>
+    <li class="item"><a routerLink="/createjob">Create Jobs</a></li>
     <li class="item"><a href="#">Blog</a></li>
        </ng-container>
   </ul>

@@ -158,10 +158,12 @@ namespace Infrastructure.Implementation.JobService
 
         }
 
-        public async Task<IEnumerable<JobDto>> AllJobsOfEmployer(int employerId)
+        public async Task<IEnumerable<JobDto>> AllJobsOfEmployer()
         {
+            var userid = GetCurrentUserId();
+            var employer =  _db.EmployerProfiles.FirstOrDefault(x => x.UserId == userid);
             var jobs = await _db.JobPosts
-                  .Where(j => j.EmployerProfileId == employerId)
+                  .Where(j => j.EmployerProfileId == employer.Id)
                   .Select(j => new JobDto
                   {
                       Id = j.Id,

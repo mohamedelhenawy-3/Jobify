@@ -77,7 +77,8 @@ getWorkModeClass(modeId: number): string {
     if (p >= 1 && p <= this.totalPages) {
       this.pageChange.emit(p);
     }
-  }getJobIcon(job: any): string {
+  }
+  getJobIcon(job: any): string {
   const title = job.title?.toLowerCase() || '';
 
   // 1️⃣ Specific roles
