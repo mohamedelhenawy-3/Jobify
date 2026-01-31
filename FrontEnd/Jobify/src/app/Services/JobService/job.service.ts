@@ -55,5 +55,11 @@ private apiUrl = 'https://localhost:44309/api/Job';
   getJobDetails(id: number) {
   return this.HttpClient.get<jobdetails>(`https://localhost:44309/api/Job/${id}`);
 }
+getJob(id:number){
+    return this.HttpClient.get<Job>(`https://localhost:44309/api/Job/myjob/${id}`);
 
+}
+updateJob(id: number, data: any): Observable<any> {
+  return this.HttpClient.put(`https://localhost:44309/api/Job/${id}`, data);
+}
 }

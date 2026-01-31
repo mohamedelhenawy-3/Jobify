@@ -71,8 +71,17 @@ namespace Jobify.Controllers
 
             return Ok(job);
         }
+        [HttpGet("myjob/{id:int}")]
+        public async Task<IActionResult> GetJob(int id)
+        {
+            var job = await _jobService.GetJob(id);
+            if (job == null)
+                return NotFound("Job not found");
 
-       
+            return Ok(job);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetAllJobs()
         {

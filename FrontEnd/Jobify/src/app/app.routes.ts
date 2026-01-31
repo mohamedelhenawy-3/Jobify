@@ -11,6 +11,7 @@ import { CreatejobComponent } from './Componats/createjob/createjob.component';
 import { ManagejobsComponent } from './Componats/managejobs/managejobs.component';
 import { JobdetailsComponent } from './Componats/jobdetails/jobdetails.component';
 import { SeekerprofileComponent } from './Componats/JoobSeeker/seekerprofile/seekerprofile.component';
+import { UpdateJobComponent } from './Componats/update-job/update-job.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -23,7 +24,8 @@ export const routes: Routes = [
     { path: 'createjob', component: CreatejobComponent },
     { path: 'managejobs', component: ManagejobsComponent },
     {path:'details/:id',component:JobdetailsComponent},
-    {path:'seeker',component:SeekerprofileComponent}
+    {path:'seeker',component:SeekerprofileComponent},
+    {path:'updateJob/:id',component:UpdateJobComponent}
 
 
 

@@ -1,0 +1,135 @@
+/* Page background */
+.page-content {
+  min-height: 100vh;
+  background: #f4f6f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  box-sizing: border-box;
+}
+
+/* Card container */
+.job-form-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  padding: 32px 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Title */
+.form-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* Form layout */
+.job-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Labels */
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Inputs & selects */
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+/* Focus effect */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Textarea */
+.form-group textarea {
+  resize: vertical;
+}
+
+/* Rows */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* 3-column row */
+.form-row .form-group:nth-child(3) {
+  grid-column: span 1;
+}
+
+/* Dropdown row with 3 columns */
+.form-row:has(select) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Button */
+.submit-btn {
+  margin-top: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.1s;
+}
+
+/* Hover */
+.submit-btn:hover {
+  background: #1e40af;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Active */
+.submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .job-form-container {
+    padding: 24px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-title {
+    font-size: 22px;
+  }
+}

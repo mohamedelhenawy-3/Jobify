@@ -102,8 +102,8 @@ getJobIcon(job: any): string {
 deleteJob(){
 
 }
-editJob(){
-
+editJob(id:number){
+return this.router.navigate(['/updateJob',id]);
 }
 viewJob(id:number){
 return this.router.navigate(['/details',id]);

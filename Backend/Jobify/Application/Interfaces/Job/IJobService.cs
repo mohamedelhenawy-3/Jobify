@@ -16,6 +16,7 @@ namespace Application.Interfaces.Job
     {
         Task <SuccessResponse> CreateJob(CreateJob createjobdto);
         Task<ReturnedJobDto> GetJobById(int id);
+        Task<JobDto> GetJob(int id);
         Task<IEnumerable<ReturnedJobDto>> AllJobsOfEmployer();
 
         Task<IEnumerable<JobDto>> AllJobs();

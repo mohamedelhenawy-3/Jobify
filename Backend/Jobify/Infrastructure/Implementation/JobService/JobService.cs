@@ -122,17 +122,18 @@ namespace Infrastructure.Implementation.JobService
 
             var employer = await _db.EmployerProfiles
                             .FirstOrDefaultAsync(e => e.UserId == user);
-            var job = await _db.JobPosts
+            var job = await _db.JobPosts.Include(x=>x.WorkMode).Include(x=>x.Industry).Include(x=>x.EmploymentType)
                    .FirstOrDefaultAsync(j =>
                        j.Id == id &&
                        j.EmployerProfileId == employer.Id);
 
             job.Title = updatejob.Title;
+            job.Description = updatejob.Description;
             job.Location = updatejob.Location;
             job.MaxSalary = updatejob.MaxSalary;
             job.MinSalary = updatejob.MinSalary;
             job.IndustryId = updatejob.IndustryId;
-            job.StatusId = updatejob.StatusId;
+            job.WorkModeId = updatejob.WorkModeId;
             job.EmploymentTypeId = updatejob.EmploymentTypeId;
 
 
@@ -282,5 +283,33 @@ namespace Infrastructure.Implementation.JobService
             };
         }
 
+        public async Task<JobDto> GetJob(int id)
+        {
+
+            var job = await _db.JobPosts
+             .Include(j => j.WorkMode)
+             .Include(j => j.Industry)
+             .Include(j => j.EmploymentType)
+             .Include(j => j.Status)
+             .FirstOrDefaultAsync(j => j.Id == id);
+
+            if (job == null)
+                throw new KeyNotFoundException("Job not found");
+
+            return new JobDto
+            {
+                Id = job.Id,
+                Title = job.Title,
+                Description = job.Description,
+                Location = job.Location,
+                MinSalary = job.MinSalary,
+                MaxSalary = job.MaxSalary,
+
+                WorkModeId = job.WorkModeId,
+                IndustryId = job.IndustryId,
+                EmploymentTypeId = job.IndustryId,
+                StatusId = job.StatusId
+            };
+        }
     }
 }
