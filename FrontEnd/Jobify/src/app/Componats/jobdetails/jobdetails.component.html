@@ -2,14 +2,17 @@
 
 <div *ngIf="!loading && jobs" class="job-page">
 
-  <!-- LEFT: Main Content -->
+  <!-- LEFT: MAIN CONTENT -->
   <div class="job-main">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <div class="job-header">
       <div class="job-title">
-        <i class="icon">💻</i>
-        <h1>{{ jobs.title }}</h1>
+        <span class="icon">💻</span>
+        <div>
+          <h1>{{ jobs.title }}</h1>
+          <p class="job-location">📍 {{ jobs.location }}</p>
+        </div>
       </div>
 
       <span class="job-status" [ngClass]="jobs.status.toLowerCase()">
@@ -17,20 +20,42 @@
       </span>
     </div>
 
-    <p class="job-location">📍 {{ jobs.location }}</p>
-
-    <!-- Description -->
-    <div class="job-description">
-      <h2>Job Description</h2>
+    <!-- DESCRIPTION -->
+    <section class="job-section">
+      <h2>📄 Job Description</h2>
       <p>{{ jobs.description }}</p>
-    </div>
+    </section>
 
-    <!-- Action -->
- 
+    <!-- REQUIREMENTS -->
+    <section class="job-section">
+      <h2>✅ Requirements</h2>
+      <ul>
+        <li *ngFor="let item of jobs.requirements?.split('\n')">
+          {{ item }}
+        </li>
+      </ul>
+    </section>
+
+    <!-- RESPONSIBILITIES -->
+    <section class="job-section">
+      <h2>🛠 Responsibilities</h2>
+      <ul>
+        <li *ngFor="let item of jobs.responsibilities?.split('\n')">
+          {{ item }}
+        </li>
+      </ul>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="job-section">
+      <h2>🎓 Education / Experience</h2>
+      <p>{{ jobs.educationOrExperience }}</p>
+    </section>
+
   </div>
 
-  <!-- RIGHT: Sidebar -->
-  <div class="job-sidebar">
+  <!-- RIGHT: SIDEBAR -->
+  <aside class="job-sidebar">
 
     <h3>Job Overview</h3>
 
@@ -52,17 +77,12 @@
     <div class="sidebar-item">
       <span>💰 Salary</span>
       <strong>
-        {{ jobs.minSalary | currency:'EGP' }} - {{ jobs.maxSalary | currency:'EGP' }}
+        {{ jobs.minSalary | currency:'EGP' }} –
+        {{ jobs.maxSalary | currency:'EGP' }}
       </strong>
     </div>
 
-    <div class="sidebar-item">
-      <span>📌 Status</span>
-      <strong>{{ jobs.status }}</strong>
-    </div>
-   <div class="job-actions">
-      <button class="apply-btn">Apply Now</button>
-    </div>
-  </div>
+    <button class="apply-btn">Apply Now</button>
 
+  </aside>
 </div>

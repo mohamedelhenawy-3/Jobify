@@ -15,7 +15,7 @@ import { Console } from 'console';
 export class JobspagesComponent implements OnInit {
  jobs: Job[] = [];
   page = 1;
-  pageSize = 10;
+  pageSize = 12;
   totalPages = 0;
 
   filters = {

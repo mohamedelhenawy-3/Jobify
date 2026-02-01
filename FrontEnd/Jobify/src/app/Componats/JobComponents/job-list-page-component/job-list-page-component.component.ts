@@ -14,6 +14,7 @@ import { ActivatedRoute, Router, RouterConfigurationFeature } from '@angular/rou
   styleUrl: './job-list-page-component.component.css'
 })
 export class JobListPageComponentComponent implements OnInit  {
+  loading: boolean = true; // ✅ add loading property
 
   @Input() jobs: Job[] = [];
   @Input() page = 1;

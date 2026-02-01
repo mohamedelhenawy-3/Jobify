@@ -21,5 +21,8 @@ namespace Application.DTOs.JobPost
         public int IndustryId { get; set; }
         public int EmploymentTypeId { get; set; }
         public int StatusId { get; set; }
+        public string Responsibilities { get; set; }
+        public string EducationOrExperience { get; set; }
+        public string Requirements { get; set; }
     }
 }

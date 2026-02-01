@@ -272,7 +272,15 @@ namespace Infrastructure.DBContext
                 entity.Property(j => j.Title)
                       .IsRequired()
                       .HasMaxLength(200);
-
+                entity.Property(j => j.Responsibilities)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+                entity.Property(j => j.Requirements)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+                entity.Property(j => j.EducationOrExperience)
+                    .IsRequired()
+                    .HasMaxLength(2000);
                 entity.Property(j => j.Description)
                       .IsRequired()
                       .HasMaxLength(3000);

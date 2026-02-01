@@ -54,6 +54,9 @@ namespace Infrastructure.Implementation.JobService
                 EmployerProfileId = employerProfile.Id,
                 WorkModeId = createjobdto.WorkModeId,
                 CreatedByUserId = user,
+                EducationOrExperience=createjobdto.EducationOrExperience,
+                Requirements=createjobdto.Responsibilities,
+                Responsibilities=createjobdto.Requirements,
                 CreatedAt = DateTime.UtcNow
             };
             await _db.JobPosts.AddAsync(Job);
@@ -86,7 +89,9 @@ namespace Infrastructure.Implementation.JobService
                 Location = job.Location,
                 MinSalary = job.MinSalary,
                 MaxSalary = job.MaxSalary,
-
+                Requirements = job.Requirements,
+                Responsibilities = job.Responsibilities,
+                EducationOrExperience = job.EducationOrExperience,
                 WorkMode = job.WorkMode.Name,
                 Industry = job.Industry.IndustryName,
                 EmploymentType = job.EmploymentType.TypeName,
@@ -301,6 +306,9 @@ namespace Infrastructure.Implementation.JobService
                 Id = job.Id,
                 Title = job.Title,
                 Description = job.Description,
+                Requirements=job.Requirements,
+                Responsibilities=job.Responsibilities,
+                EducationOrExperience=job.EducationOrExperience,
                 Location = job.Location,
                 MinSalary = job.MinSalary,
                 MaxSalary = job.MaxSalary,

@@ -37,6 +37,9 @@ export class CreatejobComponent  implements OnInit {
       industryId: [null, Validators.required],
       employmentTypeId: [null, Validators.required],
       workModeId: [null, Validators.required],
+      responsibilities:['', Validators.required],
+      requirements:['', Validators.required],  
+      educationOrExperience:['', Validators.required],    
       statusId: [3] // Active by default
     })
   }

@@ -8,6 +8,9 @@ export interface createjob {
   industryId: number;
   employmentTypeId: number;
   statusId: number;
+  responsibilities:string;
+  educationOrExperience:string;
+  requirements:string;
 }
 
 

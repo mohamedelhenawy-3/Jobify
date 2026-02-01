@@ -1,4 +1,6 @@
-<div class="job-list">
+
+<div  class="job-list">
+
   <div *ngFor="let job of jobs" class="job-card">
 
     <!-- HEADER -->
@@ -19,30 +21,24 @@
       </div>
 
     </div>
-<!--  -->
 
-   <!-- META -->
-<div class="job-meta">
+    <!-- META -->
+    <div class="job-meta">
 
-  <span class="badge industry">
-    <i class="fas fa-industry"></i>
-    {{ getIndustryName(job.industryId) }}
-  </span>
+      <span class="badge industry">
+        <i class="fas fa-industry"></i>
+        {{ getIndustryName(job.industryId) }}
+      </span>
 
-  <span
-    class="badge"
-    [ngClass]="getWorkModeClass(job.workModeId)">
-    {{ getWorkModeName(job.workModeId) }}
-  </span>
+      <span class="badge" [ngClass]="getWorkModeClass(job.workModeId)">
+        {{ getWorkModeName(job.workModeId) }}
+      </span>
 
-  <span
-    class="badge"
-    [ngClass]="getEmploymentTypeClass(job.employmentTypeId)">
-    {{ getEmploymentTypeName(job.employmentTypeId) }}
-  </span>
+      <span class="badge" [ngClass]="getEmploymentTypeClass(job.employmentTypeId)">
+        {{ getEmploymentTypeName(job.employmentTypeId) }}
+      </span>
 
-</div>
-
+    </div>
 
     <!-- FOOTER -->
     <div class="job-footer">
@@ -51,15 +47,10 @@
         {{ job.minSalary | number }} - {{ job.maxSalary | number }} EGP
       </span>
 
-      <!-- <button class="apply-btn">
-        <i class="fas fa-paper-plane"></i>
-        Apply
-      </button> -->
-     <a  class="apply-btn" (click)="viewJob(job.id)">
+      <a class="apply-btn" (click)="viewJob(job.id)">
         <i class="fas fa-paper-plane"></i>
         Job details
-    </a>
-     
+      </a>
     </div>
 
   </div>
@@ -67,17 +58,13 @@
 
 <!-- PAGINATION -->
 <div class="pagination">
-  <button (click)="changePage(page - 1)" [disabled]="page === 1">
-    Prev
-  </button>
+  <button (click)="changePage(page - 1)" [disabled]="page === 1">Prev</button>
 
-  <button
-    *ngFor="let i of [].constructor(totalPages); let idx = index"
-    (click)="changePage(idx + 1)"
-    [class.active]="page === idx + 1">
+  <button *ngFor="let i of [].constructor(totalPages); let idx = index"
+          (click)="changePage(idx + 1)"
+          [class.active]="page === idx + 1">
     {{ idx + 1 }}
   </button>
-  <button (click)="changePage(page + 1)" [disabled]="page === totalPages">
-    Next
-  </button>
+
+  <button (click)="changePage(page + 1)" [disabled]="page === totalPages">Next</button>
 </div>

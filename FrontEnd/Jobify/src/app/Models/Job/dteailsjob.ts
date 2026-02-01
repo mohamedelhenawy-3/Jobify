@@ -8,5 +8,8 @@ export interface jobdetails {
   workMode: string;
   industry: string;
   employmentType: string;
-  status: string;
+    responsibilities:string;
+  educationOrExperience:string;
+  requirements:string;
+  status:string;
 }

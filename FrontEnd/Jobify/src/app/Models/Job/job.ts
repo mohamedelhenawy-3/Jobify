@@ -9,4 +9,6 @@ export interface Job {
   industryId: number;
   employmentTypeId: number;
   statusId: number;
+    status: number;
+
 }
