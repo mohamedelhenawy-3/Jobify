@@ -15,6 +15,9 @@ namespace Application.DTOs.JobSeeker
         public string? PhoneNumber { get; set; }
         public string? Location { get; set; }
         public IFormFile? ProfileImage { get; set; }
+        public List<string>? Skills { get; set; } = new();
+
+
 
     }
 }

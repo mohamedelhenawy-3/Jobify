@@ -1,98 +1,151 @@
 <div class="profile-page" *ngIf="!loading && profile">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <div class="profile-header">
-    <img
-      class="profile-image"
-      [src]="profile.profileImage || 'assets/default-user.png'"
-      alt="Profile Image"
-    />
 
+    <!-- Profile Image -->
+    <ng-container *ngIf="!editProfile; else editImage">
+      <img
+        class="profile-image"
+        [src]="profile.profileImage || 'assets/default-user.png'"
+        alt="Profile Image"
+      />
+    </ng-container>
+
+    <ng-template #editImage>
+      <input type="file" (change)="onFileSelected($event)" />
+    </ng-template>
+
+    <!-- Basic Info -->
     <div class="profile-info">
-      <h1>{{ profile.headline || 'Job Seeker' }}</h1>
-      <p class="location">📍 {{ profile.location || 'Location not set' }}</p>
+      <ng-container *ngIf="!editProfile; else editHeader">
+        <h1>{{ profile.headline || 'Job Seeker' }}</h1>
+        <p class="location">📍 {{ profile.location || 'Location not set' }}</p>
+      </ng-container>
+
+      <ng-template #editHeader>
+        <input type="text" [(ngModel)]="profile.headline" placeholder="Headline" />
+        <input type="text" [(ngModel)]="profile.location" placeholder="Location" />
+      </ng-template>
     </div>
+
+    <!-- Actions -->
+    <div class="profile-actions">
+      <button *ngIf="!editProfile" class="btn" (click)="editProfile = true">
+        Edit profile
+      </button>
+
+      <ng-container *ngIf="editProfile">
+        <button class="btn" (click)="saveProfile()">Save</button>
+        <button class="btn-outline" (click)="cancelEdit()">Cancel</button>
+      </ng-container>
+    </div>
+
   </div>
 
-  <!-- CONTENT -->
+  <!-- ================= MAIN CONTENT ================= -->
   <div class="profile-content">
 
-    <!-- LEFT -->
+    <!-- ===== LEFT COLUMN ===== -->
     <div class="profile-left">
 
-      <!-- ABOUT -->
+      <!-- About -->
       <div class="card">
-        <h2>About Me</h2>
-        <p>
-          {{ profile.summary || 'No summary added yet.' }}
-        </p>
-      </div>
+        <h2>About</h2>
 
-      <!-- SKILLS -->
-      <div class="card">
-        <h2>Skills</h2>
-
-        <div class="skills">
-          <span class="skill"
-                *ngFor="let skill of profile.skills">
-            {{ skill.name }}
-          </span>
-        </div>
-
-        <p *ngIf="profile.skills.length === 0" class="muted">
-          No skills added yet.
-        </p>
-      </div>
-
-      <!-- CONTACT -->
-      <div class="card">
-        <h2>Contact Information</h2>
-        <p><strong>Phone:</strong> {{ profile.phoneNumber || 'Not provided' }}</p>
-      </div>
-
-    </div>
-
-    <!-- RIGHT -->
-    <div class="profile-right">
-
-      <!-- RESUME -->
-      <div class="card">
-        <h2>Resume</h2>
-
-        <ng-container *ngIf="profile.resumeUrl; else noResume">
-          <a
-            [href]="profile.resumeUrl"
-            target="_blank"
-            class="btn">
-            📄 View Resume
-          </a>
+        <ng-container *ngIf="!editProfile; else editSummary">
+          <p>{{ profile.summary || 'No summary added yet.' }}</p>
         </ng-container>
 
-        <ng-template #noResume>
-          <p class="muted">No resume uploaded yet.</p>
-          <button class="btn-outline">Upload Resume</button>
+        <ng-template #editSummary>
+          <textarea
+            [(ngModel)]="profile.summary"
+            rows="4"
+            placeholder="Tell recruiters about yourself">
+          </textarea>
         </ng-template>
       </div>
 
-      <!-- APPLICATIONS -->
-      <div class="card">
-        <h2>Job Applications</h2>
+      <<div class="card">
+  <h2>Skills</h2>
 
-        <ng-container *ngIf="profile.applications.length > 0; else noApps">
-          <!-- future list -->
-        </ng-container>
-
-        <ng-template #noApps>
-          <p class="muted">You haven’t applied to any jobs yet.</p>
-          <button class="btn">Browse Jobs</button>
-        </ng-template>
-      </div>
-
+  <div *ngIf="!editProfile">
+    <div class="skills">
+      <span class="skill" *ngFor="let skill of profile.skills">{{ skill.name }}</span>
     </div>
+    <p *ngIf="profile.skills.length === 0" class="muted">No skills added yet.</p>
+  </div>
+
+  <div *ngIf="editProfile">
+    <input type="text" placeholder="Add skills separated by commas" [(ngModel)]="skillsInput"/>
   </div>
 </div>
 
-<!-- LOADING -->
+      <!-- Contact -->
+      <div class="card">
+        <h2>Contact info</h2>
+
+        <ng-container *ngIf="!editProfile; else editPhone">
+          <p><strong>Phone:</strong> {{ profile.phoneNumber || 'Not provided' }}</p>
+        </ng-container>
+
+        <ng-template #editPhone>
+          <input
+            type="text"
+            [(ngModel)]="profile.phoneNumber"
+            placeholder="Phone number"
+          />
+        </ng-template>
+      </div>
+
+    </div>
+
+    <!-- ===== RIGHT COLUMN ===== -->
+    <div class="profile-right">
+
+      <!-- Resume -->
+      <div class="card">
+        <h2>Resume</h2>
+
+        <ng-container *ngIf="!editProfile">
+          <ng-container *ngIf="profile.resumeUrl; else noResume">
+            <a
+              [href]="profile.resumeUrl"
+              target="_blank"
+              class="btn">
+              View resume
+            </a>
+          </ng-container>
+
+          <ng-template #noResume>
+            <p class="muted">No resume uploaded</p>
+          </ng-template>
+        </ng-container>
+
+        <ng-container *ngIf="editProfile">
+          <input type="file" />
+        </ng-container>
+      </div>
+
+      <!-- Applications -->
+      <div class="card">
+        <h2>Job applications</h2>
+
+        <ng-container *ngIf="profile.applications.length > 0; else noApps">
+          <!-- later -->
+        </ng-container>
+
+        <ng-template #noApps>
+          <p class="muted">You haven’t applied to any jobs yet</p>
+        </ng-template>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= LOADING ================= -->
 <div class="loading" *ngIf="loading">
   Loading profile...
 </div>

@@ -145,7 +145,28 @@ namespace Infrastructure.Implementation
                 }
             }
 
-            
+            if (updateprofiledto.Skills != null && updateprofiledto.Skills.Any())
+            {
+                var existingSkills = profile.Skills.Select(s => s.Name.ToLower()).ToList();
+
+                var newSkills = updateprofiledto.Skills
+                    .Where(s => !existingSkills.Contains(s.ToLower()))
+                    .Select(s => new Skill
+                    {
+                        Name = s.Trim(),
+                        JobSeeker = profile
+                    }).ToList();
+
+                if (newSkills.Any())
+                {
+                    foreach (var skill in newSkills)
+                    {
+                        profile.Skills.Add(skill);
+                    }
+                }
+
+            }
+
             _db.JobSeekers.Update(profile);
             await _db.SaveChangesAsync();
 
