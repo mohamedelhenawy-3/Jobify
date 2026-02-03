@@ -1,21 +1,27 @@
-<div *ngIf="loading" class="loading">Loading job details...</div>
+<!-- LOADING -->
+<div *ngIf="loading" class="loading">
+  Loading job details...
+</div>
 
+<!-- JOB PAGE -->
 <div *ngIf="!loading && jobs" class="job-page">
 
-  <!-- LEFT: MAIN CONTENT -->
-  <div class="job-main">
+  <!-- MAIN CONTENT (LEFT) -->
+  <main class="job-main">
 
     <!-- HEADER -->
     <div class="job-header">
       <div class="job-title">
-        <span class="icon">💻</span>
+        <i [class]="getJobIcon(jobs)" class="job-icon"></i>
         <div>
           <h1>{{ jobs.title }}</h1>
           <p class="job-location">📍 {{ jobs.location }}</p>
         </div>
       </div>
 
-      <span class="job-status" [ngClass]="jobs.status.toLowerCase()">
+      <span
+        class="job-status"
+        [ngClass]="jobs.status?.toLowerCase()">
         {{ jobs.status }}
       </span>
     </div>
@@ -27,34 +33,34 @@
     </section>
 
     <!-- REQUIREMENTS -->
-    <section class="job-section">
+    <section class="job-section" *ngIf="jobs.requirements">
       <h2>✅ Requirements</h2>
       <ul>
-        <li *ngFor="let item of jobs.requirements?.split('\n')">
-          {{ item }}
+        <li *ngFor="let req of jobs.requirements.split('\n')">
+          {{ req }}
         </li>
       </ul>
     </section>
 
     <!-- RESPONSIBILITIES -->
-    <section class="job-section">
+    <section class="job-section" *ngIf="jobs.responsibilities">
       <h2>🛠 Responsibilities</h2>
       <ul>
-        <li *ngFor="let item of jobs.responsibilities?.split('\n')">
-          {{ item }}
+        <li *ngFor="let res of jobs.responsibilities.split('\n')">
+          {{ res }}
         </li>
       </ul>
     </section>
 
-    <!-- EDUCATION -->
-    <section class="job-section">
-      <h2>🎓 Education / Experience</h2>
+    <!-- EDUCATION / EXPERIENCE -->
+    <section class="job-section" *ngIf="jobs.educationOrExperience">
+      <h2>🎓 Education & Experience</h2>
       <p>{{ jobs.educationOrExperience }}</p>
     </section>
 
-  </div>
+  </main>
 
-  <!-- RIGHT: SIDEBAR -->
+  <!-- SIDEBAR (RIGHT) -->
   <aside class="job-sidebar">
 
     <h3>Job Overview</h3>
@@ -82,7 +88,10 @@
       </strong>
     </div>
 
-    <button class="apply-btn">Apply Now</button>
+    <button class="apply-btn">
+      Apply Now
+    </button>
 
   </aside>
+
 </div>

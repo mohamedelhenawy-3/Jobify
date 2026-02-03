@@ -18,6 +18,7 @@ export class CreatejobComponent  implements OnInit {
   industries: any[] = [];
   employmentTypes: any[] = [];
   workModes: any[] = [];
+  
   constructor(private Lookupservice:LookupService,private jobservice:JobService ,private fb:FormBuilder){
   }
   
@@ -40,7 +41,7 @@ export class CreatejobComponent  implements OnInit {
       responsibilities:['', Validators.required],
       requirements:['', Validators.required],  
       educationOrExperience:['', Validators.required],    
-      statusId: [3] // Active by default
+      statusId: [5] // Active by default
     })
   }
     loadLookups() {

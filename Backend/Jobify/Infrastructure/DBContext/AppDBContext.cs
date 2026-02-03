@@ -39,6 +39,7 @@ namespace Infrastructure.DBContext
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<JobApplicationNote> JobApplicationNotes { get; set; }
         public DbSet<JobIndustry> JobIndustries { get; set; }
+        public DbSet<JobStatus> JobStatuses { get; set; }
         public DbSet<WorkMode> WorkModes { get; set; }
         public DbSet<EmploymentType> EmploymentTypes { get; set; }
         public DbSet<Skill> Skills { get; set; }
@@ -246,19 +247,7 @@ namespace Infrastructure.DBContext
                       .HasMaxLength(50);
             });
 
-            /* =========================
-               JobApplicationStatus (Lookup)
-            ========================== */
-            builder.Entity<JobApplicationStatus>(entity =>
-            {
-                entity.ToTable("JobApplicationStatuses");
-
-                entity.HasKey(s => s.Id);
-
-                entity.Property(s => s.StatusName)
-                      .IsRequired()
-                      .HasMaxLength(50);
-            });
+         
 
             /* =========================
                JobPost
@@ -333,11 +322,18 @@ namespace Infrastructure.DBContext
 
                 entity.HasKey(ja => ja.Id);
 
-                entity.Property(ja => ja.CoverLetterUrl)
+                entity.Property(ja => ja.CoverLetter)
                       .HasMaxLength(500);
 
-                entity.Property(ja => ja.ResumeUrl)
+                entity.Property(ja => ja.LinkedInUrl)
                       .HasMaxLength(500);
+                entity.Property(ja => ja.ExperienceSummary)
+                .HasMaxLength(500);
+                entity.Property(ja => ja.Motivation)
+               .HasMaxLength(500);
+                entity.Property(ja => ja.Status)
+      .HasConversion<int>()
+      .IsRequired();
 
                 entity.Property(ja => ja.AppliedAt)
                       .HasDefaultValueSql("GETUTCDATE()");
@@ -352,9 +348,7 @@ namespace Infrastructure.DBContext
                       .HasForeignKey(ja => ja.JobPostId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(ja => ja.Status)
-                      .WithMany()
-                      .HasForeignKey(ja => ja.StatusId);
+             
             });
 
             /* =========================

@@ -80,7 +80,6 @@ namespace Infrastructure.Implementation
                 ResumeUrl = jobSeeker.ResumeUrl,
                 Location = jobSeeker.Location,
                 ProfileImage = jobSeeker.ProfileImage.ImageUrl,
-                Applications = jobSeeker.Applications,
                 Headline = jobSeeker.Headline,
                 Summary = jobSeeker.Summary,
                 Skills = jobSeeker.Skills

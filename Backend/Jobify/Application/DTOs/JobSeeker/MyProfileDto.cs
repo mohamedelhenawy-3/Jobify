@@ -18,7 +18,6 @@ namespace Application.DTOs.JobSeeker
         public string? Summary { get; set; }
         public List<MySkills> Skills { get; set; } = new();
 
-        public ICollection<JobApplication>? Applications { get; set; }
 
 
     }

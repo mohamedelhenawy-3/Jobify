@@ -14,16 +14,17 @@ namespace Domain.Entities
         public int JobSeekerId { get; set; }
         public JobSeeker? JobSeeker { get; set; }
 
-        public int? JobPostId { get; set; }
-        public JobPost? JobPost { get; set; }
+        public int JobPostId { get; set; }
+        public JobPost JobPost { get; set; }
+        public string? CoverLetter { get; set; }
+        public string? ExperienceSummary { get; set; }
+        public string? LinkedInUrl { get; set; }
+        public string? Motivation { get; set; }
+            
 
-        public string? CoverLetterUrl { get; set; }
-        public string? ResumeUrl { get; set; }
+        public ApplicationStatus Status { get; set; } = ApplicationStatus.Applied;
 
-        public int StatusId { get; set; }
-        public JobApplicationStatus Status { get; set; }
-
-        public DateTime AppliedAt { get; set; }
+        public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<JobApplicationNote> ? Notes { get; set; }
     }

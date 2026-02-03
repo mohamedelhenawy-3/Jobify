@@ -50,7 +50,7 @@ namespace Infrastructure.Implementation.JobService
                 MaxSalary = createjobdto.MaxSalary,
                 IndustryId = createjobdto.IndustryId,
                 EmploymentTypeId = createjobdto.EmploymentTypeId,
-                StatusId = createjobdto.StatusId,
+                StatusId = createjobdto.StatusId ,// default Draft
                 EmployerProfileId = employerProfile.Id,
                 WorkModeId = createjobdto.WorkModeId,
                 CreatedByUserId = user,
@@ -59,6 +59,8 @@ namespace Infrastructure.Implementation.JobService
                 Responsibilities=createjobdto.Requirements,
                 CreatedAt = DateTime.UtcNow
             };
+
+
             await _db.JobPosts.AddAsync(Job);
             await _db.SaveChangesAsync();
 

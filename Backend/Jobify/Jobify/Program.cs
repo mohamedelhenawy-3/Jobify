@@ -28,6 +28,8 @@ using Application.Interfaces.JobSeeker;
 using Domain.Entities;
 using Infrastructure.Implementation;
 using Application.Interfaces.Skills;
+using Application.Interfaces.JobApplication;
+using Infrastructure.Implementation.JobApplicationSrevice;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,7 +83,7 @@ builder.Services.AddScoped<IEmployerService, EmployerService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IJobSeekerService, JobSeekerService>();
 builder.Services.AddScoped<ISkillsService, SkillsService>();
-
+builder.Services.AddScoped<IJobApplication, JobApplicationService>();
 
 builder.Services.AddScoped<CloudinaryService>();
 
