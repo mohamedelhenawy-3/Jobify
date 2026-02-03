@@ -1,0 +1,143 @@
+/* Container title */
+h4 {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+/* Loading / no-data */
+.loading, .no-data {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+/* Applications list */
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Card */
+.application-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.application-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* Candidate section */
+.candidate-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+.candidate-text .name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.candidate-text .email {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Job Info */
+.job-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.job-title {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.applied-at {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* Status Colors */
+.Applied {
+  background-color: #3b82f6; /* Blue */
+}
+.UnderReview {
+  background-color: #facc15; /* Yellow */
+  color: #111827;
+}
+.Shortlisted {
+  background-color: #10b981; /* Green */
+}
+.InterviewScheduled {
+  background-color: #8b5cf6; /* Purple */
+}
+.Interviewed {
+  background-color: #f97316; /* Orange */
+}
+.Offered {
+  background-color: #14b8a6; /* Teal */
+}
+.Hired {
+  background-color: #059669; /* Dark Green */
+}
+.Rejected {
+  background-color: #ef4444; /* Red */
+}
+.Withdrawn {
+  background-color: #6b7280; /* Gray */
+}
+
+/* Button */
+.btn-sm {
+  font-size: 0.85rem;
+  padding: 5px 14px;
+}
+.btn-primary {
+  background-color: #3b82f6;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}

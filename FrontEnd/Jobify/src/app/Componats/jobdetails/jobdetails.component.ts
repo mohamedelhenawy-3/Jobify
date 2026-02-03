@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { jobdetails } from '../../Models/Job/dteailsjob';
 import { JobService } from '../../Services/JobService/job.service';
 import { CommonModule } from '@angular/common';
@@ -15,7 +15,7 @@ export class JobdetailsComponent implements OnInit{
   loading: boolean = true;
 
   jobs!:jobdetails;
-constructor(private router:ActivatedRoute,private jobservice:JobService){
+constructor(private router:ActivatedRoute,private jobservice:JobService ,private route:Router){
 
 }
   getJobIcon(job: jobdetails): string {
@@ -48,5 +48,8 @@ constructor(private router:ActivatedRoute,private jobservice:JobService){
 
     console.log("jobdetails",res);})
     }
+  }
+    goToApply(jobId: number): void {
+    this.route.navigate(['/apply', jobId]);  // navigate to JobApplicationCreateComponent
   }
 }

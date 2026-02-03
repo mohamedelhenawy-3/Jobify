@@ -1,35 +1,36 @@
 using Application.Interfaces.Auth;
-using Infrastructure.Reposoitory.AuthRepository.Implementation; // wherever your AuthService lives
-using Infrastructure.Reposoitory.AuthRepository;
 using Application.Interfaces.Auth;
-using Infrastructure.Implementation.AuthService;
+using Application.Interfaces.Company;
+using Application.Interfaces.Job;
+using Application.Interfaces.JobApplication;
+using Application.Interfaces.JobSeeker;
+using Application.Interfaces.Skills;
+using Application.Interfaces.Token;
+using Domain.Entities;
 using Domain.Identity;
 using Infrastructure.DBContext;
+using Infrastructure.Implementation;
+using Infrastructure.Implementation.AuthService;
+using Infrastructure.Implementation.CLoudinary;
+using Infrastructure.Implementation.CompanyService;
+using Infrastructure.Implementation.JobApplicationSrevice;
+using Infrastructure.Implementation.JobService;
+using Infrastructure.Implementation.TokenServices;
+using Infrastructure.Reposoitory.AuthRepository;
+using Infrastructure.Reposoitory.AuthRepository.Implementation; // wherever your AuthService lives
+using Infrastructure.Reposoitory.AuthRepository.Interface;
+using Infrastructure.Reposoitory.RefreshTokenRepository.Implementation;
+using Infrastructure.Reposoitory.RefreshTokenRepository.Interface;
 using Infrastructure.Reposoitory.UserRepository.Implementation;
 using Infrastructure.Reposoitory.UserRepository.Interface;
+using Infrastructure.Security;
 using Jobify.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Application.Interfaces.Token;
-using Infrastructure.Implementation.TokenServices;
-using Infrastructure.Reposoitory.RefreshTokenRepository.Interface;
-using Infrastructure.Reposoitory.RefreshTokenRepository.Implementation;
-using Infrastructure.Reposoitory.AuthRepository.Interface;
-using Infrastructure.Security;
-using Application.Interfaces.Company;
-using Infrastructure.Implementation.CompanyService;
-using Infrastructure.Implementation.CLoudinary;
-using Application.Interfaces.Job;
-using Infrastructure.Implementation.JobService;
-using Application.Interfaces.JobSeeker;
-using Domain.Entities;
-using Infrastructure.Implementation;
-using Application.Interfaces.Skills;
-using Application.Interfaces.JobApplication;
-using Infrastructure.Implementation.JobApplicationSrevice;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +87,13 @@ builder.Services.AddScoped<ISkillsService, SkillsService>();
 builder.Services.AddScoped<IJobApplication, JobApplicationService>();
 
 builder.Services.AddScoped<CloudinaryService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
+
 
 builder.Services.AddHttpContextAccessor();
 

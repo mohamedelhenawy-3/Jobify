@@ -1,0 +1,44 @@
+<div class="container mt-4">
+
+  <h4 class="mb-4">Job Applications</h4>
+
+  <div *ngIf="isLoading" class="text-center loading">
+    Loading applications...
+  </div>
+
+  <div *ngIf="!isLoading && !applications.length" class="text-center no-data">
+    No applications found.
+  </div>
+
+  <div class="applications-list" *ngIf="!isLoading && applications.length">
+    <div class="application-card" *ngFor="let app of applications">
+
+      <!-- Candidate -->
+      <div class="candidate-info">
+        <img [src]="app.profileImageUrl" alt="Profile Image" class="profile-img">
+        <div class="candidate-text">
+          <div class="name">{{ app.joSeekerFullName }}</div>
+          <div class="email">{{ app.joSeekerEmail }}</div>
+        </div>
+      </div>
+
+      <!-- Job Info -->
+      <div class="job-info">
+        <div class="job-title">{{ app.jobTitle }}</div>
+        <div class="applied-at">Applied: {{ app.appliedAt | date:'medium' }}</div>
+      </div>
+
+      <!-- Status & Actions -->
+      <div class="card-footer">
+        <span class="status-badge" [ngClass]="statusClass(app.status)">
+          {{ getStatusLabel(app.status) }}
+        </span>
+        <button class="btn btn-primary btn-sm" (click)="viewDetails(app.applicationId)">
+          View Details
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

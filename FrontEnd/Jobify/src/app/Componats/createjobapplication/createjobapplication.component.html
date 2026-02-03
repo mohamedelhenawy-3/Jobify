@@ -1,0 +1,35 @@
+<div class="container mt-5">
+
+  <h2 class="mb-4">Apply for this Job</h2>
+
+  <form [formGroup]="applicationForm" (ngSubmit)="submitApplication()">
+
+    <div class="form-group mb-3">
+      <label>Cover Letter</label>
+      <textarea class="form-control" rows="4" formControlName="coverLetter" placeholder="Write your cover letter..."></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+      <label>Experience Summary</label>
+      <textarea class="form-control" rows="3" formControlName="experienceSummary" placeholder="Summarize your experience..."></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+      <label>LinkedIn / GitHub URL</label>
+      <input type="url" class="form-control" formControlName="linkedInUrl" placeholder="https://...">
+    </div>
+
+    <div class="form-group mb-3">
+      <label>Motivation</label>
+      <textarea class="form-control" rows="3" formControlName="motivation" placeholder="Why are you motivated for this role?"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="applicationForm.invalid || submitting">
+      {{ submitting ? 'Submitting...' : 'Apply Now' }}
+    </button>
+
+    <div *ngIf="successMessage" class="text-success mt-2">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="text-danger mt-2">{{ errorMessage }}</div>
+
+  </form>
+</div>
