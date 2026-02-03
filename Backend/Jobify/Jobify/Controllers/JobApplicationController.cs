@@ -1,7 +1,9 @@
 ﻿using Application.DTOs;
+using Application.DTOs.JobApplication;
 using Application.DTOs.JobPost;
 using Application.Interfaces.JobApplication;
 using Application.Interfaces.Skills;
+using Domain.Entities.LooksUp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +46,20 @@ namespace Jobify.Controllers
             return Ok(result);
 
         }
+        [HttpGet("AppliedJobDetails/{id}")]
+        public async Task<IActionResult> GetAppliedJobDetails(int id )
+        {
+            var result = await _IJoobService.GetAppliedJobSeekerDeyails(id);
+            return Ok(result);
+
+        }
+        [HttpPut("AppliedJobDetails/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateAppliedJobStatus newStatus)
+        {
+            var result = await _IJoobService.UpdateJobStatus(newStatus, id);
+            return Ok(result);
+        }
+
 
     }
 }

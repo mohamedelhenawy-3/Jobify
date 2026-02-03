@@ -13,6 +13,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Infrastructure.Implementation.JobApplicationSrevice
 {
@@ -138,5 +139,53 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
 
             return application;
         }
+
+        public async Task<AppliedJoSeekerDetails> GetAppliedJobSeekerDeyails(int applicationId)
+        {
+            var applicationDetails = await _db.JobApplications
+                .Where(a => a.Id == applicationId)
+                .Include(a => a.JobSeeker).ThenInclude(js => js.User)
+                .Include(a => a.JobSeeker).ThenInclude(js => js.Resume)
+                .Include(a => a.JobPost)
+                .Select(a => new AppliedJoSeekerDetails
+                {
+                 
+                    CoverLetter = a.CoverLetter,
+                    Motivation = a.Motivation,
+                    ExperienceSummary = a.ExperienceSummary,
+                    LinkedInUrl = a.LinkedInUrl,
+                    ResumeUrl = a.JobSeeker.Resume != null ? a.JobSeeker.Resume.PdfUrl : null
+                }).FirstOrDefaultAsync();
+
+            return applicationDetails!;
+        }
+        public async Task<SuccessResponse> UpdateJobStatus(UpdateAppliedJobStatus updatestatusdto, int applicationId)
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Unauthorized");
+
+            var profile = await _db.EmployerProfiles
+                .FirstOrDefaultAsync(js => js.UserId == userId);
+
+            if (profile == null)
+                throw new Exception("Employer profile not found");
+
+            var application = await _db.JobApplications
+                .FirstOrDefaultAsync(a => a.Id == applicationId && a.JobPost.EmployerProfileId == profile.Id);
+
+            if (application == null)
+                throw new Exception("Application not found or you are not authorized");
+
+            application.Status = updatestatusdto.status;
+
+            await _db.SaveChangesAsync();
+
+            return new SuccessResponse
+            {
+                Message = "Application status updated successfully"
+            };
+        }
+
     }
 }

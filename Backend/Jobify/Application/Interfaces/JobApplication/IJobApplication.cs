@@ -14,5 +14,8 @@ namespace Application.Interfaces.JobApplication
         Task<SuccessResponse> CreateApplication(CreateJobApplication jobdto ,int id);
         Task<IEnumerable<MyApplications>> GetMyApplications();
         Task<IEnumerable<AppliedJobSeekers>> GetAppliedJobSeeker();
+        Task<AppliedJoSeekerDetails> GetAppliedJobSeekerDeyails(int applicationId);
+        Task<SuccessResponse> UpdateJobStatus(UpdateAppliedJobStatus updatestatusdto, int applicationId);
+
     }
 }
