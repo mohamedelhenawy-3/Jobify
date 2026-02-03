@@ -107,5 +107,36 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
             return applications;
 
         }
+
+        public async  Task<IEnumerable<AppliedJobSeekers>> GetAppliedJobSeeker()
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Unauthorized");
+
+            var profile = await _db.EmployerProfiles
+                .FirstOrDefaultAsync(js => js.UserId == userId);
+
+            var application = await _db.JobApplications
+               .Where(a => a.JobPost.EmployerProfileId == profile.Id)
+                    .Include(a => a.JobPost)
+                    .Include(a => a.JobSeeker)
+                        .ThenInclude(js => js.User)
+                    .Include(x => x.JobSeeker)
+                        .ThenInclude(x => x.ProfileImage)
+
+                        .Select(a => new AppliedJobSeekers
+                        {
+                            ApplicationId = a.Id,
+                            Status = a.Status.ToString(),
+                            AppliedAt = a.AppliedAt,
+                            JobTitle = a.JobPost.Title,
+                            JoSeekerEmail = a.JobSeeker.User.Email,
+                            JoSeekerFullName = a.JobSeeker.User.UserName,
+                            ProfileImageUrl = a.JobSeeker.ProfileImage.ImageUrl
+                        }).ToListAsync();
+
+            return application;
+        }
     }
 }

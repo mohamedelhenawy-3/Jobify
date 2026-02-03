@@ -13,5 +13,6 @@ namespace Application.Interfaces.JobApplication
     {
         Task<SuccessResponse> CreateApplication(CreateJobApplication jobdto ,int id);
         Task<IEnumerable<MyApplications>> GetMyApplications();
+        Task<IEnumerable<AppliedJobSeekers>> GetAppliedJobSeeker();
     }
 }

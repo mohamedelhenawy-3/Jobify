@@ -36,6 +36,14 @@ namespace Jobify.Controllers
             return Ok(result);
 
         }
+        [HttpGet()]
+
+        public async Task<IActionResult> GetAppliedJob()
+        {
+            var result = await _IJoobService.GetAppliedJobSeeker();
+            return Ok(result);
+
+        }
 
     }
 }
