@@ -5,6 +5,7 @@ import { ApplicationStatus } from '../../Models/JobApplications/ApplicationStatu
 import { AppliedJobSeekerListItem } from '../../Models/JobApplications/AppliedJobSeekers';
 import { AppliedJobSeekerDetails } from '../../Models/JobApplications/appliedSeekerDetails';
 import { CreateJobApplication } from '../../Models/JobApplications/CreateJobApplication';
+import { JobSeekerApplication } from '../../Models/JobApplications/JobSeekerApplication';
 
 
 @Injectable({
@@ -48,9 +49,9 @@ export class JobApplicationService {
      ============================ */
 
   // // Get my applications (job seeker)
-  // getMyApplications(): Observable<JobApplication[]> {
-  //   return this.http.get<JobApplication[]>(`${this.baseUrl}/my-applications`);
-  // }
+  getMyApplications(): Observable<JobSeekerApplication[]> {
+    return this.http.get<JobSeekerApplication[]>(`${this.baseUrl}/MyApplications`);
+  }
 
   // // Withdraw application
   // withdrawApplication(applicationId: number): Observable<any> {

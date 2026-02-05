@@ -17,6 +17,8 @@ import { ApplicationDetailsComponent } from './Componats/application-details/app
 import { CreatejobapplicationComponent } from './Componats/createjobapplication/createjobapplication.component';
 import { SideBarComponent } from './Componats/side-bar/side-bar.component';
 import { MainLayoutComponent } from './Componats/main-layout/main-layout.component';
+import { JobseekerapplicationsComponent } from './Componats/jobseekerapplications/jobseekerapplications.component';
+import { SavedjobsComponent } from './Componats/savedjobs/savedjobs.component';
 
 export const routes: Routes = [
     { path: 'langingpage', component: LandingPageComponent },
@@ -33,7 +35,11 @@ export const routes: Routes = [
         {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
          {path:'updateJob/:id',component:UpdateJobComponent},
           {path:'details/:id',component:JobdetailsComponent},
-          { path: 'apply/:id', component: CreatejobapplicationComponent }
+          { path: 'apply/:id', component: CreatejobapplicationComponent },
+          { path: 'myapplications', component: JobseekerapplicationsComponent },
+           { path: 'savedjobs', component: SavedjobsComponent },
+
+
    
        ]
      },

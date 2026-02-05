@@ -1,0 +1,122 @@
+.applications-page {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+/* Loading & Empty */
+.loading,
+.empty-state {
+  text-align: center;
+  font-size: 16px;
+  color: #6b7280;
+  margin-top: 50px;
+}
+
+/* Grid */
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* Card */
+.application-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.application-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.company {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status-badge.underreview {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.status-badge.accepted {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.status-badge.rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Info */
+.card-info p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.card-info .date {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Cover Letter */
+.cover-letter {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cover-letter strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #111827;
+}
+
+.cover-letter p {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.6;
+}

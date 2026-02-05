@@ -81,7 +81,7 @@ app-navbar {
   flex-direction: column;  /* stack vertically */
   align-items: stretch;    /* remove horizontal centering */
   justify-content: flex-start;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  background: linear-gradient(135deg, #ffffff, #fcfeff, #fbfeff);
   padding: 20px;           /* optional safe padding */
 }
 
@@ -101,7 +101,7 @@ app-navbar {
   font-size: 14px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #cbd5e1;
+  color: #000000;
   margin-bottom: 15px;
 }
 
@@ -110,6 +110,7 @@ app-navbar {
   font-size: 32px;
   line-height: 1.4;
   margin-bottom: 30px;
+  color: #000;
 }
 
 /* Search box */
@@ -124,12 +125,12 @@ app-navbar {
 .search-box input {
   width: 100%;
   padding: 15px 50px 15px 20px;
-  border-radius: 50px;
-  border: none;
+  border-radius: 30px;
+  border: 1px solid black;
   outline: none;
   font-size: 16px;
-  background: #fff;
-  color: #333;
+  background: #ffffff;
+  color: #ffffff;
 }
 
 /* Search icon */

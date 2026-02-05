@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.SavedJob;
+﻿using Application.DTOs.SavedJobDto;
+using Application.Interfaces.SavedJob;
 using Domain.Entities;
 using Infrastructure.DBContext;
 using Microsoft.AspNetCore.Http;
@@ -32,15 +33,25 @@ namespace Infrastructure.Implementation.SavedJobService
                 .FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
-        public async  Task<List<JobPost>> GetSavedJobsAsync()
+        public async Task<List<SavedJobDto>> GetSavedJobsAsync()
         {
             var userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId))
                 throw new UnauthorizedAccessException();
-            return await _db.SavedJobs
-                       .Where(x => x.UserId == userId)
-                       .Select(x => x.Job)
-                       .ToListAsync();
+
+            var savedJobs = await _db.SavedJobs
+                .Where(x => x.UserId == userId)
+                .Include(s => s.Job)   // include the Job entity
+                .Select(x => new SavedJobDto
+                {
+                    id = x.Job.Id,
+                    title = x.Job.Title,
+                    description = x.Job.Description,
+                    location = x.Job.Location
+                })
+                .ToListAsync();
+
+            return savedJobs;
         }
 
         public async  Task<bool> IsJobSavedAsync(int jobId)

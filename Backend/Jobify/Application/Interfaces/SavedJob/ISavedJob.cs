@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs.SavedJobDto;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,6 @@ namespace Application.Interfaces.SavedJob
         Task SaveJobAsync( int jobId);
         Task UnsaveJobAsync( int jobId);
         Task<bool> IsJobSavedAsync(int jobId);
-        Task<List<JobPost>> GetSavedJobsAsync();
+        Task<List<SavedJobDto>> GetSavedJobsAsync();
     }
 }

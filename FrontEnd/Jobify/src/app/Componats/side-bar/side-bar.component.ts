@@ -49,8 +49,8 @@ export class SideBarComponent implements OnInit {
         { label: 'home', route: '/home', icon: 'fas fa-home' },
         { label: 'Dashboard', route: '/dashboard', icon: 'fas fa-home' },
         { label: 'Find Jobs', route: '/findjob', icon: 'fas fa-search' },
-        { label: 'My Applications', route: '/applications', icon: 'fas fa-clipboard-list' },
-        { label: 'Saved Jobs', route: '/saved', icon: 'fas fa-bookmark' },
+        { label: 'My Applications', route: '/myapplications', icon: 'fas fa-clipboard-list' },
+        { label: 'Saved Jobs', route: '/savedjobs', icon: 'fas fa-bookmark' },
         { label: 'Profile', route: '/seeker', icon: 'fas fa-user' }
       ];
     } else if (this.userRole === 'Employer') {

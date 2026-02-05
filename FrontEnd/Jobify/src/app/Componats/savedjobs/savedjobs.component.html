@@ -1,0 +1,44 @@
+<div class="saved-jobs-page">
+
+  <h2>⭐ My Saved Jobs</h2>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading saved jobs...
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && savedJobs.length === 0" class="empty-state">
+    You haven’t saved any jobs yet.
+  </div>
+
+  <!-- Saved Jobs Grid -->
+  <div class="jobs-grid" *ngIf="!loading && savedJobs.length">
+
+    <div class="job-card" *ngFor="let job of savedJobs">
+
+      <!-- Header -->
+      <div class="job-header">
+        <h3>{{ job.title }}</h3>
+        <span class="company">{{ job.location }}</span>
+      </div>
+
+      <!-- Description -->
+      <p class="description">{{ job.description }}</p>
+
+      <!-- Actions -->
+      <div class="job-actions">
+        <button
+  class="view-btn"
+  [routerLink]="['/details', job.id]">
+  View Job
+</button>
+
+        <button class="remove-btn" >Remove</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

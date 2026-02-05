@@ -1,0 +1,52 @@
+<div class="applications-page">
+
+  <h2 class="page-title">My Job Applications</h2>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading your applications...
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && applications.length === 0" class="empty-state">
+    <p>You haven’t applied to any jobs yet.</p>
+  </div>
+
+  <!-- Applications List -->
+  <div class="applications-grid" *ngIf="!loading && applications.length">
+
+    <div class="application-card" *ngFor="let app of applications">
+
+      <!-- Header -->
+      <div class="card-header">
+        <div>
+          <h3>{{ app.jobTitle }}</h3>
+          <span class="company">{{ app.companyName }}</span>
+        </div>
+
+        <span class="status-badge" [ngClass]="getStatusClass(app.status)">
+          {{ app.status }}
+        </span>
+      </div>
+
+      <!-- Info -->
+      <div class="card-info">
+        <p>📍 {{ app.jobLocation }}</p>
+        <p>🏠 {{ app.workMode }}</p>
+        <p>🕒 {{ app.employmentType }}</p>
+        <p class="date">
+          Applied on {{ app.appliedAt | date: 'mediumDate' }}
+        </p>
+      </div>
+
+      <!-- Cover Letter -->
+      <div class="cover-letter">
+        <strong>Cover Letter</strong>
+        <p>{{ app.coverLetterUrl }}</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
