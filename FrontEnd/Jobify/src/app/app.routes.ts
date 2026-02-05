@@ -15,26 +15,37 @@ import { UpdateJobComponent } from './Componats/update-job/update-job.component'
 import { ApplicationsComponent } from './Componats/applications/applications.component';
 import { ApplicationDetailsComponent } from './Componats/application-details/application-details.component';
 import { CreatejobapplicationComponent } from './Componats/createjobapplication/createjobapplication.component';
+import { SideBarComponent } from './Componats/side-bar/side-bar.component';
+import { MainLayoutComponent } from './Componats/main-layout/main-layout.component';
 
 export const routes: Routes = [
-    { path: '', component: LandingPageComponent },
-    { path: 'register/employer', component: EmployeregisterComponent },
-    { path: 'register/job-seeker', component: JobseekerregisterComponent }, 
+    { path: 'langingpage', component: LandingPageComponent },
+      { path: '',
+      component: MainLayoutComponent,
+     children: [
+        { path: 'applications', component: ApplicationsComponent },
+        {path:'seeker',component:SeekerprofileComponent},
+        { path: 'home', component: HomeComponent },
+        { path: 'findjob', component: JobspagesComponent },
+        { path: 'createjob', component: CreatejobComponent },
+        { path: 'managejobs', component: ManagejobsComponent },
+        {path:'jobapplications',component:ApplicationsComponent},
+        {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
+         {path:'updateJob/:id',component:UpdateJobComponent},
+          {path:'details/:id',component:JobdetailsComponent},
+          { path: 'apply/:id', component: CreatejobapplicationComponent }
+   
+       ]
+     },
+    {path:'sidebar',component:SideBarComponent}, 
     { path: 'register', component: RegisterComponent },
     { path: 'login', component: LoginComponent },
-    { path: 'home', component: HomeComponent },
-    { path: 'findjob', component: JobspagesComponent },
-    { path: 'createjob', component: CreatejobComponent },
-    { path: 'managejobs', component: ManagejobsComponent },
-    {path:'details/:id',component:JobdetailsComponent},
-    { path: 'apply/:id', component: CreatejobapplicationComponent }, // new route
 
 
-    {path:'seeker',component:SeekerprofileComponent},
-    {path:'updateJob/:id',component:UpdateJobComponent},
+    // {path:'updateJob/:id',component:UpdateJobComponent},
 
-    {path:'jobapplications',component:ApplicationsComponent},
-     {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
+    // {path:'jobapplications',component:ApplicationsComponent},
+    //  {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
   // other routes...
 
 ];

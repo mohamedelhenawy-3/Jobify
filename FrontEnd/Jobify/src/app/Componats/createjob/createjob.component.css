@@ -1,33 +1,50 @@
-/* Container */
+/* ============================= */
+/* Page Layout - fill space next to sidebar and navbar */
+/* ============================= */
 .page-content {
-  padding-top: 20px; /* space below navbar */
-  padding-bottom: 10px;
-  max-height: 100vh;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  flex: 1; /* take remaining space next to sidebar */
+  display: flex;
+  justify-content: center; /* center form horizontally */
+  align-items: flex-start; /* start at top */
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px); /* full viewport minus navbar height */
+  background-color: #f4f6f9;
+  overflow: hidden; /* prevent scrolling */
 }
 
-
+/* ============================= */
+/* Form Card Container - internal scroll if needed */
+/* ============================= */
 .job-form-container {
-  max-width: 600px;
-  margin: 50px auto;
-  margin-top: 40px;
-  padding: 40px 30px;
   background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 70%;
+  max-width: 900px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+
+  /* Make form scrollable if too tall */
+  max-height: calc(100vh - 100px); /* minus navbar + padding */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Title */
+/* ============================= */
+/* Form Title */
 .form-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  color: #1f2937;
   text-align: center;
-  font-size: 28px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 30px;
+  flex-shrink: 0;
 }
 
-/* Form */
+/* ============================= */
+/* Form Layout */
 .job-form {
   display: flex;
   flex-direction: column;
@@ -38,61 +55,85 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
 .form-group label {
-  font-weight: 600;
   font-size: 14px;
+  font-weight: 500;
   color: #374151;
-  margin-bottom: 6px;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
-  padding: 12px 15px;
+  padding: 12px 14px;
   font-size: 14px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
   outline: none;
-  transition: border 0.3s, box-shadow 0.3s;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-/* Textarea */
 textarea {
-  resize: none;
+  resize: vertical;
+  max-height: 40px;
 }
 
-/* Form Row (Multiple fields side by side) */
+/* Rows */
 .form-row {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
-.form-row .form-group {
-  flex: 1;
+.form-row.three-columns {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 /* Submit Button */
 .submit-btn {
-  padding: 15px;
-  font-size: 16px;
+  margin-top: 10px;
+  padding: 14px;
+  font-size: 15px;
   font-weight: 600;
-  background-color: #4f46e5;
-  color: white;
+  background: #2563eb;
+  color: #fff;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .submit-btn:hover {
-  background-color: #4338ca;
+  background: #1e40af;
+}
+
+/* ============================= */
+/* Responsive */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 16px;
+  }
+
+  .job-form-container {
+    padding: 2px;
+    max-height: none; /* let mobile scroll naturally */
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-title {
+    font-size: 22px;
+  }
 }

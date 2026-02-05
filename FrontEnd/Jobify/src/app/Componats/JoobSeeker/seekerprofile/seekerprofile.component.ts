@@ -31,6 +31,7 @@ skillsInput = ''; // string of skills comma separated
     this.profileService.getMyProfile().subscribe({
       next: res => {
         this.profile = res;
+        console.log("PRFILE",res);
         this.loading = false;
       },
       error: () => this.loading = false

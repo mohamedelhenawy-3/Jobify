@@ -1,0 +1,17 @@
+<div *ngIf="isLoggedIn$ | async" class="sidebar">
+  <div class="sidebar-header">
+    <h2>Jobify</h2>
+  </div>
+
+  <ul class="sidebar-menu">
+    <li
+      *ngFor="let item of sidebarItems"
+      [class.active]="active === getKeyFromRoute(item.route)"
+    >
+      <a [routerLink]="item.route">
+        <i *ngIf="item.icon" class="{{ item.icon }}"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+</div>

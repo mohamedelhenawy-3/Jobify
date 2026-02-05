@@ -18,6 +18,8 @@ namespace Infrastructure.DBContext
         {
 
         }
+        public DbSet<SavedJob> SavedJobs { get; set; }
+
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         // =========================
         // Identity & Users
@@ -169,7 +171,9 @@ namespace Infrastructure.DBContext
                 
 
             });
-
+            builder.Entity<SavedJob>()
+      .HasIndex(x => new { x.UserId, x.JobId })
+      .IsUnique();
 
             //Pdf
             builder.Entity<Pdf>(entity =>

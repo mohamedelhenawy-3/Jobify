@@ -1,20 +1,18 @@
-/* Navbar */
 .navbar {
   display: flex;
-  background: #ffffff;
-  border-radius: 30px;
-  padding: 12px 24px;
-  margin: 0 auto;
-  width: 95%;
-  justify-content: space-between;
   align-items: center;
-  position: fixed;
-  top: 12px;
-  left: 0;
-  right: 0;
-  z-index: 9999;
+  justify-content: space-between;
+
+  background: #ffffff;
+  padding: 12px 24px;
+
+  width: 100%;          /* 👈 take remaining width */
+  height: 64px;
+
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  z-index: 10;
 }
+
 
 /* Brand */
 .brand {
@@ -110,6 +108,7 @@
   text-decoration: none;
   font-weight: 500;
   transition: color 0.25s, transform 0.2s;
+  margin-right: 10px;
 }
 
 .right-actions a:hover,

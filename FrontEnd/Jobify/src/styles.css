@@ -5,4 +5,12 @@ body {
   min-height: 80vh;
   background: #f4f6f9;
   font-family: "Segoe UI", Tahoma, sans-serif;
+}.left {
+  width: 120px !important;
+  flex-shrink: 0;
+  top: 3px;
+  height: fit-content;
+}
+.job-filter-sidebar {
+  width: 120px !important;
 }

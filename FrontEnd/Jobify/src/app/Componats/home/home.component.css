@@ -1,26 +1,98 @@
-/* Reset */
-* {
+/* ================= RESET ================= */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Full height container */
-.container {
-  height: 100vh;
+/* ================= APP LAYOUT ================= */
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* prevent page scroll */
+}
+
+.app-layout {
   display: flex;
-  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar */
+app-side-bar {
+  width: 260px;
+  height: 100vh;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #1e1e2f; /* optional */
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Navbar */
+app-navbar {
+  height: 60px;
+  min-height: 60px;
+  width: 100%;
+  margin: 0;
+  padding: 0 16px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* Router content area */
+.page-content {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;      /* scroll only here */
+  background-color: #f5f6fa;
+}
+
+/* ================= HOME PAGE ================= */
+
+/* Full width container */
+.container {
+  min-height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;  /* stack vertically */
+  align-items: stretch;    /* remove horizontal centering */
+  justify-content: flex-start;
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  padding: 20px;           /* optional safe padding */
 }
 
 /* Hero card */
 .hero {
-  text-align: center;
-  max-width: 700px;
+  max-width: 1100px;
   width: 100%;
-  padding: 40px;
+  /* margin:  auto; */
+  margin-top: 80px;          /* center hero only */
+  padding: 100px 100px;
+  text-align: center;
   color: #fff;
 }
 
@@ -71,37 +143,40 @@
   cursor: pointer;
 }
 
-/* Hover effect */
+/* Hover/focus effect */
 .search-box input:focus {
-  box-shadow: 0 0 
-  0 3px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
+
+/* ================= TOP CATEGORIES ================= */
 .top-categories h2 {
-  text-align: center;      /* Center the text */
-  font-size: 28px;         /* Bigger font */
-  font-weight: 700;        /* Bold */
-  color: #333;             /* Dark color */
-  margin-bottom: 30px;     /* Space below heading */
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 30px;
   position: relative;
 }
 
-/* Optional: underline for a modern style */
+/* Optional underline */
 .top-categories h2::after {
   content: '';
   display: block;
   width: 60px;
   height: 4px;
-  background: #00bcd4;     /* Accent color */
-  margin: 10px auto 0;     /* Center underline below text */
+  background: #00bcd4;
+  margin: 10px auto 0;
   border-radius: 2px;
 }
 
-/* Container for industries */
+/* Industries grid */
 .industries-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 cards per row */
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
-  padding: 20px;
+  width: 100%;
+  margin: 0;
+  padding: 0;  /* remove side spacing */
 }
 
 /* Individual industry card */
@@ -160,7 +235,7 @@
   font-weight: bold;
 }
 
-/* Responsive adjustments */
+/* ================= RESPONSIVE ================= */
 @media (max-width: 1200px) {
   .industries-grid {
     grid-template-columns: repeat(4, 1fr);

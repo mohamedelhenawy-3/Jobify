@@ -66,20 +66,32 @@
         </ng-template>
       </div>
 
-      <<div class="card">
-  <h2>Skills</h2>
+      <!-- Skills -->
+      <div class="card">
+        <h2>Skills</h2>
 
-  <div *ngIf="!editProfile">
-    <div class="skills">
-      <span class="skill" *ngFor="let skill of profile.skills">{{ skill.name }}</span>
-    </div>
-    <p *ngIf="profile.skills.length === 0" class="muted">No skills added yet.</p>
-  </div>
+        <div *ngIf="!editProfile">
+          <div class="skills">
+            <span
+              class="skill"
+              *ngFor="let skill of profile.skills ?? []">
+              {{ skill.name }}
+            </span>
+          </div>
 
-  <div *ngIf="editProfile">
-    <input type="text" placeholder="Add skills separated by commas" [(ngModel)]="skillsInput"/>
-  </div>
-</div>
+          <p *ngIf="(profile.skills?.length ?? 0) === 0" class="muted">
+            No skills added yet.
+          </p>
+        </div>
+
+        <div *ngIf="editProfile">
+          <input
+            type="text"
+            placeholder="Add skills separated by commas"
+            [(ngModel)]="skillsInput"
+          />
+        </div>
+      </div>
 
       <!-- Contact -->
       <div class="card">
@@ -127,12 +139,12 @@
         </ng-container>
       </div>
 
-      <!-- Applications -->
+      <!-- Applications (SAFE) -->
       <div class="card">
         <h2>Job applications</h2>
 
-        <ng-container *ngIf="profile.applications.length > 0; else noApps">
-          <!-- later -->
+        <ng-container *ngIf="(profile.applications?.length ?? 0) > 0; else noApps">
+          <!-- future list -->
         </ng-container>
 
         <ng-template #noApps>

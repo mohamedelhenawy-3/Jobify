@@ -1,12 +1,12 @@
 /* Sidebar container */
 .job-filter-sidebar {
-    width: 200px;
+    width: 120px;
     padding: 30px;
     background-color: #f8f9fa; /* light gray background */
     border-right: 1px solid #dee2e6;
-    height: 80vh; /* full height */
+    height: 100vh; /* full height */
     position: sticky;
-    top: 10px;
+    top: 3px;
     overflow-y: auto;
     font-family: Arial, sans-serif;
 }

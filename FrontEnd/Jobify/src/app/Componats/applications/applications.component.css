@@ -4,6 +4,7 @@ h4 {
   font-size: 1.5rem;
   color: #1f2937;
   margin-bottom: 1.5rem;
+  margin: 30px;
 }
 
 /* Loading / no-data */
@@ -16,6 +17,7 @@ h4 {
 .applications-list {
   display: flex;
   flex-direction: column;
+  margin: 10px;
   gap: 20px;
 }
 
