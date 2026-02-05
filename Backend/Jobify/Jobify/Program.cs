@@ -4,6 +4,7 @@ using Application.Interfaces.Company;
 using Application.Interfaces.Job;
 using Application.Interfaces.JobApplication;
 using Application.Interfaces.JobSeeker;
+using Application.Interfaces.SavedJob;
 using Application.Interfaces.Skills;
 using Application.Interfaces.Token;
 using Domain.Entities;
@@ -15,6 +16,7 @@ using Infrastructure.Implementation.CLoudinary;
 using Infrastructure.Implementation.CompanyService;
 using Infrastructure.Implementation.JobApplicationSrevice;
 using Infrastructure.Implementation.JobService;
+using Infrastructure.Implementation.SavedJobService;
 using Infrastructure.Implementation.TokenServices;
 using Infrastructure.Reposoitory.AuthRepository;
 using Infrastructure.Reposoitory.AuthRepository.Implementation; // wherever your AuthService lives
@@ -85,6 +87,7 @@ builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IJobSeekerService, JobSeekerService>();
 builder.Services.AddScoped<ISkillsService, SkillsService>();
 builder.Services.AddScoped<IJobApplication, JobApplicationService>();
+builder.Services.AddScoped<ISavedJob, SavedJobService>();
 
 builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddControllers()
