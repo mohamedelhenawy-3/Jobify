@@ -148,6 +148,72 @@ html, body {
   color: #111827;
   font-weight: 600;
 }
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 16px;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  background-color: #2563eb;
+  color: #ffffff;
+
+  border: 1px solid #2563eb;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+/* .save-btn:hover:not(:disabled) {
+  background-color: #dbf612;
+} */
+
+/* Saved state */
+.save-btn {
+  width: 50px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.bookmark-icon {
+  width: 24px;
+  height: 24px;
+  fill: #9ca3af; /* default gray */
+  transition: fill 0.2s ease, transform 0.2s ease;
+}
+
+.save-btn:hover .bookmark-icon {
+  fill: #2563eb;
+  transform: scale(1.2);
+}
+
+.save-btn.saved {
+  border-color: #2563eb;
+  background-color: #2563eb;
+}
+
+.save-btn.saved .bookmark-icon {
+  fill: #ffffff;
+  transform: scale(1.2);
+}
+
+.save-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 
 .apply-btn {
   margin-top: 20px;

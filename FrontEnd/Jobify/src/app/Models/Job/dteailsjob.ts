@@ -12,4 +12,5 @@ export interface jobdetails {
   educationOrExperience:string;
   requirements:string;
   status:string;
+    isSaved?: boolean;
 }

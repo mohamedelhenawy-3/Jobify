@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { jobdetails } from '../../Models/Job/dteailsjob';
 import { JobService } from '../../Services/JobService/job.service';
 import { CommonModule } from '@angular/common';
+import { SavedjobsService } from '../../Services/Savedjobsservice/savedjobs.service';
 
 @Component({
   selector: 'app-jobdetails',
@@ -13,9 +14,11 @@ import { CommonModule } from '@angular/common';
 })
 export class JobdetailsComponent implements OnInit{
   loading: boolean = true;
+isSaved = false;
+saving = false;
 
   jobs!:jobdetails;
-constructor(private router:ActivatedRoute,private jobservice:JobService ,private route:Router){
+constructor(private router:ActivatedRoute,private savedservice:SavedjobsService,private jobservice:JobService ,private route:Router){
 
 }
   getJobIcon(job: jobdetails): string {
@@ -40,16 +43,36 @@ constructor(private router:ActivatedRoute,private jobservice:JobService ,private
   return 'fas fa-briefcase';
 }
   ngOnInit(): void {
-    const jobid=this.router.snapshot.paramMap.get('id');
-    if(jobid){this.jobservice.getJobDetails(+jobid).subscribe(res=>{
-      
+    const jobid=Number(this.router.snapshot.paramMap.get('id'));
+    if(jobid)
+    {
+      this.jobservice.getJobDetails(+jobid).subscribe(res=>{
       this.jobs=res;
-              this.loading = false;
-
-    console.log("jobdetails",res);})
+      this.loading = false;
+       console.log("jobdetails",res);})
     }
+      this.savedservice.isJobSaved(+jobid).subscribe(res => {
+          this.isSaved = res;
+      });
   }
     goToApply(jobId: number): void {
     this.route.navigate(['/apply', jobId]);  // navigate to JobApplicationCreateComponent
   }
+  toggleSave(jobId: number) {
+  if (this.saving) return;
+
+  this.saving = true;
+
+  const request = this.isSaved
+    ? this.savedservice.unsaveJob(jobId)
+    : this.savedservice.saveJob(jobId);
+
+  request.subscribe({
+    next: () => {
+      this.isSaved = !this.isSaved;
+      this.saving = false;
+    },
+    error: () => this.saving = false
+  });
+}
 }

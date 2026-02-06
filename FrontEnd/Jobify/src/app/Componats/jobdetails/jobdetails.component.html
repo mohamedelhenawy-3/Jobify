@@ -63,8 +63,20 @@
   <!-- SIDEBAR (RIGHT) -->
   <aside class="job-sidebar">
 
-    <h3>Job Overview</h3>
-
+    <h3>Job Overview 
+       <button
+  class="save-btn"
+  [class.saved]="isSaved"
+  (click)="toggleSave(jobs.id)"
+  aria-label="Save job">
+  <svg viewBox="0 0 24 24" class="bookmark-icon">
+    <path
+      d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"
+    />
+  </svg>
+</button>
+    </h3>
+    
     <div class="sidebar-item">
       <span>🏢 Industry</span>
       <strong>{{ jobs.industry }}</strong>
@@ -91,6 +103,9 @@
 <button class="apply-btn" (click)="goToApply(jobs.id)">
   Apply Now
 </button>
+
+
+
 
 
   </aside>

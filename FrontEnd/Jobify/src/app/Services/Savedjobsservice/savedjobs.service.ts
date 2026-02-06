@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,19 @@ private apiUrl = 'https://localhost:44309/api/SavedJob';
     return this.HttpClient.get(`${this.apiUrl}`);
   }
 
-  saveJob(jobId: string) {
-    return this.HttpClient.post(`${this.apiUrl}/save`, { jobId });
+
+  saveJob(jobId: number): Observable<void> {
+    return this.HttpClient.post<void>(`${this.apiUrl}/${jobId}`, {});
   }
 
-  removeSavedJob(jobId: string) {
-    return this.HttpClient.delete(`${this.apiUrl}/saved/${jobId}`);
+  unsaveJob(jobId: number): Observable<void> {
+    return this.HttpClient.delete<void>(`${this.apiUrl}/${jobId}`);
+  }
+
+
+
+  isJobSaved(jobId: number): Observable<boolean> {
+    return this.HttpClient.get<boolean>(`${this.apiUrl}/check/${jobId}`);
   }
 
  
