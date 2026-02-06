@@ -67,20 +67,24 @@ namespace Infrastructure.Implementation
             var userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Unauthorized");
-
+            var user =  _db.Users.Where(x => x.Id == userId);
             var jobSeeker = await _db.JobSeekers
                 .Include(js => js.Applications)
                 .Include(js => js.ProfileImage)
                 .Include(js => js.Skills)
+                .Include(x=>x.Resume)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
+
+            var resume = _db.Pdfs.Where(x => x.JobSeekerId == jobSeeker.Id).Select(x => x.PdfUrl).FirstOrDefault();
 
             return new MyProfileDto
             {
+                    FullName =user.Select(x=>x.FullName).FirstOrDefault(),
                 PhoneNumber = jobSeeker.PhoneNumber,
-                ResumeUrl = jobSeeker.ResumeUrl,
                 Location = jobSeeker.Location,
                 ProfileImage = jobSeeker.ProfileImage.ImageUrl,
                 Headline = jobSeeker.Headline,
+                Resume = resume,
                 Summary = jobSeeker.Summary,
                 Skills = jobSeeker.Skills
                 .Select(s => new MySkills
@@ -101,30 +105,49 @@ namespace Infrastructure.Implementation
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Unauthorized");
 
+            // Load FULL user entity
+            var user = await _db.Users
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            // Load profile with related data
             var profile = await _db.JobSeekers
                 .Include(js => js.ProfileImage)
+                .Include(js => js.Skills)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
 
-            // Update fields if provided
-            if (!string.IsNullOrEmpty(updateprofiledto.PhoneNumber)) profile.PhoneNumber = updateprofiledto.PhoneNumber;
-            if (!string.IsNullOrEmpty(updateprofiledto.Location)) profile.Location = updateprofiledto.Location;
+            // ✅ Update user full name properly
+            if (!string.IsNullOrEmpty(updateprofiledto.FullName))
+                user.FullName = updateprofiledto.FullName;
 
-            if (!string.IsNullOrEmpty(updateprofiledto.Headline)) profile.Headline = updateprofiledto.Headline;
-            if (!string.IsNullOrEmpty(updateprofiledto.Summary)) profile.Summary = updateprofiledto.Summary;
+            if (!string.IsNullOrEmpty(updateprofiledto.PhoneNumber))
+                profile.PhoneNumber = updateprofiledto.PhoneNumber;
 
-            // Handle profile image
+            if (!string.IsNullOrEmpty(updateprofiledto.Location))
+                profile.Location = updateprofiledto.Location;
+
+            if (!string.IsNullOrEmpty(updateprofiledto.Headline))
+                profile.Headline = updateprofiledto.Headline;
+
+            if (!string.IsNullOrEmpty(updateprofiledto.Summary))
+                profile.Summary = updateprofiledto.Summary;
+
+            // ================= IMAGE =================
             if (updateprofiledto.ProfileImage != null)
             {
-                // Delete old image if exists
-                if (profile.ProfileImage != null && !string.IsNullOrEmpty(profile.ProfileImage.PublicId))
+                if (profile.ProfileImage != null &&
+                    !string.IsNullOrEmpty(profile.ProfileImage.PublicId))
                 {
                     await _cloudinaryService.DeleteImageAsync(profile.ProfileImage.PublicId);
                 }
 
-                var (url, publicId) = await _cloudinaryService.UploadImageAsync(updateprofiledto.ProfileImage);
+                var (url, publicId) =
+                    await _cloudinaryService.UploadImageAsync(updateprofiledto.ProfileImage);
 
                 if (profile.ProfileImage == null)
                 {
@@ -144,9 +167,12 @@ namespace Infrastructure.Implementation
                 }
             }
 
+            // ================= SKILLS =================
             if (updateprofiledto.Skills != null && updateprofiledto.Skills.Any())
             {
-                var existingSkills = profile.Skills.Select(s => s.Name.ToLower()).ToList();
+                var existingSkills = profile.Skills
+                    .Select(s => s.Name.ToLower())
+                    .ToList();
 
                 var newSkills = updateprofiledto.Skills
                     .Where(s => !existingSkills.Contains(s.ToLower()))
@@ -156,26 +182,21 @@ namespace Infrastructure.Implementation
                         JobSeeker = profile
                     }).ToList();
 
-                if (newSkills.Any())
+                foreach (var skill in newSkills)
                 {
-                    foreach (var skill in newSkills)
-                    {
-                        profile.Skills.Add(skill);
-                    }
+                    profile.Skills.Add(skill);
                 }
-
             }
 
-            _db.JobSeekers.Update(profile);
             await _db.SaveChangesAsync();
 
             return new SuccessResponse
             {
-                Message = "user profile updated successfully."
+                Message = "User profile updated successfully."
             };
         }
 
-        public async  Task<SuccessResponse> UploadCv(UploadMyResume resumedto)
+        public async Task<SuccessResponse> UploadCv(UploadMyResume resumedto)
         {
             var userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId))
@@ -188,39 +209,49 @@ namespace Infrastructure.Implementation
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
 
-            if(resumedto.Resume != null)
-            {
-                if(profile.Resume != null && !string.IsNullOrEmpty(profile.Resume.PublicId)){
-                    await _cloudinaryService.DeleteImageAsync(profile.Resume.PublicId);
-                };
-               var (url,publicId)= await _cloudinaryService.UploadPdfAsync(resumedto.Resume);
-                if (profile.Resume == null)
-                {
-                    profile.Resume = new Pdf
-                    {
-                        PdfUrl = url,
-                        PublicId = publicId,
-                        CreatedAt = DateTime.UtcNow,
-                        JobSeeker = profile
-                    };
-                }
-                else
-                {
-                    profile.ProfileImage.ImageUrl = url;
-                    profile.ProfileImage.PublicId = publicId;
-                    profile.ProfileImage.CreatedAt = DateTime.UtcNow;
-                }
+            if (resumedto.Resume == null)
+                throw new Exception("No file uploaded");
 
+            // Delete old resume if exists
+            if (profile.Resume != null && !string.IsNullOrEmpty(profile.Resume.PublicId))
+            {
+                await _cloudinaryService.DeleteImageAsync(profile.Resume.PublicId);
             }
 
-            _db.JobSeekers.Update(profile);
+            // Upload new PDF
+            var (url, publicId) = await _cloudinaryService.UploadPdfAsync(resumedto.Resume);
+
+            if (profile.Resume == null)
+            {
+                // 🔥 Create new Pdf entity
+                var resume = new Pdf
+                {
+                    PdfUrl = url,
+                    PublicId = publicId,
+                    CreatedAt = DateTime.UtcNow,
+                    JobSeekerId = profile.Id
+                };
+
+                profile.Resume = resume;
+
+                await _db.Pdfs.AddAsync(resume); // 🔥 Important
+            }
+            else
+            {
+                // 🔥 Update existing one
+                profile.Resume.PdfUrl = url;
+                profile.Resume.PublicId = publicId;
+                profile.Resume.CreatedAt = DateTime.UtcNow;
+            }
+
             await _db.SaveChangesAsync();
 
             return new SuccessResponse
             {
-                Message = " upLoaded Cv successfully."
+                Message = "CV uploaded successfully."
             };
         }
+
 
         public async Task<ResumeDto> ViewMyCv()
         {

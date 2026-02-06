@@ -10,6 +10,8 @@ namespace Application.DTOs.JobSeeker
 {
     public class UpdateMyProfile
     {
+
+        public string FullName { get; set; }
         public string? Headline { get; set; }
         public string? Summary { get; set; }
         public string? PhoneNumber { get; set; }

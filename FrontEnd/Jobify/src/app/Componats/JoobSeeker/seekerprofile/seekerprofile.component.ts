@@ -48,6 +48,7 @@ skillsInput = ''; // string of skills comma separated
 
 saveProfile() {
   const formData = new FormData();
+  if (this.profile.fullName) formData.append('fullName', this.profile.fullName);
 
   if (this.profile.headline) formData.append('Headline', this.profile.headline);
   if (this.profile.summary) formData.append('Summary', this.profile.summary);

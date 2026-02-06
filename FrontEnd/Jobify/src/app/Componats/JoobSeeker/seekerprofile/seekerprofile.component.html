@@ -19,11 +19,13 @@
     <!-- Basic Info -->
     <div class="profile-info">
       <ng-container *ngIf="!editProfile; else editHeader">
-        <h1>{{ profile.headline || 'Job Seeker' }}</h1>
+        <h1>{{ profile.fullName || 'Profile Name'}}</h1>
+        <h3>{{ profile.headline || 'Job Seeker' }}</h3>
         <p class="location">📍 {{ profile.location || 'Location not set' }}</p>
       </ng-container>
 
       <ng-template #editHeader>
+        <input type="text" [(ngModel)]="profile.fullName" placeholder="fullName" />
         <input type="text" [(ngModel)]="profile.headline" placeholder="Headline" />
         <input type="text" [(ngModel)]="profile.location" placeholder="Location" />
       </ng-template>
@@ -120,9 +122,9 @@
         <h2>Resume</h2>
 
         <ng-container *ngIf="!editProfile">
-          <ng-container *ngIf="profile.resumeUrl; else noResume">
+          <ng-container *ngIf="profile.resume; else noResume">
             <a
-              [href]="profile.resumeUrl"
+              [href]="profile.resume"
               target="_blank"
               class="btn">
               View resume
