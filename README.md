@@ -94,8 +94,4 @@ ng serve -o
 * **LinkedIn:** [https://www.linkedin.com/in/mohamed-el-henawy-759888209/]
 * **Email:** [mohamed.henawii11@gmail.com]
 
----
 
-### Helpful Next Step
-
-**Would you like me to generate a set of "Technical Interview Questions" based specifically on this README so you can practice explaining the project to a recruiter?**
