@@ -91,9 +91,8 @@ ng serve -o
 
 **Your Name**
 
-* **LinkedIn:** [Your Profile Link]
-* **Portfolio:** [Your Website Link]
-* **Email:** [Your Email Address]
+* **LinkedIn:** [https://www.linkedin.com/in/mohamed-el-henawy-759888209/]
+* **Email:** [mohamed.henawii11@gmail.com]
 
 ---
 
