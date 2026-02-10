@@ -47,7 +47,7 @@ export class SideBarComponent implements OnInit {
     if (this.userRole === 'JobSeeker') {
       this.sidebarItems = [
         { label: 'home', route: '/home', icon: 'fas fa-home' },
-        { label: 'Dashboard', route: '/dashboard', icon: 'fas fa-home' },
+        { label: 'Dashboard', route: '/jobseekerdashboard', icon: 'fas fa-home' },
         { label: 'Find Jobs', route: '/findjob', icon: 'fas fa-search' },
         { label: 'My Applications', route: '/myapplications', icon: 'fas fa-clipboard-list' },
         { label: 'Saved Jobs', route: '/savedjobs', icon: 'fas fa-bookmark' },

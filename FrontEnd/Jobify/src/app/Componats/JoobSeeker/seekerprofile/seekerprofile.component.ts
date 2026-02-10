@@ -56,7 +56,7 @@ saveProfile() {
   if (this.profile.location) formData.append('Location', this.profile.location);
   if (this.selectedFile) formData.append('ProfileImage', this.selectedFile);
 
-  // ✅ Add skills
+  // ✅ Add skillsng serve
   if (this.skillsInput) {
 const skillsArray = this.skillsInput.split(',').map(s => s.trim());
 skillsArray.forEach(skill => formData.append('Skills', skill));

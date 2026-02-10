@@ -19,6 +19,7 @@ import { SideBarComponent } from './Componats/side-bar/side-bar.component';
 import { MainLayoutComponent } from './Componats/main-layout/main-layout.component';
 import { JobseekerapplicationsComponent } from './Componats/jobseekerapplications/jobseekerapplications.component';
 import { SavedjobsComponent } from './Componats/savedjobs/savedjobs.component';
+import { JobseekerdashboardComponent } from './Componats/jobseekerdashboard/jobseekerdashboard.component';
 
 export const routes: Routes = [
     { path: 'langingpage', component: LandingPageComponent },
@@ -38,6 +39,8 @@ export const routes: Routes = [
           { path: 'apply/:id', component: CreatejobapplicationComponent },
           { path: 'myapplications', component: JobseekerapplicationsComponent },
            { path: 'savedjobs', component: SavedjobsComponent },
+                      { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
+
 
 
    

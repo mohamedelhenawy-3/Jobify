@@ -1,0 +1,76 @@
+<div class="dashboard-wrapper">
+
+  <!-- Header -->
+  <div class="dashboard-header mb-4">
+    <h2>Job Seeker Dashboard</h2>
+    <p class="text-muted">Overview of your job applications and saved jobs.</p>
+  </div>
+
+  <!-- Top Stats Cards (Grid) -->
+  <div class="stats-grid mb-4">
+    <div class="stat-card" *ngFor="let card of topStats">
+      <div class="card-content">
+        <h6 class="stat-title">{{ card.title }}</h6>
+        <h3 class="stat-value">{{ card.value }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Applied Jobs Table (Full Width) -->
+  <div class="table-section mb-4 full-width">
+    <h4>My Applications</h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Date Applied</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let job of appliedJobs">
+            <td>{{ job.jobTitle }}</td>
+            <td>{{ job.company }}</td>
+            <td>{{ job.location }}</td>
+            <td>{{ job.dateApplied | date:'mediumDate' }}</td>
+            <td>
+              <span class="badge" 
+                    [ngClass]="{
+                      'applied': job.status==='Applied',
+                      'underreview': job.status==='UnderReview',
+                      'interviewed': job.status==='Interviewed'
+                    }">{{ job.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Saved Jobs Table (Full Width) -->
+  <div class="table-section mb-4 full-width">
+    <h4>Saved Jobs</h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Job Title</th>
+            <th>Location</th>
+            <th>Date Saved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let job of savedJobs">
+            <td>{{ job.title }}</td>
+            <td>{{ job.location }}</td>
+            <td>{{ job.createdAt | date:'mediumDate' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
