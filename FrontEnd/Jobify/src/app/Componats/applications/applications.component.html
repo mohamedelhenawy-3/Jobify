@@ -13,9 +13,9 @@
   <div class="applications-list" *ngIf="!isLoading && applications.length">
     <div class="application-card" *ngFor="let app of applications">
 
-      <!-- Candidate -->
+      <!-- Candidate Info -->
       <div class="candidate-info">
-        <img [src]="app.profileImageUrl" alt="Profile Image" class="profile-img">
+        <img [src]="app.profileImageUrl || defaultProfile" alt="Profile Image" class="profile-img">
         <div class="candidate-text">
           <div class="name">{{ app.joSeekerFullName }}</div>
           <div class="email">{{ app.joSeekerEmail }}</div>
@@ -33,6 +33,16 @@
         <span class="status-badge" [ngClass]="statusClass(app.status)">
           {{ getStatusLabel(app.status) }}
         </span>
+      <select class="form-select form-select-sm status-select" 
+        [(ngModel)]="app.status" 
+        (change)="changeStatus(app.applicationId, app.status)">
+  <option value="Applied">Applied</option>
+  <option value="UnderReview">Under Review</option>
+  <option value="Interviewed">Interviewed</option>
+  <option value="Hired">Hired</option>
+  <option value="Rejected">Rejected</option>
+</select>
+
         <button class="btn btn-primary btn-sm" (click)="viewDetails(app.applicationId)">
           View Details
         </button>

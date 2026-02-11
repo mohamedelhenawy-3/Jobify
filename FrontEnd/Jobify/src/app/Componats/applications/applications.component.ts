@@ -4,35 +4,40 @@ import { ApplicationStatus } from '../../Models/JobApplications/ApplicationStatu
 import { JobApplicationService } from '../../Services/JobApplication/jopapplicationservice.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-applications',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './applications.component.html',
-  styleUrl: './applications.component.css'
+  styleUrls: ['./applications.component.css']
 })
-export class ApplicationsComponent implements OnInit{
-    isLoading = true;
-  constructor(private applicationservice: JobApplicationService,private router:Router) {}
+export class ApplicationsComponent implements OnInit {
+  isLoading = true;
+  applications: AppliedJobSeekerListItem[] = [];
+  appstatus = ApplicationStatus;
+  defaultProfile = 'assets/default-user.png';
+
+  constructor(private applicationservice: JobApplicationService, private router: Router) {}
+
   ngOnInit(): void {
     this.loadApplications();
   }
-  applications: AppliedJobSeekerListItem[] = [];
-  appstatus=ApplicationStatus; 
 
-    loadApplications(): void {
+  loadApplications(): void {
     this.applicationservice.getEmployerApplications()
       .subscribe({
         next: (res) => {
-          console.log(res)
+          console.log(res);
           this.applications = res;
           this.isLoading = false;
         },
         error: () => this.isLoading = false
       });
   }
-    getStatusLabel(status: ApplicationStatus): string {
+
+  getStatusLabel(status: ApplicationStatus): string {
     return ApplicationStatus[status];
   }
 
@@ -48,11 +53,19 @@ export class ApplicationsComponent implements OnInit{
     }
   }
 
-viewDetails(applicationId: number): void {
-  // Navigate to details page
-  this.router.navigate(['/ApplicationDetails', applicationId]);
-
-  console.log('View details for application', applicationId);
+  changeStatus(applicationId: number, status: ApplicationStatus) {
+  this.applicationservice.updateApplicationStatus(applicationId, status)
+    .subscribe({
+      next: () => {
+        console.log(`Application ${applicationId} updated to ${status}`);
+      },
+      error: (err) => console.error('Failed to update status', err)
+    });
 }
 
+
+  viewDetails(applicationId: number): void {
+    this.router.navigate(['/ApplicationDetails', applicationId]);
+    console.log('View details for application', applicationId);
+  }
 }

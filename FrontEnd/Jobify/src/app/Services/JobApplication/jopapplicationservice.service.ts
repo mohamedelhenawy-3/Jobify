@@ -57,4 +57,7 @@ export class JobApplicationService {
   // withdrawApplication(applicationId: number): Observable<any> {
   //   return this.http.put(`${this.baseUrl}/${applicationId}/withdraw`, {});
   // }
+    updateApplicationStatus(applicationId: number, status: ApplicationStatus): Observable<any> {
+    return this.http.put(`${this.baseUrl}/AppliedJobDetails/${applicationId}`, { status });
+  }
 }

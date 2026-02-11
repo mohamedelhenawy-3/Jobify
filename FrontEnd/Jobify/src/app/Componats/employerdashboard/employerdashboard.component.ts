@@ -31,6 +31,6 @@ export class EmployerdashboardComponent implements OnInit {
 
   goToJobDetails(jobId: number) {
     // navigate to job details page (example)
-    window.location.href = `/job-details/${jobId}`;
+    window.location.href = `/details/${jobId}`;
   }
 }
