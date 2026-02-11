@@ -54,6 +54,7 @@ namespace Jobify.Controllers
             var savedJobs = _context.SavedJobs
                                     .Where(s => s.UserId == appUserId)   // SavedJobs.UserId is string AppUserId
                                     .Select(s => new {
+                                        s.Job.Id,
                                         s.Job.Title,
                                         s.Job.Location,
                                         s.Job.CreatedAt

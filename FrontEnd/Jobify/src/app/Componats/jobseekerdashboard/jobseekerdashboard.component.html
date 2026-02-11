@@ -1,75 +1,83 @@
-<div class="dashboard-wrapper">
+<div class="dashboard">
 
-  <!-- Header -->
-  <div class="dashboard-header mb-4">
+  <!-- HEADER -->
+  <div class="dashboard-header">
     <h2>Job Seeker Dashboard</h2>
-    <p class="text-muted">Overview of your job applications and saved jobs.</p>
+    <p>Track your applications and saved jobs in one place.</p>
   </div>
 
-  <!-- Top Stats Cards (Grid) -->
-  <div class="stats-grid mb-4">
+  <!-- STATS CARDS -->
+  <div class="stats-container">
     <div class="stat-card" *ngFor="let card of topStats">
-      <div class="card-content">
-        <h6 class="stat-title">{{ card.title }}</h6>
-        <h3 class="stat-value">{{ card.value }}</h3>
+      <span class="stat-title">{{ card.title }}</span>
+      <span class="stat-value">{{ card.value }}</span>
+    </div>
+  </div>
+
+  <!-- APPLICATIONS SECTION -->
+  <div class="card-section">
+    <div class="section-header">
+      <h3>My Applications</h3>
+    </div>
+
+    <div class="custom-table applications-table">
+
+      <div class="table-head">
+        <span>Job Title</span>
+        <span>Company</span>
+        <span>Location</span>
+        <span>Date Applied</span>
+        <span>Status</span>
       </div>
+
+      <div class="table-row" *ngFor="let job of appliedJobs">
+        <span>{{ job.jobTitle }}</span>
+        <span>{{ job.company }}</span>
+        <span>{{ job.location }}</span>
+        <span>{{ job.dateApplied | date:'mediumDate' }}</span>
+        <span>
+          <span class="status-badge"
+            [ngClass]="{
+              'applied': job.status==='Applied',
+              'underreview': job.status==='UnderReview',
+              'interviewed': job.status==='Interviewed'
+            }">
+            {{ job.status }}
+          </span>
+        </span>
+      </div>
+
     </div>
   </div>
 
-  <!-- Applied Jobs Table (Full Width) -->
-  <div class="table-section mb-4 full-width">
-    <h4>My Applications</h4>
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead>
-          <tr>
-            <th>Job Title</th>
-            <th>Company</th>
-            <th>Location</th>
-            <th>Date Applied</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let job of appliedJobs">
-            <td>{{ job.jobTitle }}</td>
-            <td>{{ job.company }}</td>
-            <td>{{ job.location }}</td>
-            <td>{{ job.dateApplied | date:'mediumDate' }}</td>
-            <td>
-              <span class="badge" 
-                    [ngClass]="{
-                      'applied': job.status==='Applied',
-                      'underreview': job.status==='UnderReview',
-                      'interviewed': job.status==='Interviewed'
-                    }">{{ job.status }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- SAVED JOBS SECTION -->
+  <div class="card-section">
+    <div class="section-header">
+      <h3>Saved Jobs</h3>
     </div>
-  </div>
 
-  <!-- Saved Jobs Table (Full Width) -->
-  <div class="table-section mb-4 full-width">
-    <h4>Saved Jobs</h4>
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead>
-          <tr>
-            <th>Job Title</th>
-            <th>Location</th>
-            <th>Date Saved</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let job of savedJobs">
-            <td>{{ job.title }}</td>
-            <td>{{ job.location }}</td>
-            <td>{{ job.createdAt | date:'mediumDate' }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="custom-table saved-table">
+
+      <div class="table-head">
+        <span>Job Title</span>
+        <span>Location</span>
+        <span>Date Saved</span>
+      </div>
+
+      <div class="table-row" *ngFor="let job of savedJobs">
+        <span>{{ job.title }}</span>
+        <span>{{ job.location }}</span>
+        <span>{{ job.createdAt | date:'mediumDate' }}</span>
+         <span>
+       <button 
+  class="details-btn"
+  (click)="goToJobDetails(job.id)">
+  View Details
+</button>
+
+      </span>
+      </div>
+
     </div>
   </div>
 

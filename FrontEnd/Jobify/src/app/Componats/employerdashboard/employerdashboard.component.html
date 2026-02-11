@@ -1,0 +1,80 @@
+<div class="dashboard">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <h2>Employer Dashboard</h2>
+    <p>Manage your job postings and track candidate applications.</p>
+  </div>
+
+  <!-- TOP STATS CARDS -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <span class="stat-title">Active Jobs</span>
+      <span class="stat-value">{{ topStats.activeJobs }}</span>
+      <span class="stat-sub">Expiring Soon: {{ topStats.expiringSoon }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-title">Total Applications</span>
+      <span class="stat-value">{{ topStats.totalApplications }}</span>
+      <span class="stat-sub">This Month</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-title">New Today</span>
+      <span class="stat-value">{{ topStats.newToday }}</span>
+    </div>
+  </div>
+
+  <!-- POSTED JOBS SECTION -->
+  <div class="card-section">
+    <div class="section-header">
+      <h3>Posted Jobs</h3>
+      <a class="view-all-btn">View All</a>
+    </div>
+
+    <div class="custom-table posted-jobs-table">
+      <div class="table-head">
+        <span>Job Title</span>
+        <span>Status</span>
+        <span>Applications</span>
+        <span>Posted</span>
+        <span>Actions</span>
+      </div>
+
+      <div class="table-row" *ngFor="let job of postedJobs">
+        <span>{{ job.title }}</span>
+        <span>{{ job.status }}</span>
+        <span>{{ job.applications }}</span>
+        <span>{{ job.posted | date:'mediumDate' }}</span>
+        <span>
+          <button class="view-btn" (click)="goToJobDetails(job.id)">View</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT APPLICATIONS SECTION -->
+  <div class="card-section">
+    <div class="section-header">
+      <h3>Recent Applications</h3>
+      <a class="view-all-btn">View All</a>
+    </div>
+
+    <div class="recent-applications">
+      <div class="application-item" *ngFor="let app of recentApplications">
+        <div class="applicant-info">
+          <img [src]="app.applicantImage || '/assets/default-user.png'" alt="{{app.applicantName}}" />
+          <div>
+            <h4>{{ app.applicantName }}</h4>
+            <p>{{ app.jobTitle }}</p>
+          </div>
+        </div>
+        <div class="application-meta">
+          <span class="status-badge">{{ app.status }}</span>
+          <span class="applied-time">{{ app.appliedAt | date:'short' }}</span>
+          <button class="resume-btn">View Resume</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
