@@ -24,6 +24,7 @@ import { EmployerdashboardComponent } from './Componats/employerdashboard/employ
 
 export const routes: Routes = [
     { path: 'langingpage', component: LandingPageComponent },
+    
       { path: '',
       component: MainLayoutComponent,
      children: [

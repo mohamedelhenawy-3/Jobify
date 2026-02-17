@@ -1,54 +1,59 @@
 <div class="container mt-4">
-
-  <h4 class="mb-4">Job Applications</h4>
-
-  <div *ngIf="isLoading" class="text-center loading">
-    Loading applications...
+  <div class="header-section">
+    <h4>Job Applications</h4>
+    <span class="count-badge">{{ applications.length }} Total</span>
   </div>
 
-  <div *ngIf="!isLoading && !applications.length" class="text-center no-data">
-    No applications found.
+  <div *ngIf="isLoading" class="loader-wrapper">
+    <div class="spinner"></div>
+    <p>Loading applications...</p>
+  </div>
+
+  <div *ngIf="!isLoading && !applications.length" class="no-data-card">
+    <i class="fas fa-folder-open"></i>
+    <p>No applications found yet.</p>
   </div>
 
   <div class="applications-list" *ngIf="!isLoading && applications.length">
     <div class="application-card" *ngFor="let app of applications">
-
-      <!-- Candidate Info -->
+      
       <div class="candidate-info">
-        <img [src]="app.profileImageUrl || defaultProfile" alt="Profile Image" class="profile-img">
+        <div class="img-container">
+          <img [src]="app.profileImageUrl || 'assets/default-user.png'" alt="Profile" class="profile-img">
+          <span class="status-indicator" [ngClass]="app.status"></span>
+        </div>
         <div class="candidate-text">
           <div class="name">{{ app.joSeekerFullName }}</div>
-          <div class="email">{{ app.joSeekerEmail }}</div>
+          <div class="email"><i class="far fa-envelope"></i> {{ app.joSeekerEmail }}</div>
         </div>
       </div>
 
-      <!-- Job Info -->
       <div class="job-info">
         <div class="job-title">{{ app.jobTitle }}</div>
-        <div class="applied-at">Applied: {{ app.appliedAt | date:'medium' }}</div>
+        <div class="applied-at"><i class="far fa-clock"></i> Applied {{ app.appliedAt | date:'mediumDate' }}</div>
       </div>
 
-      <!-- Status & Actions -->
-      <div class="card-footer">
-        <span class="status-badge" [ngClass]="statusClass(app.status)">
-          {{ getStatusLabel(app.status) }}
-        </span>
-      <select class="form-select form-select-sm status-select" 
-        [(ngModel)]="app.status" 
-        (change)="changeStatus(app.applicationId, app.status)">
-  <option value="Applied">Applied</option>
-  <option value="UnderReview">Under Review</option>
-  <option value="Interviewed">Interviewed</option>
-  <option value="Hired">Hired</option>
-  <option value="Rejected">Rejected</option>
-</select>
-
-        <button class="btn btn-primary btn-sm" (click)="viewDetails(app.applicationId)">
-          View Details
+      <div class="action-section">
+        <div class="status-container">
+          <span class="status-badge" [ngClass]="app.status">
+            {{ app.status }}
+          </span>
+          <select class="status-select" 
+                  [(ngModel)]="app.status" 
+                  (change)="changeStatus(app.applicationId, app.status)">
+            <option value="Applied">Applied</option>
+            <option value="UnderReview">Under Review</option>
+            <option value="Interviewed">Interviewed</option>
+            <option value="Hired">Hired</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        
+        <button class="view-btn" (click)="viewDetails(app.applicationId)">
+          Details
         </button>
       </div>
 
     </div>
   </div>
-
 </div>

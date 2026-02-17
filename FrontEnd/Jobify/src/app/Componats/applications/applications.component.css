@@ -1,145 +1,176 @@
-/* Container title */
-h4 {
+/* --- Header Styling --- */
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
+  margin-bottom: 2rem;
+  padding: 0 10px;
+}
+
+.header-section h4 {
+  margin: 0;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.count-badge {
+  background: #e0e7ff;
+  color: #6366f1;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
   font-weight: 700;
-  font-size: 1.5rem;
-  color: #1f2937;
-  margin-bottom: 1.5rem;
-  margin: 30px;
 }
 
-/* Loading / no-data */
-.loading, .no-data {
-  font-size: 0.95rem;
-  color: #6b7280;
-}
-
-/* Applications list */
+/* --- List & Card Layout --- */
 .applications-list {
   display: flex;
   flex-direction: column;
-  margin: 10px;
-  gap: 20px;
+  gap: 12px;
 }
 
-/* Card */
 .application-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  background: white;
+  border-radius: 16px;
+  padding: 20px 25px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.5fr; /* Horizontal scan */
+  align-items: center;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
 }
 
 .application-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: translateX(5px);
+  border-color: #6366f1;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.05);
 }
 
-/* Candidate section */
+/* --- Candidate Section --- */
 .candidate-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
+}
+
+.img-container {
+  position: relative;
 }
 
 .profile-img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 14px; /* Squircular */
   object-fit: cover;
-  border: 2px solid #e5e7eb;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #cbd5e1;
 }
 
 .candidate-text .name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
-  color: #111827;
+  color: #1a1a2e;
 }
 
 .candidate-text .email {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: #64748b;
 }
 
-/* Job Info */
-.job-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
+/* --- Job Info --- */
 .job-title {
-  font-weight: 500;
-  font-size: 1rem;
-  color: #374151;
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 0.95rem;
 }
 
 .applied-at {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: #94a3b8;
+  margin-top: 4px;
 }
 
-/* Card Footer */
-.card-footer {
+/* --- Actions & Status --- */
+.action-section {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  margin-top: 8px;
+  gap: 20px;
 }
 
-/* Status Badge */
-.status-badge {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: #fff;
+.status-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-/* Status Colors */
-.Applied {
-  background-color: #3b82f6; /* Blue */
-}
-.UnderReview {
-  background-color: #facc15; /* Yellow */
-  color: #111827;
-}
-.Shortlisted {
-  background-color: #10b981; /* Green */
-}
-.InterviewScheduled {
-  background-color: #8b5cf6; /* Purple */
-}
-.Interviewed {
-  background-color: #f97316; /* Orange */
-}
-.Offered {
-  background-color: #14b8a6; /* Teal */
-}
-.Hired {
-  background-color: #059669; /* Dark Green */
-}
-.Rejected {
-  background-color: #ef4444; /* Red */
-}
-.Withdrawn {
-  background-color: #6b7280; /* Gray */
-}
-
-/* Button */
-.btn-sm {
-  font-size: 0.85rem;
-  padding: 5px 14px;
-}
-.btn-primary {
-  background-color: #3b82f6;
+.status-select {
   border: none;
+  background: #f8fafc;
+  font-size: 0.75rem;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.btn-primary:hover {
-  background-color: #2563eb;
+.view-btn {
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+
+.view-btn:hover {
+  background: #6366f1;
+}
+
+/* --- Status Badges (SaaS Style) --- */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Modern Palette */
+.Applied { background: #eff6ff; color: #1d4ed8; }
+.UnderReview { background: #fefce8; color: #a16207; }
+.Interviewed { background: #f5f3ff; color: #6d28d9; }
+.Hired { background: #f0fdf4; color: #15803d; }
+.Rejected { background: #fef2f2; color: #b91c1c; }
+
+/* Status Indicator Dots */
+.status-indicator.Applied { background: #3b82f6; }
+.status-indicator.Hired { background: #22c55e; }
+.status-indicator.Rejected { background: #ef4444; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .application-card {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .action-section {
+    justify-content: space-between;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+  }
 }
