@@ -1,20 +1,17 @@
-<div class="container">
-  <div class="hero">
-    <p class="description">Search & Apply For Your New Job</p>
+<div class="page-content">
+      <section class="hero-container">
+        <div class="hero-content">
+          <p class="description">Search & Apply For Your New Job</p>
+          <h3>Find jobs that match your skills and grow your career with Jobify</h3>
+          <div class="search-box">
+            <input type="text" placeholder="Search now for your new job">
+            <span class="search-icon">🔍</span>
+          </div>
+        </div>
+      </section>
 
-    <h3>
-      Find jobs that match your skills and grow your career with Jobify
-    </h3>
-
-    <div class="search-box">
-      <input type="search" placeholder="Search now for your new job">
-      <span class="search-icon">🔍</span>
-    </div>
-  </div>
-</div>
-
-<section class="top-categories">
-  <h2>Top Industries</h2>
+  <section class="top-categories">
+  <h2>Top Categories</h2>
   <div class="industries-grid">
     <div *ngFor="let ind of indstries" class="industry-card">
       <!-- Use image instead of Font Awesome -->
@@ -25,3 +22,87 @@
   </div>
 </section>
 
+      <section class="dual-cta">
+        <div class="cta-container">
+          <div class="cta-card seeker-card">
+            <div class="cta-content">
+              <h2>Find Your Dream Job</h2>
+              <p>Build your profile, upload your resume, and let top recruiters find you.</p>
+              <button class="btn btn-primary">Upload Resume</button>
+            </div>
+          </div>
+
+          <div class="cta-card employer-card">
+            <div class="cta-content">
+              <h2>Hire Top Talent</h2>
+              <p>Post your job openings and reach thousands of qualified candidates today.</p>
+              <button class="btn btn-secondary">Post a Job</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="featured-jobs">
+        <div class="section-header">
+          <h2>Featured Opportunities</h2>
+          <a href="/jobs" class="view-all">View All Jobs →</a>
+        </div>
+        <div class="jobs-grid">
+          <div class="job-card">
+            <div class="job-type remote">Remote</div>
+            <h4>Senior Frontend Developer</h4>
+            <p class="company-name">TechFlow Inc.</p>
+            <div class="job-meta">
+              <span>📍 New York, NY</span>
+              <span>💰 $80k - $120k</span>
+            </div>
+            <button class="apply-btn">Apply Now</button>
+          </div>
+          </div>
+      </section>
+
+      <section class="how-it-works">
+        <h2>Getting started is easy</h2>
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h4>Create Account</h4>
+            <p>Set up your profile in less than 2 minutes.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h4>Post or Search</h4>
+            <p>Employers post jobs; Seekers find them.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h4>Connect</h4>
+            <p>Interview and get hired directly through the platform.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="why-us">
+        <div class="why-container">
+          <div class="why-image">
+            <div class="image-placeholder">🚀</div>
+          </div>
+          <div class="why-text">
+            <h2>Why Jobify?</h2>
+            <ul class="benefit-list">
+              <li>
+                <strong>Direct Messaging</strong>
+                <p>Talk directly to hiring managers without the "middle man."</p>
+              </li>
+              <li>
+                <strong>Fast Application</strong>
+                <p>Apply to any job in seconds with our "One-Click" resume tool.</p>
+              </li>
+              <li>
+                <strong>Verified Employers</strong>
+                <p>We manually check every company to ensure your safety.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
