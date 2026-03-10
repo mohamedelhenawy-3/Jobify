@@ -28,8 +28,26 @@ export class JobseekerapplicationsComponent {
       }
     });
   }
-
+// Maps status to CSS classes for colors
   getStatusClass(status: string): string {
-    return status.toLowerCase();
+    return status.toLowerCase().replace(/\s+/g, '');
   }
+
+  // Counts for the summary cards
+  getCount(status: string): number {
+    return this.applications.filter(app => 
+      app.status.toLowerCase() === status.toLowerCase()
+    ).length;
+  }
+
+  // Generates a consistent background color for the logo fallback based on company name
+  getLogoBgColor(name: string): string {
+    const colors = ['#DBEAFE', '#D1FAE5', '#FEE2E2', '#FEF3C7', '#F3E8FF', '#E0F2FE'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  }
+
 }

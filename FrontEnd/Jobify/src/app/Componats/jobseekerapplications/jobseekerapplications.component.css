@@ -1,122 +1,210 @@
-.applications-page {
-  max-width: 1100px;
+/* --- Root Container --- */
+.applications-container {
+  max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.page-title {
-  font-size: 26px;
-  font-weight: 600;
-  margin-bottom: 30px;
-  color: #1f2937;
-}
-
-/* Loading & Empty */
-.loading,
-.empty-state {
-  text-align: center;
-  font-size: 16px;
-  color: #6b7280;
-  margin-top: 50px;
-}
-
-/* Grid */
+/* --- The Grid --- */
 .applications-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
 }
 
-/* Card */
+/* --- The Modern Card --- */
 .application-card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #eef2f6;
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
 
 .application-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+  border-color: #2563eb33;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Header */
+/* --- Header Styling --- */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 24px;
 }
 
-.card-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #111827;
+.company-placeholder {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  color: rgba(30, 41, 59, 0.8);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.company {
-  font-size: 14px;
-  color: #6b7280;
-}
-
-/* Status Badge */
+/* --- Status Badges --- */
 .status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.pending { background: #fff7ed; color: #c2410c; }
+.pending .status-dot { background: #f97316; }
+
+.accepted { background: #f0fdf4; color: #15803d; }
+.accepted .status-dot { background: #22c55e; }
+
+.rejected { background: #fef2f2; color: #b91c1c; }
+.rejected .status-dot { background: #ef4444; }
+
+/* --- Job Content --- */
+.job-info {
+  flex-grow: 1; /* Pushes footer to the bottom */
+}
+
+.job-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+
+.company-name {
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-pill {
+  background: #f8fafc;
+  color: #475569;
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
-  text-transform: capitalize;
+  border: 1px solid #f1f5f9;
 }
 
-.status-badge.pending {
-  background: #fff7ed;
-  color: #c2410c;
+.icon {
+  margin-right: 4px;
+  filter: grayscale(1);
 }
 
-.status-badge.underreview {
-  background: #eff6ff;
-  color: #1d4ed8;
+/* --- Footer --- */
+.card-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.status-badge.accepted {
-  background: #ecfdf5;
-  color: #047857;
+.date-info {
+  display: flex;
+  flex-direction: column;
 }
 
-.status-badge.rejected {
-  background: #fef2f2;
-  color: #b91c1c;
+.date-info .label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-/* Info */
-.card-info p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: #374151;
-}
-
-.card-info .date {
-  color: #6b7280;
+.date-info .value {
   font-size: 13px;
+  color: #475569;
+  font-weight: 600;
 }
 
-/* Cover Letter */
-.cover-letter {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #e5e7eb;
+.view-btn {
+  background: #f1f5f9;
+  border: none;
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.cover-letter strong {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #111827;
+.view-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
 }
 
-.cover-letter p {
-  font-size: 14px;
-  color: #4b5563;
-  line-height: 1.6;
+/* --- States --- */
+.loading-wrapper, .empty-state-card {
+  text-align: center;
+  padding: 80px 20px;
+  background: #ffffff;
+  border-radius: 30px;
+  border: 1px solid #eef2f6;
+}
+
+.empty-illustration { font-size: 50px; margin-bottom: 20px; }
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* --- Mobile Fixes --- */
+@media (max-width: 480px) {
+  .applications-grid {
+    grid-template-columns: 1fr;
+  }
 }

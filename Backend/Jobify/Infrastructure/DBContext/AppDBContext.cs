@@ -45,6 +45,9 @@ namespace Infrastructure.DBContext
         public DbSet<WorkMode> WorkModes { get; set; }
         public DbSet<EmploymentType> EmploymentTypes { get; set; }
         public DbSet<Skill> Skills { get; set; }
+        public DbSet<Education> Educations { get; set; }
+
+        public DbSet<Experience> Experiences { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -73,11 +76,23 @@ namespace Infrastructure.DBContext
                       .HasForeignKey<EmployerProfile>(ep => ep.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+            builder.Entity<Experience>()
+      .HasOne(e => e.JobSeeker)
+      .WithMany(js => js.Experiences)
+      .HasForeignKey(e => e.JobSeekerId)
+      .OnDelete(DeleteBehavior.Cascade);
 
-            /* =========================
-               JobSeeker
-            ========================== */
-            builder.Entity<JobSeeker>(entity =>
+            // Education relationship
+            builder.Entity<Education>()
+                .HasOne(e => e.JobSeeker)
+                .WithMany(js => js.Educations)
+                .HasForeignKey(e => e.JobSeekerId)
+                .OnDelete(DeleteBehavior.Cascade);
+        
+        /* =========================
+           JobSeeker
+        ========================== */
+        builder.Entity<JobSeeker>(entity =>
             {
                 entity.ToTable("JobSeekers");
 

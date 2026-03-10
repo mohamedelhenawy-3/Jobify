@@ -1,44 +1,48 @@
-<div class="Conatiner">
-  <div class="EmployerCard">
-    <h3>Welcome Back</h3>
-    <p class="subtitle">Login to continue to Jobify</p>
+<div class="main-wrapper">
+  <div class="login-card">
+    <div class="card-header">
+      <div class="logo">Jobify<span>.</span></div>
+      <h3>Welcome Back</h3>
+      <p class="subtitle">Enter your details to stay updated on your career world</p>
+    </div>
 
-    <form [formGroup]="loginform" (ngSubmit)="login()">
-      <div class="registercard">
-      <label>Email</label>
-    <input
-      type="email"
-      formControlName="email"
-      placeholder="Enter your email"
-    />
-    <small *ngIf="loginform.get('email')?.touched && loginform.get('email')?.invalid">
-      Valid email is required
-    </small>
-
-    <!-- Password -->
-    <label>Password</label>
-    <input
-      type="password"
-      formControlName="password"
-      placeholder="Enter password"
-    />
-
-
-        <div class="options">
-          <a href="#">Forgot password?</a>
+    <form [formGroup]="loginform" (ngSubmit)="login()" class="form-body">
+      <div class="input-group">
+        <label>Email Address</label>
+        <div class="input-wrapper">
+          <input 
+            type="email" 
+            formControlName="email" 
+            placeholder="name@company.com"
+            [class.is-invalid]="loginform.get('email')?.touched && loginform.get('email')?.invalid"
+          />
         </div>
+        <small class="error-text" *ngIf="loginform.get('email')?.touched && loginform.get('email')?.invalid">
+          Please enter a valid email address
+        </small>
+      </div>
 
-        <div class="btn">
-          <button type="submit">Login</button>
+      <div class="input-group">
+        <div class="label-row">
+          <label>Password</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            formControlName="password" 
+            placeholder="••••••••"
+          />
         </div>
       </div>
+
+      <button type="submit" class="login-btn" [disabled]="loginform.invalid">
+        Sign In
+      </button>
     </form>
-    <div class="signin-section">
-    <p>
-    
-      Already have an account?
-    <a class="signin-link" routerLink="/register">Register</a>
-     </p>
+
+    <div class="footer-section">
+      <p>New to Jobify? <a routerLink="/register">Create an account</a></p>
     </div>
   </div>
 </div>

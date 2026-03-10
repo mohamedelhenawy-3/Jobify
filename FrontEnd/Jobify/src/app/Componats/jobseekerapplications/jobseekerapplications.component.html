@@ -1,47 +1,53 @@
-<div class="applications-page">
-
-  <h2 class="page-title">My Job Applications</h2>
-
-  <!-- Loading -->
-  <div *ngIf="loading" class="loading">
-    Loading your applications...
+<div class="applications-container">
+  
+  <div *ngIf="loading" class="loading-wrapper">
+    <div class="spinner"></div>
+    <p>Syncing your applications...</p>
   </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!loading && applications.length === 0" class="empty-state">
-    <p>You haven’t applied to any jobs yet.</p>
+  <div *ngIf="!loading && applications.length === 0" class="empty-state-card">
+    <div class="empty-illustration">📂</div>
+    <h3>No applications yet</h3>
+    <p>Your application history will appear here once you start applying.</p>
+    <button class="btn-primary" routerLink="/jobs">Browse Jobs</button>
   </div>
 
-  <!-- Applications List -->
   <div class="applications-grid" *ngIf="!loading && applications.length">
-
     <div class="application-card" *ngFor="let app of applications">
-
-      <!-- Header -->
+      
       <div class="card-header">
-        <div>
-          <h3>{{ app.jobTitle }}</h3>
-          <span class="company">{{ app.companyName }}</span>
+        <div class="company-placeholder" [style.backgroundColor]="getLogoBgColor(app.companyName)">
+          <span class="initial">{{ app.companyName[0] }}</span>
         </div>
 
         <span class="status-badge" [ngClass]="getStatusClass(app.status)">
+          <span class="status-dot"></span>
           {{ app.status }}
         </span>
       </div>
 
-      <!-- Info -->
-      <div class="card-info">
-        <p>📍 {{ app.jobLocation }}</p>
-        <p>🏠 {{ app.workMode }}</p>
-        <p>🕒 {{ app.employmentType }}</p>
-        <p class="date">
-          Applied on {{ app.appliedAt | date: 'mediumDate' }}
-        </p>
+      <div class="job-info">
+        <h3 class="job-title">{{ app.jobTitle }}</h3>
+        <p class="company-name">{{ app.companyName }}</p>
+        
+        <div class="meta-row">
+          <span class="meta-pill">
+            <span class="icon">📍</span> {{ app.jobLocation }}
+          </span>
+          <span class="meta-pill">
+            <span class="icon">🏠</span> {{ app.workMode }}
+          </span>
+        </div>
       </div>
 
- 
+      <div class="card-footer">
+        <div class="date-info">
+          <span class="label">Applied</span>
+          <span class="value">{{ app.appliedAt | date: 'mediumDate' }}</span>
+        </div>
+        <button class="view-btn">View Details</button>
+      </div>
+
     </div>
-
   </div>
-
 </div>

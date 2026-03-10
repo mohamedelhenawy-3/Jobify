@@ -1,4 +1,6 @@
-﻿using Application.DTOs.Skills;
+﻿using Application.DTOs.Education;
+using Application.DTOs.Experience;
+using Application.DTOs.Skills;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -18,7 +20,20 @@ namespace Application.DTOs.JobSeeker
         public string? Resume { get; set; }
         public string? Headline { get; set; }
         public string? Summary { get; set; }
+
+
+        public string? ProfileImageUrl { get; set; }
+        public string? ResumeUrl { get; set; }
+
+   
+
+        public string? LinkedInUrl { get; set; }
+        public string? GithubUrl { get; set; }
+
         public List<MySkills> Skills { get; set; } = new();
+
+        public List<ExperienceDto> Experiences { get; set; } = new();
+        public List<EducationDto> Educations { get; set; } = new();
 
 
 

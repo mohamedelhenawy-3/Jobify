@@ -316,3 +316,67 @@ input:focus, textarea:focus {
 .social-btn i {
   font-size: 18px;
 }
+
+
+
+
+
+
+/* Resume Card Styling */
+.card .btn-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  cursor: pointer;
+}
+
+.card .btn-full:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+}
+
+.card .btn-full:active {
+  transform: translateY(0);
+}
+
+/* Muted state when no resume is found */
+.card .muted {
+  text-align: center;
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 12px;
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Edit mode file input */
+.card input[type="file"] {
+  width: 100%;
+  font-size: 13px;
+  color: #64748b;
+  padding: 10px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+
+/* Ensure the FontAwesome icon looks good inside the button */
+.card .btn-full i {
+  font-size: 18px;
+}

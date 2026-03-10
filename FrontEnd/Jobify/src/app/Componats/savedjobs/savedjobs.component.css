@@ -1,84 +1,148 @@
+/* SAVED JOBS - PREMIUM STYLESHEET */
+
 .saved-jobs-page {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 40px auto;
-  padding: 0 20px;
+  padding: 0 24px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc; /* Subtle background tint */
 }
 
+/* Page Header */
 .saved-jobs-page h2 {
-  margin-bottom: 25px;
-  font-size: 26px;
-  font-weight: 600;
-  color: #1f2937;
+  margin-bottom: 32px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.025em;
 }
 
+/* Loading & Empty States */
 .loading,
 .empty-state {
   text-align: center;
-  color: #6b7280;
+  padding: 80px 40px;
+  background: white;
+  border-radius: 24px;
+  border: 2px dashed #e2e8f0;
+  color: #64748b;
   font-size: 16px;
-  margin-top: 50px;
+  font-weight: 500;
 }
 
+/* Grid System */
 .jobs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
+  gap: 28px;
 }
 
+/* The Premium Card */
 .job-card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 24px;
+  padding: 28px;
+  border: 1px solid #edf2f7;
+  display: flex;
+  flex-direction: column; /* Critical for button alignment */
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
 
 .job-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+  border-color: #2563eb33;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
 }
 
+/* Header & Typography */
 .job-header h3 {
-  margin: 0;
-  font-size: 18px;
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
 }
 
 .company {
   font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 18px;
   display: block;
 }
 
+/* Smart Description Clamping */
 .description {
   font-size: 14px;
-  color: #374151;
-  margin-bottom: 14px;
-  line-height: 1.5;
-  max-height: 120px; /* optional: limit height */
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  flex-grow: 1; /* Pushes actions to the bottom */
+  
+  /* Limits text to 4 lines and adds '...' */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Action Buttons */
 .job-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  margin-top: auto; /* Ensures buttons always align at bottom */
 }
 
+/* Primary Button (View Job) */
 .view-btn {
+  flex: 2; /* Makes 'View' button wider */
   background: #2563eb;
-  color: #fff;
+  color: #ffffff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-decoration: none;
 }
 
+.view-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* Secondary Button (Remove) */
 .remove-btn {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  flex: 1;
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #ffe4e6;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: #ffe4e6;
+  color: #be123c;
+  border-color: #fecdd3;
+}
+
+/* Responsive Fix */
+@media (max-width: 480px) {
+  .jobs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .job-actions {
+    flex-direction: column;
+  }
 }

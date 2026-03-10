@@ -1,94 +1,69 @@
-<div class="Conatiner">
-  <div class="EmployerCard">
-
-    <!-- Back button -->
-    <div class="back-btn" onclick="history.back()">
-      ← Back
+<div class="auth-wrapper">
+  <div class="registration-card">
+    
+    <div class="back-nav" onclick="history.back()">
+      <span class="arrow">←</span> Back to home
     </div>
 
-    <!-- Switch Buttons -->
-    <div class="switch">
+    <div class="header-section">
+      <div class="logo">Jobify<span>.</span></div>
+      <h3>Create Account</h3>
+      <p class="subtitle">Join thousands of {{ userType === 'JobSeeker' ? 'job seekers' : 'companies' }} today</p>
+    </div>
+
+    <div class="segmented-control">
       <button 
+        type="button"
         [class.active]="userType === 'JobSeeker'"
         (click)="switch('JobSeeker')">
         Job Seeker
       </button>
-
       <button 
+        type="button"
         [class.active]="userType === 'Employer'"
         (click)="switch('Employer')">
         Employer
       </button>
     </div>
 
-    <!-- TITLE -->
-    <h3 *ngIf="userType === 'JobSeeker'">Job Seeker Register</h3>
-    <h3 *ngIf="userType === 'Employer'">Employer Register</h3>
+    <form [formGroup]="registerForm" (ngSubmit)="submit()" class="form-body">
+      
+      <div class="input-group">
+        <label>Email Address</label>
+        <input type="email" formControlName="email" placeholder="name@example.com" />
+        <small class="error-text" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+          Please enter a valid email.
+        </small>
+      </div>
 
- <form [formGroup]="registerForm" (ngSubmit)="submit()">
-  <div class="registercard">
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" formControlName="password" placeholder="Min. 8 characters" />
+      </div>
 
-    <!-- Job Seeker -->
-    <label *ngIf="userType === 'JobSeeker'">Full Name</label>
-    <input
-      *ngIf="userType === 'JobSeeker'"
-      type="text"
-      formControlName="fullName"
-      placeholder="Enter your full name"
-    />
+      <div class="input-group animate-fade" *ngIf="userType === 'JobSeeker'">
+        <label>Full Name</label>
+        <input type="text" formControlName="fullName" placeholder="John Doe" />
+      </div>
 
-    <!-- Email -->
-    <label>Email</label>
-    <input
-      type="email"
-      formControlName="email"
-      placeholder="Enter your email"
-    />
-    <small *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-      Valid email is required
-    </small>
+      <div class="employer-extra animate-fade" *ngIf="userType === 'Employer'">
+        <div class="input-group">
+          <label>Company Name</label>
+          <input type="text" formControlName="companyName" placeholder="Tech Solutions Inc." />
+        </div>
+        <div class="input-group">
+          <label>Company Website</label>
+          <input type="text" formControlName="companyWebsite" placeholder="https://company.com" />
+        </div>
+      </div>
 
-    <!-- Password -->
-    <label>Password</label>
-    <input
-      type="password"
-      formControlName="password"
-      placeholder="Enter password"
-    />
-
-    <!-- Employer Fields -->
-    <div *ngIf="userType === 'Employer'">
-      <label>Company Name</label>
-      <input
-        type="text"
-        formControlName="companyName"
-        placeholder="Company name"
-      />
-
-      <label>Company Website</label>
-      <input
-        type="text"
-        formControlName="companyWebsite"
-        placeholder="https://company.com"
-      />
-    </div>
-
-    <div class="btn">
-      <button type="submit" [disabled]="loading">
-        Register as {{ userType }}
+      <button type="submit" class="submit-btn" [disabled]="loading">
+        {{ loading ? 'Creating Account...' : 'Register as ' + userType }}
       </button>
-    </div>
+    </form>
 
-  </div>
-</form>
-
-
-    <!-- Sign In Link -->
-    <div class="signin-section">
-      <p>
-        Already have an account?
-        <a class="signin-link" routerLink="/login">Sign in</a>
-      </p>
+    <div class="footer-link">
+      Already have an account? <a routerLink="/login">Sign in</a>
     </div>
 
   </div>

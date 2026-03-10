@@ -1,4 +1,6 @@
 ﻿using Application.DTOs.Auth.AuthResponse;
+using Application.DTOs.Education;
+using Application.DTOs.Experience;
 using Application.DTOs.JobSeeker;
 using Application.DTOs.Skills;
 using Application.DTOs.SuccefullOp;
@@ -7,8 +9,10 @@ using CloudinaryDotNet;
 using Domain.Entities;
 using Infrastructure.DBContext;
 using Infrastructure.Implementation.CLoudinary;
+using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,6 +76,8 @@ namespace Infrastructure.Implementation
                 .Include(js => js.Applications)
                 .Include(js => js.ProfileImage)
                 .Include(js => js.Skills)
+                .Include(x => x.Experiences)
+                .Include(x => x.Educations)
                 .Include(x=>x.Resume)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
@@ -86,13 +92,36 @@ namespace Infrastructure.Implementation
                 Headline = jobSeeker.Headline,
                 Resume = resume,
                 Summary = jobSeeker.Summary,
+                LinkedInUrl = jobSeeker.LinkedInUrl,
+                GithubUrl = jobSeeker.GithubUrl,
                 Skills = jobSeeker.Skills
                 .Select(s => new MySkills
                 {
                     Id = s.Id,
                     Name = s.Name
                 })
-                .ToList()
+                .ToList(),
+                Experiences = jobSeeker.Experiences
+            .Select(e => new ExperienceDto
+            {
+                Id = e.Id,
+                CompanyName = e.CompanyName,
+                JobTitle = e.JobTitle,
+                Description = e.Description,
+                StartDate = e.StartDate,
+                EndDate = e.EndDate
+            }).ToList(),
+
+                Educations = jobSeeker.Educations
+            .Select(e => new EducationDto
+            {
+                Id = e.Id,
+                Institution = e.Institution,
+                Degree = e.Degree,
+                FieldOfStudy = e.FieldOfStudy,
+                StartDate = e.StartDate,
+                EndDate = e.EndDate
+            }).ToList()
             };
 
 
@@ -106,48 +135,51 @@ namespace Infrastructure.Implementation
                 throw new Exception("Unauthorized");
 
             // Load FULL user entity
-            var user = await _db.Users
-                .FirstOrDefaultAsync(x => x.Id == userId);
-
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user == null)
                 throw new Exception("User not found");
 
-            // Load profile with related data
+            // Load JobSeeker profile with related data
             var profile = await _db.JobSeekers
                 .Include(js => js.ProfileImage)
                 .Include(js => js.Skills)
+                .Include(g=>g.Experiences).Include(c=>c.Educations)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
 
-            // ✅ Update user full name properly
-            if (!string.IsNullOrEmpty(updateprofiledto.FullName))
+            // ================= BASIC INFO =================
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.FullName))
                 user.FullName = updateprofiledto.FullName;
 
-            if (!string.IsNullOrEmpty(updateprofiledto.PhoneNumber))
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.PhoneNumber))
                 profile.PhoneNumber = updateprofiledto.PhoneNumber;
 
-            if (!string.IsNullOrEmpty(updateprofiledto.Location))
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.Location))
                 profile.Location = updateprofiledto.Location;
 
-            if (!string.IsNullOrEmpty(updateprofiledto.Headline))
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.Headline))
                 profile.Headline = updateprofiledto.Headline;
 
-            if (!string.IsNullOrEmpty(updateprofiledto.Summary))
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.LinkedInUrl))
+                profile.LinkedInUrl = updateprofiledto.LinkedInUrl;
+
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.GithubUrl))
+                profile.GithubUrl = updateprofiledto.GithubUrl;
+
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.Summary))
                 profile.Summary = updateprofiledto.Summary;
 
             // ================= IMAGE =================
             if (updateprofiledto.ProfileImage != null)
             {
-                if (profile.ProfileImage != null &&
-                    !string.IsNullOrEmpty(profile.ProfileImage.PublicId))
+                if (profile.ProfileImage != null && !string.IsNullOrEmpty(profile.ProfileImage.PublicId))
                 {
                     await _cloudinaryService.DeleteImageAsync(profile.ProfileImage.PublicId);
                 }
 
-                var (url, publicId) =
-                    await _cloudinaryService.UploadImageAsync(updateprofiledto.ProfileImage);
+                var (url, publicId) = await _cloudinaryService.UploadImageAsync(updateprofiledto.ProfileImage);
 
                 if (profile.ProfileImage == null)
                 {
@@ -156,7 +188,7 @@ namespace Infrastructure.Implementation
                         ImageUrl = url,
                         PublicId = publicId,
                         CreatedAt = DateTime.UtcNow,
-                        JobSeeker = profile
+                        JobSeekerId = profile.Id
                     };
                 }
                 else
@@ -166,20 +198,17 @@ namespace Infrastructure.Implementation
                     profile.ProfileImage.CreatedAt = DateTime.UtcNow;
                 }
             }
-
+          
             // ================= SKILLS =================
             if (updateprofiledto.Skills != null && updateprofiledto.Skills.Any())
             {
-                var existingSkills = profile.Skills
-                    .Select(s => s.Name.ToLower())
-                    .ToList();
-
+                var existingSkills = profile.Skills.Select(s => s.Name.ToLower()).ToList();
                 var newSkills = updateprofiledto.Skills
                     .Where(s => !existingSkills.Contains(s.ToLower()))
                     .Select(s => new Skill
                     {
                         Name = s.Trim(),
-                        JobSeeker = profile
+                        JobSeekerId = profile.Id
                     }).ToList();
 
                 foreach (var skill in newSkills)
@@ -187,6 +216,18 @@ namespace Infrastructure.Implementation
                     profile.Skills.Add(skill);
                 }
             }
+                List<EducationDto> educations = string.IsNullOrEmpty(updateprofiledto.EducationsJson)
+    ? new List<EducationDto>()
+    : JsonConvert.DeserializeObject<List<EducationDto>>(updateprofiledto.EducationsJson)!;
+
+            List<ExperienceDto> experiences = string.IsNullOrEmpty(updateprofiledto.ExperiencesJson)
+                ? new List<ExperienceDto>()
+                : JsonConvert.DeserializeObject<List<ExperienceDto>>(updateprofiledto.ExperiencesJson)!;
+
+            // call your update methods
+            UpdateEducations(profile, educations);
+            UpdateExperiences(profile, experiences);
+     
 
             await _db.SaveChangesAsync();
 
@@ -195,7 +236,6 @@ namespace Infrastructure.Implementation
                 Message = "User profile updated successfully."
             };
         }
-
         public async Task<SuccessResponse> UploadCv(UploadMyResume resumedto)
         {
             var userId = GetCurrentUserId();
@@ -277,5 +317,106 @@ namespace Infrastructure.Implementation
             };
             return resume;
         }
+
+        private void UpdateExperiences(JobSeeker jobSeeker, List<ExperienceDto>? dtos)
+        {
+            dtos ??= new List<ExperienceDto>();
+
+            jobSeeker.Experiences ??= new List<Experience>();
+
+            var dtoIds = dtos
+                .Where(x => x.Id != null)
+                .Select(x => x.Id!.Value)
+                .ToList();
+
+            var removed = jobSeeker.Experiences
+                .Where(e => !dtoIds.Contains(e.Id))
+                .ToList();
+
+            _db.Experiences.RemoveRange(removed);
+
+            foreach (var dto in dtos)
+            {
+                if (dto.Id == null)
+                {
+                    // ADD new experience
+                    jobSeeker.Experiences.Add(new Experience
+                    {
+                        CompanyName = dto.CompanyName,
+                        JobTitle = dto.JobTitle,
+                        Description = dto.Description,
+                        StartDate = dto.StartDate,
+                        EndDate = dto.EndDate
+                    });
+                }
+                else
+                {
+                    // UPDATE existing experience
+                    var existing = jobSeeker.Experiences
+                        .FirstOrDefault(e => e.Id == dto.Id);
+
+                    if (existing != null)
+                    {
+                        existing.CompanyName = dto.CompanyName;
+                        existing.JobTitle = dto.JobTitle;
+                        existing.Description = dto.Description;
+                        existing.StartDate = dto.StartDate;
+                        existing.EndDate = dto.EndDate;
+                    }
+                }
+            }
+        }
+        private void UpdateEducations(JobSeeker jobSeeker, List<EducationDto>? educationDtos)
+        {
+            educationDtos ??= new List<EducationDto>();
+
+            jobSeeker.Educations ??= new List<Education>();
+
+            // IDs coming from frontend
+            var dtoIds = educationDtos
+                .Where(e => e.Id.HasValue)
+                .Select(e => e.Id!.Value)
+                .ToList();
+
+            // Find educations removed by the user
+            var removedEducations = jobSeeker.Educations
+                .Where(e => !dtoIds.Contains(e.Id))
+                .ToList();
+
+            _db.Educations.RemoveRange(removedEducations);
+
+            foreach (var dto in educationDtos)
+            {
+                if (dto.Id == null)
+                {
+                    // ADD new education
+                    jobSeeker.Educations.Add(new Education
+                    {
+                        Institution = dto.Institution,
+                        Degree = dto.Degree,
+                        FieldOfStudy = dto.FieldOfStudy,
+                        StartDate = dto.StartDate,
+                        EndDate = dto.EndDate
+                    });
+                }
+                else
+                {
+                    // UPDATE existing education
+                    var existingEducation = jobSeeker.Educations
+                        .FirstOrDefault(e => e.Id == dto.Id);
+
+                    if (existingEducation != null)
+                    {
+                        existingEducation.Institution = dto.Institution;
+                        existingEducation.Degree = dto.Degree;
+                        existingEducation.FieldOfStudy = dto.FieldOfStudy;
+                        existingEducation.StartDate = dto.StartDate;
+                        existingEducation.EndDate = dto.EndDate;
+                    }
+                }
+            }
+        }
     }
+
+
 }
