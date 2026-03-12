@@ -16,4 +16,7 @@ export class JobseekerService {
   getMyProfile(): Observable<JobSeekerProfile> {
     return this.http.get<JobSeekerProfile>(`${this.baseUrl}/me`);
   }
+   updateProfile(formData: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/me`, formData);
+  }
 }

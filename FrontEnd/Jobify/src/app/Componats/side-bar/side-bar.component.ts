@@ -46,20 +46,20 @@ export class SideBarComponent implements OnInit {
   setSidebarItems(): void {
     if (this.userRole === 'JobSeeker') {
       this.sidebarItems = [
-        { label: 'home', route: '/home', icon: 'fas fa-home' },
-        { label: 'Dashboard', route: '/jobseekerdashboard', icon: 'fas fa-home' },
-        { label: 'Find Jobs', route: '/findjob', icon: 'fas fa-search' },
-        { label: 'My Applications', route: '/myapplications', icon: 'fas fa-clipboard-list' },
-        { label: 'Saved Jobs', route: '/savedjobs', icon: 'fas fa-bookmark' },
-        { label: 'Profile', route: '/seeker', icon: 'fas fa-user' }
+        { label: 'home', route: '/Jobify/home', icon: 'fas fa-home' },
+        { label: 'Dashboard', route: '/Jobify/jobseekerdashboard', icon: 'fas fa-home' },
+        { label: 'Find Jobs', route: '/Jobify/findjob', icon: 'fas fa-search' },
+        { label: 'My Applications', route: '/Jobify/myapplications', icon: 'fas fa-clipboard-list' },
+        { label: 'Saved Jobs', route: '/Jobify/savedjobs', icon: 'fas fa-bookmark' },
+        { label: 'Profile', route: '/Jobify/seeker', icon: 'fas fa-user' }
       ];
     } else if (this.userRole === 'Employer') {
       this.sidebarItems = [
-        { label: 'Dashboard', route: '/employerdashboard', icon: 'fas fa-home' },
-        { label: 'Post Job', route: '/createjob', icon: 'fas fa-plus-circle' },
-        { label: 'My Jobs', route: '/managejobs', icon: 'fas fa-briefcase' },
-        { label: 'Applications', route: '/jobapplications', icon: 'fas fa-clipboard-list' },
-        { label: 'Company Profile', route: '/company', icon: 'fas fa-building' }
+        { label: 'Dashboard', route: '/Jobify/employerdashboard', icon: 'fas fa-home' },
+        { label: 'Post Job', route: '/Jobify/createjob', icon: 'fas fa-plus-circle' },
+        { label: 'My Jobs', route: '/Jobify/managejobs', icon: 'fas fa-briefcase' },
+        { label: 'Applications', route: '/Jobify/jobapplications', icon: 'fas fa-clipboard-list' },
+        { label: 'Company Profile', route: 'Jobify/company', icon: 'fas fa-building' }
       ];
     }
   }

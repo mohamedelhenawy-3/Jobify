@@ -65,7 +65,7 @@ export class ApplicationsComponent implements OnInit {
 
 
   viewDetails(applicationId: number): void {
-    this.router.navigate(['/ApplicationDetails', applicationId]);
+    this.router.navigate(['/Jobify/ApplicationDetails', applicationId]);
     console.log('View details for application', applicationId);
   }
 }

@@ -14,6 +14,7 @@ using Infrastructure.Implementation;
 using Infrastructure.Implementation.AuthService;
 using Infrastructure.Implementation.CLoudinary;
 using Infrastructure.Implementation.CompanyService;
+using Infrastructure.Implementation.FileUploadService;
 using Infrastructure.Implementation.JobApplicationSrevice;
 using Infrastructure.Implementation.JobService;
 using Infrastructure.Implementation.SavedJobService;
@@ -90,6 +91,9 @@ builder.Services.AddScoped<IJobApplication, JobApplicationService>();
 builder.Services.AddScoped<ISavedJob, SavedJobService>();
 
 builder.Services.AddScoped<CloudinaryService>();
+builder.Services.AddScoped<SupabaseService>();
+builder.Services.Configure<SupabaseSettings>(
+    builder.Configuration.GetSection("Supabase"));
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

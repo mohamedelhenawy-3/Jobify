@@ -23,9 +23,9 @@ import { JobseekerdashboardComponent } from './Componats/jobseekerdashboard/jobs
 import { EmployerdashboardComponent } from './Componats/employerdashboard/employerdashboard.component';
 
 export const routes: Routes = [
-    { path: 'langingpage', component: LandingPageComponent },
+    { path: '', component: LandingPageComponent },
     
-      { path: '',
+      { path: 'Jobify',
       component: MainLayoutComponent,
      children: [
         { path: 'applications', component: ApplicationsComponent },
@@ -36,13 +36,13 @@ export const routes: Routes = [
         { path: 'managejobs', component: ManagejobsComponent },
         {path:'jobapplications',component:ApplicationsComponent},
         {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
-         {path:'updateJob/:id',component:UpdateJobComponent},
-          {path:'details/:id',component:JobdetailsComponent},
-          { path: 'apply/:id', component: CreatejobapplicationComponent },
-          { path: 'myapplications', component: JobseekerapplicationsComponent },
-           { path: 'savedjobs', component: SavedjobsComponent },
-          { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
-                    { path: 'employerdashboard', component: EmployerdashboardComponent },
+        {path:'updateJob/:id',component:UpdateJobComponent},
+        {path:'details/:id',component:JobdetailsComponent},
+        { path: 'apply/:id', component: CreatejobapplicationComponent },
+        { path: 'myapplications', component: JobseekerapplicationsComponent },
+        { path: 'savedjobs', component: SavedjobsComponent },
+        { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
+        { path: 'employerdashboard', component: EmployerdashboardComponent },
 
 
 

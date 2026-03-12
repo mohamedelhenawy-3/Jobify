@@ -1,13 +1,24 @@
+import { Education } from "../Education/Education";
+import { Experience } from "../Experince/Experience";
 import { Skill } from "../Skill/skill";
 
 export interface JobSeekerProfile {
-  fullName:string;
+  fullName: string;
   phoneNumber: string;
-  resume: string | null;
+
   location: string | null;
   profileImage: string | null;
+  resume: string | null;
+
   headline: string | null;
   summary: string | null;
+
+  linkedInUrl: string | null;
+  githubUrl: string | null;
+resumeUrl:string|null;
   skills: Skill[];
-  applications: any[];
+
+  experiences: Experience[];
+
+  educations: Education[];
 }

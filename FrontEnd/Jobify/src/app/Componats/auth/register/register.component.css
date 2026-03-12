@@ -1,117 +1,171 @@
-/* Layout & Background */
-.auth-wrapper {
+/* =========================================
+   1. LAYOUT & MATCHING LOGIN THEME
+   ========================================= */
+.main-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 40px 20px;
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
 }
 
-.registration-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 450px;
-  padding: 40px;
-  border-radius: 24px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-/* Navigation & Logo */
-.back-nav {
-  font-size: 13px;
-  font-weight: 600;
-  color: #64748b;
-  cursor: pointer;
-  margin-bottom: 25px;
+.registration-container {
   display: flex;
-  align-items: center;
-  transition: color 0.2s;
+  width: 950px;
+  height: 600px; /* Slightly taller than login for extra fields */
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
 }
-.back-nav:hover { color: #2563eb; }
-.back-nav .arrow { margin-right: 8px; font-size: 16px; }
 
-.header-section { text-align: center; margin-bottom: 30px; }
-.logo { font-size: 26px; font-weight: 800; color: #2563eb; margin-bottom: 8px; }
+/* =========================================
+   2. IMAGE SIDE (LEFT)
+   ========================================= */
+.image-side {
+  flex: 1;
+  background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(34, 59, 89, 0.9), transparent);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.back-nav {
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: 0.3s;
+}
+.back-nav:hover { opacity: 1; transform: translateX(-5px); }
+
+.image-overlay h2 {
+  color: white !important;
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0;
+}
+.image-overlay span { color: #3b82f6; }
+
+/* =========================================
+   3. FORM SIDE (RIGHT)
+   ========================================= */
+.form-side {
+  flex: 1.2;
+  padding: 40px 50px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.logo { font-size: 24px; font-weight: 800; color: #223b59 !important; }
 .logo span { color: #10b981; }
-.header-section h3 { font-size: 22px; color: #1e293b; margin-bottom: 5px; }
-.subtitle { color: #64748b; font-size: 14px; }
+.header-section h3 { font-size: 22px; color: #1e293b !important; margin-top: 5px; }
+.subtitle { color: #64748b !important; font-size: 13px; margin-bottom: 20px; }
 
-/* Segmented Control (The Switch) */
+/* Segmented Control (Seeker/Employer Switch) */
 .segmented-control {
   display: flex;
   background: #f1f5f9;
-  padding: 5px;
+  padding: 4px;
   border-radius: 12px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .segmented-control button {
   flex: 1;
-  padding: 10px;
+  padding: 8px;
   border: none;
   background: transparent;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: #64748b;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  border-radius: 9px;
+  transition: 0.2s;
 }
 
 .segmented-control button.active {
   background: #ffffff;
-  color: #2563eb;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: #3b82f6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* Form Styling */
-.input-group { margin-bottom: 18px; }
-label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+/* =========================================
+   4. FIELDS & BUTTON (MATCHING LOGIN)
+   ========================================= */
+.fields-scroll {
+  flex-grow: 1;
+  overflow-y: auto; /* Handle extra fields without breaking height */
+  padding-right: 5px;
+}
+
+/* Modern Scrollbar */
+.fields-scroll::-webkit-scrollbar { width: 4px; }
+.fields-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+.input-group { margin-bottom: 15px; }
+label { font-size: 12px; font-weight: 600; color: #475569 !important; margin-bottom: 5px; display: block; }
 
 input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 11px 16px;
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   font-size: 14px;
-  transition: all 0.2s;
   box-sizing: border-box;
 }
 
 input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
-/* Button & Footer */
+/* ATTRACTIVE BUTTON */
 .submit-btn {
   width: 100%;
   padding: 14px;
-  background: #2563eb;
-  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white !important;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  margin-top: 15px;
-  transition: opacity 0.2s;
+  margin-top: 10px;
+  transition: all 0.3s;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
 }
 
-.submit-btn:hover { background: #1d4ed8; }
-.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-
-.footer-link { text-align: center; margin-top: 25px; font-size: 14px; color: #64748b; }
-.footer-link a { color: #2563eb; font-weight: 600; text-decoration: none; }
-
-/* Animation */
-.animate-fade {
-  animation: fadeIn 0.4s ease;
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.4);
 }
 
+.footer-link { text-align: center; margin-top: 20px; font-size: 13px; color: #64748b !important; }
+.footer-link a { color: #3b82f6 !important; font-weight: 700; text-decoration: none; }
+
+/* Animations */
+.animate-fade { animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile */
+@media (max-width: 850px) {
+  .image-side { display: none; }
+  .registration-container { width: 100%; max-width: 420px; height: auto; }
 }

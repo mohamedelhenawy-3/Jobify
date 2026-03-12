@@ -1,69 +1,69 @@
-<div class="auth-wrapper">
-  <div class="registration-card">
+<div class="main-wrapper">
+  <div class="registration-container">
     
-    <div class="back-nav" onclick="history.back()">
-      <span class="arrow">←</span> Back to home
-    </div>
-
-    <div class="header-section">
-      <div class="logo">Jobify<span>.</span></div>
-      <h3>Create Account</h3>
-      <p class="subtitle">Join thousands of {{ userType === 'JobSeeker' ? 'job seekers' : 'companies' }} today</p>
-    </div>
-
-    <div class="segmented-control">
-      <button 
-        type="button"
-        [class.active]="userType === 'JobSeeker'"
-        (click)="switch('JobSeeker')">
-        Job Seeker
-      </button>
-      <button 
-        type="button"
-        [class.active]="userType === 'Employer'"
-        (click)="switch('Employer')">
-        Employer
-      </button>
-    </div>
-
-    <form [formGroup]="registerForm" (ngSubmit)="submit()" class="form-body">
-      
-      <div class="input-group">
-        <label>Email Address</label>
-        <input type="email" formControlName="email" placeholder="name@example.com" />
-        <small class="error-text" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-          Please enter a valid email.
-        </small>
-      </div>
-
-      <div class="input-group">
-        <label>Password</label>
-        <input type="password" formControlName="password" placeholder="Min. 8 characters" />
-      </div>
-
-      <div class="input-group animate-fade" *ngIf="userType === 'JobSeeker'">
-        <label>Full Name</label>
-        <input type="text" formControlName="fullName" placeholder="John Doe" />
-      </div>
-
-      <div class="employer-extra animate-fade" *ngIf="userType === 'Employer'">
-        <div class="input-group">
-          <label>Company Name</label>
-          <input type="text" formControlName="companyName" placeholder="Tech Solutions Inc." />
+    <div class="image-side">
+      <div class="image-overlay">
+        <div class="back-nav" onclick="history.back()">
+          <span class="arrow">←</span> Back
         </div>
-        <div class="input-group">
+        <h2>Join the <br>Future of <span>Work.</span></h2>
+      </div>
+    </div>
+
+    <div class="form-side">
+      <div class="header-section">
+        <div class="logo">Jobify<span>.</span></div>
+        <h3>Create Account</h3>
+        <p class="subtitle">Join thousands of {{ userType === 'JobSeeker' ? 'seekers' : 'companies' }}</p>
+      </div>
+
+      <div class="segmented-control">
+        <button type="button" [class.active]="userType === 'JobSeeker'" (click)="switch('JobSeeker')">
+          Seeker
+        </button>
+        <button type="button" [class.active]="userType === 'Employer'" (click)="switch('Employer')">
+          Employer
+        </button>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="submit()" class="form-body">
+        
+        <div class="fields-scroll">
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" formControlName="email" placeholder="name@example.com" />
+          </div>
+
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" formControlName="password" placeholder="Min. 8 characters" />
+          </div>
+
+          <div class="input-group animate-fade" *ngIf="userType === 'JobSeeker'">
+            <label>Full Name</label>
+            <input type="text" formControlName="fullName" placeholder="John Doe" />
+          </div>
+
+          <div class="employer-extra animate-fade" *ngIf="userType === 'Employer'">
+            <div class="input-group">
+              <label>Company Name</label>
+              <input type="text" formControlName="companyName" placeholder="Tech Solutions Inc." />
+            </div>
+             <div class="input-group">
           <label>Company Website</label>
           <input type="text" formControlName="companyWebsite" placeholder="https://company.com" />
         </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="loading">
+          {{ loading ? 'Creating...' : 'Register' }}
+        </button>
+      </form>
+
+      <div class="footer-link">
+        Already have an account? <a routerLink="/login">Sign in</a>
       </div>
-
-      <button type="submit" class="submit-btn" [disabled]="loading">
-        {{ loading ? 'Creating Account...' : 'Register as ' + userType }}
-      </button>
-    </form>
-
-    <div class="footer-link">
-      Already have an account? <a routerLink="/login">Sign in</a>
     </div>
 
   </div>

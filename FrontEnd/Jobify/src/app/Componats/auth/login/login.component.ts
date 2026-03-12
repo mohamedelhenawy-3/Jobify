@@ -28,7 +28,7 @@ export class LoginComponent {
     this.authservice.login(this.loginform.value).subscribe({
       next: () => {
         alert('Login successful');
-        this.router.navigate(['/home']);
+        this.router.navigate(['Jobify/home']);
       },
       error: () => {
         alert('Email or Password Invalid');

@@ -9,6 +9,7 @@ using CloudinaryDotNet;
 using Domain.Entities;
 using Infrastructure.DBContext;
 using Infrastructure.Implementation.CLoudinary;
+using Infrastructure.Implementation.FileUploadService;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -28,15 +29,20 @@ namespace Infrastructure.Implementation
         private readonly AppDBContext _db;
         private readonly IHttpContextAccessor _httpaccessor;
         private readonly CloudinaryService _cloudinaryService;
+        private readonly SupabaseService _supabaseservice;
 
         public JobSeekerService(
               AppDBContext context,
               CloudinaryService cloudinaryService,
-              IHttpContextAccessor httpContextAccessor)
+              IHttpContextAccessor httpContextAccessor,
+               SupabaseService supabaseservice
+
+              )
         {
             _db = context;
             _cloudinaryService = cloudinaryService;
             _httpaccessor = httpContextAccessor;
+            _supabaseservice = supabaseservice;
         }
         private string? GetCurrentUserId()
         {
@@ -86,6 +92,7 @@ namespace Infrastructure.Implementation
             return new MyProfileDto
             {
                     FullName =user.Select(x=>x.FullName).FirstOrDefault(),
+                    ResumeUrl=jobSeeker.ResumeUrl,
                 PhoneNumber = jobSeeker.PhoneNumber,
                 Location = jobSeeker.Location,
                 ProfileImage = jobSeeker.ProfileImage.ImageUrl,
@@ -101,27 +108,27 @@ namespace Infrastructure.Implementation
                     Name = s.Name
                 })
                 .ToList(),
-                Experiences = jobSeeker.Experiences
-            .Select(e => new ExperienceDto
-            {
-                Id = e.Id,
-                CompanyName = e.CompanyName,
-                JobTitle = e.JobTitle,
-                Description = e.Description,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate
-            }).ToList(),
+                Experiences = jobSeeker.Experiences?
+        .Select(e => new ExperienceDto
+        {
+            Id = e.Id,
+            CompanyName = e.CompanyName,
+            JobTitle = e.JobTitle,
+            Description = e.Description,
+            StartDate = e.StartDate,
+            EndDate = e.EndDate
+        }).ToList() ?? new List<ExperienceDto>(),
 
-                Educations = jobSeeker.Educations
-            .Select(e => new EducationDto
-            {
-                Id = e.Id,
-                Institution = e.Institution,
-                Degree = e.Degree,
-                FieldOfStudy = e.FieldOfStudy,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate
-            }).ToList()
+                Educations = jobSeeker.Educations?
+        .Select(e => new EducationDto
+        {
+            Id = e.Id,
+            Institution = e.Institution,
+            Degree = e.Degree,
+            FieldOfStudy = e.FieldOfStudy,
+            StartDate = e.StartDate,
+            EndDate = e.EndDate
+        }).ToList() ?? new List<EducationDto>()
             };
 
 
@@ -248,41 +255,8 @@ namespace Infrastructure.Implementation
 
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
-
-            if (resumedto.Resume == null)
-                throw new Exception("No file uploaded");
-
-            // Delete old resume if exists
-            if (profile.Resume != null && !string.IsNullOrEmpty(profile.Resume.PublicId))
-            {
-                await _cloudinaryService.DeleteImageAsync(profile.Resume.PublicId);
-            }
-
-            // Upload new PDF
-            var (url, publicId) = await _cloudinaryService.UploadPdfAsync(resumedto.Resume);
-
-            if (profile.Resume == null)
-            {
-                // 🔥 Create new Pdf entity
-                var resume = new Pdf
-                {
-                    PdfUrl = url,
-                    PublicId = publicId,
-                    CreatedAt = DateTime.UtcNow,
-                    JobSeekerId = profile.Id
-                };
-
-                profile.Resume = resume;
-
-                await _db.Pdfs.AddAsync(resume); // 🔥 Important
-            }
-            else
-            {
-                // 🔥 Update existing one
-                profile.Resume.PdfUrl = url;
-                profile.Resume.PublicId = publicId;
-                profile.Resume.CreatedAt = DateTime.UtcNow;
-            }
+            var url = await _supabaseservice.UploadResume(resumedto.Resume);
+            profile.ResumeUrl = url;
 
             await _db.SaveChangesAsync();
 
