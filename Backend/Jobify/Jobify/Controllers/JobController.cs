@@ -117,5 +117,11 @@ namespace Jobify.Controllers
             var result = await _jobService.UpdateJob(dto,id);
             return Ok(result);
         }
+        [HttpGet("recommended")]
+        public async Task<IActionResult> GetRecommendedJobs()
+        {
+            var jobs = await _jobService.GetRecommendedJobs();
+            return Ok(jobs);
+        }
     }
 }

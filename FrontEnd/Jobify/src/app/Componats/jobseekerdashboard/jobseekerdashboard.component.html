@@ -1,12 +1,12 @@
 <div class="dashboard">
-
-  <!-- HEADER -->
   <div class="dashboard-header">
-    <h2>Job Seeker Dashboard</h2>
-    <p>Track your applications and saved jobs in one place.</p>
+    <div>
+      <h2>Dashboard</h2>
+      <p>Welcome back! Here is what's happening with your job search.</p>
+    </div>
+    <button class="dh-btn-primary">+ Search New Jobs</button>
   </div>
 
-  <!-- STATS CARDS -->
   <div class="stats-container">
     <div class="stat-card" *ngFor="let card of topStats">
       <span class="stat-title">{{ card.title }}</span>
@@ -14,14 +14,23 @@
     </div>
   </div>
 
-  <!-- APPLICATIONS SECTION -->
+  <div class="section-header">
+      <h3>Recommended for You</h3>
+  </div>
+  <div class="recommendedjobs">
+    <div *ngFor="let job of recommendedJobs" class="job-card">
+      <div style="font-size: 24px; margin-bottom: 12px;">🏢</div>
+      <h3>{{job.title}}</h3>
+      <p>{{job.companyName}} • Remote</p>
+      <span class="match">{{job.matchScore}}% Match Score</span>
+    </div>
+  </div>
+
   <div class="card-section">
     <div class="section-header">
       <h3>My Applications</h3>
     </div>
-
     <div class="custom-table applications-table">
-
       <div class="table-head">
         <span>Job Title</span>
         <span>Company</span>
@@ -29,56 +38,37 @@
         <span>Date Applied</span>
         <span>Status</span>
       </div>
-
       <div class="table-row" *ngFor="let job of appliedJobs">
-        <span>{{ job.jobTitle }}</span>
+        <span style="font-weight: 600;">{{ job.jobTitle }}</span>
         <span>{{ job.company }}</span>
-        <span>{{ job.location }}</span>
+        <span style="color: var(--text-muted);">{{ job.location }}</span>
         <span>{{ job.dateApplied | date:'mediumDate' }}</span>
         <span>
-          <span class="status-badge"
-            [ngClass]="{
-              'applied': job.status==='Applied',
-              'underreview': job.status==='UnderReview',
-              'interviewed': job.status==='Interviewed'
-            }">
+          <span class="status-badge" [ngClass]="job.status.toLowerCase().replace(' ', '')">
             {{ job.status }}
           </span>
         </span>
       </div>
-
     </div>
   </div>
 
-  <!-- SAVED JOBS SECTION -->
   <div class="card-section">
     <div class="section-header">
       <h3>Saved Jobs</h3>
     </div>
-
     <div class="custom-table saved-table">
-
       <div class="table-head">
         <span>Job Title</span>
         <span>Location</span>
         <span>Date Saved</span>
+        <span>Action</span>
       </div>
-
       <div class="table-row" *ngFor="let job of savedJobs">
-        <span>{{ job.title }}</span>
-        <span>{{ job.location }}</span>
+        <span style="font-weight: 600;">{{ job.title }}</span>
+        <span style="color: var(--text-muted);">{{ job.location }}</span>
         <span>{{ job.createdAt | date:'mediumDate' }}</span>
-         <span>
-       <button 
-  class="details-btn"
-  (click)="goToJobDetails(job.id)">
-  View Details
-</button>
-
-      </span>
+        <button class="details-btn" (click)="goToJobDetails(job.id)">View</button>
       </div>
-
     </div>
   </div>
-
 </div>

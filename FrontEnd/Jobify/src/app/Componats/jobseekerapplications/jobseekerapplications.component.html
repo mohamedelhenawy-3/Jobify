@@ -16,9 +16,6 @@
     <div class="application-card" *ngFor="let app of applications">
       
       <div class="card-header">
-        <div class="company-placeholder" [style.backgroundColor]="getLogoBgColor(app.companyName)">
-          <span class="initial">{{ app.companyName[0] }}</span>
-        </div>
 
         <span class="status-badge" [ngClass]="getStatusClass(app.status)">
           <span class="status-dot"></span>

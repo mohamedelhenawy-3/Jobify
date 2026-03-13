@@ -30,4 +30,14 @@ this.savedjobsservice.getSavedJobs().subscribe({
   }, error: () => this.loading = false
 })  }
 
+unsavedJob(id:number){
+  this.savedjobsservice.unsaveJob(id).subscribe(()=>{
+    next:{
+      alert("Un Saved Succefylly");
+ 
+
+    }
+  })
+}
+
 }

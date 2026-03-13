@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { DashboarderviceService } from '../../Services/DashBoardService/dashboardervice.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { JobRecommendation } from '../../Models/Job/recommendedjob';
+import { JobService } from '../../Services/JobService/job.service';
 
 @Component({
   selector: 'app-jobseekerdashboard',
@@ -11,12 +13,13 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './jobseekerdashboard.component.css'
 })
 export class JobseekerdashboardComponent  implements OnInit{
+  recommendedJobs: JobRecommendation[] = [];
    appliedJobs: any[] = [];
   savedJobs: any[] = [];
 
   topStats: { title: string, value: number }[] = [];
 
-  constructor(private dashboardService: DashboarderviceService,private router: Router) { }
+  constructor(private dashboardService: DashboarderviceService,private router: Router,private jobService:JobService) { }
 
   ngOnInit(): void {
     this.dashboardService.getDashboard().subscribe(data => {
@@ -32,6 +35,15 @@ export class JobseekerdashboardComponent  implements OnInit{
 ;      this.savedJobs = data.savedJobs;
  console.log( "saved",this.savedJobs)
     });
+
+      this.jobService.getRecommendedJobs().subscribe({
+    next: (res) => {
+      this.recommendedJobs = res;
+    },
+    error: (err) => {
+      console.error(err);
+    }
+  });
   }
   goToJobDetails(jobId: number) {
   this.router.navigate(['/details', jobId]);

@@ -73,8 +73,10 @@ getWorkModeClass(modeId: number): string {
     default: return 'badge-default';
   }
 }
+
+
 viewJob(id:number){
-return this.router.navigate(['/details',id]);
+return this.router.navigate(['/Jobify/details',id]);
 }
 
 

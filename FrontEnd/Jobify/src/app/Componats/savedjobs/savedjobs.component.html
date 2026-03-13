@@ -30,11 +30,11 @@
       <div class="job-actions">
         <button
   class="view-btn"
-  [routerLink]="['/details', job.id]">
+  [routerLink]="['/Jobify/details', job.id]">
   View Job
 </button>
 
-        <button class="remove-btn" >Remove</button>
+        <button class="remove-btn" (click)="unsavedJob(job.id)" >Remove</button>
       </div>
 
     </div>

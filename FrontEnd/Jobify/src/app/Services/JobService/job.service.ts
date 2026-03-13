@@ -6,6 +6,7 @@ import { JobResponse } from '../../Models/Job/jobres';
 import { createjob } from '../../Models/Job/createjob';
 import { Job } from '../../Models/Job/job';
 import { jobdetails } from '../../Models/Job/dteailsjob';
+import { JobRecommendation } from '../../Models/Job/recommendedjob';
 
 @Injectable({
   providedIn: 'root'
@@ -62,4 +63,9 @@ getJob(id:number){
 updateJob(id: number, data: any): Observable<any> {
   return this.HttpClient.put(`https://localhost:44309/api/Job/${id}`, data);
 }
+
+
+  getRecommendedJobs(): Observable<JobRecommendation[]> {
+    return this.HttpClient.get<JobRecommendation[]>(`https://localhost:44309/api/Job/recommended`);
+  }
 }

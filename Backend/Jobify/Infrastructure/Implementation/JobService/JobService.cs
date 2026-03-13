@@ -2,6 +2,7 @@
 using Application.DTOs.industry;
 using Application.DTOs.JobPost;
 using Application.DTOs.Pagenation;
+using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Job;
 using Domain.Entities;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,13 +52,13 @@ namespace Infrastructure.Implementation.JobService
                 MaxSalary = createjobdto.MaxSalary,
                 IndustryId = createjobdto.IndustryId,
                 EmploymentTypeId = createjobdto.EmploymentTypeId,
-                StatusId = createjobdto.StatusId ,// default Draft
+                StatusId = createjobdto.StatusId,// default Draft
                 EmployerProfileId = employerProfile.Id,
                 WorkModeId = createjobdto.WorkModeId,
                 CreatedByUserId = user,
-                EducationOrExperience=createjobdto.EducationOrExperience,
-                Requirements=createjobdto.Responsibilities,
-                Responsibilities=createjobdto.Requirements,
+                EducationOrExperience = createjobdto.EducationOrExperience,
+                Requirements = createjobdto.Responsibilities,
+                Responsibilities = createjobdto.Requirements,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -100,7 +102,7 @@ namespace Infrastructure.Implementation.JobService
                 Status = job.Status.StatusName
             };
         }
-        
+
 
         public async Task<IEnumerable<JobDto>> AllJobs()
         {
@@ -129,7 +131,7 @@ namespace Infrastructure.Implementation.JobService
 
             var employer = await _db.EmployerProfiles
                             .FirstOrDefaultAsync(e => e.UserId == user);
-            var job = await _db.JobPosts.Include(x=>x.WorkMode).Include(x=>x.Industry).Include(x=>x.EmploymentType)
+            var job = await _db.JobPosts.Include(x => x.WorkMode).Include(x => x.Industry).Include(x => x.EmploymentType)
                    .FirstOrDefaultAsync(j =>
                        j.Id == id &&
                        j.EmployerProfileId == employer.Id);
@@ -177,7 +179,7 @@ namespace Infrastructure.Implementation.JobService
         public async Task<IEnumerable<ReturnedJobDto>> AllJobsOfEmployer()
         {
             var userid = GetCurrentUserId();
-            var employer =  _db.EmployerProfiles.FirstOrDefault(x => x.UserId == userid);
+            var employer = _db.EmployerProfiles.FirstOrDefault(x => x.UserId == userid);
             var jobs = await _db.JobPosts
                   .Where(j => j.EmployerProfileId == employer.Id)
                   .Select(j => new ReturnedJobDto
@@ -277,7 +279,7 @@ namespace Infrastructure.Implementation.JobService
                     MaxSalary = j.MaxSalary,
                     MinSalary = j.MinSalary,
                     Location = j.Location,
-                    WorkModeId=j.WorkModeId
+                    WorkModeId = j.WorkModeId
                 })
                 .ToListAsync();
 
@@ -308,9 +310,9 @@ namespace Infrastructure.Implementation.JobService
                 Id = job.Id,
                 Title = job.Title,
                 Description = job.Description,
-                Requirements=job.Requirements,
-                Responsibilities=job.Responsibilities,
-                EducationOrExperience=job.EducationOrExperience,
+                Requirements = job.Requirements,
+                Responsibilities = job.Responsibilities,
+                EducationOrExperience = job.EducationOrExperience,
                 Location = job.Location,
                 MinSalary = job.MinSalary,
                 MaxSalary = job.MaxSalary,
@@ -320,6 +322,50 @@ namespace Infrastructure.Implementation.JobService
                 EmploymentTypeId = job.IndustryId,
                 StatusId = job.StatusId
             };
+        }
+
+        public async Task<List<RecommendedJobsDto>> GetRecommendedJobs()
+        {
+            var userid = GetCurrentUserId();
+            var seeker = await _db.JobSeekers
+                         .Include(s => s.Skills)
+                         .FirstOrDefaultAsync(s => s.UserId == userid);
+
+
+            if (seeker == null)
+                return new List<RecommendedJobsDto>();
+
+            var acticejobs = await _db.JobPosts.Include(e => e.EmployerProfile).ToListAsync();
+            var results = new List<RecommendedJobsDto>();
+
+            foreach (var job in acticejobs)
+            {
+                ICollection<Skill> skills = seeker.Skills;
+                int score = CalculateMatchScore(job, skills);
+                results.Add(new RecommendedJobsDto
+                {
+                    JobId = job.Id,
+                    Title = job.Title,
+                    CompanyName = job.EmployerProfile.CompanyName,
+                    MatchScore = score,
+
+                    Location = job.Location,
+                    MinSalary = job.MinSalary,
+                    MaxSalary = job.MaxSalary
+                });
+            }
+            return results
+                  .OrderByDescending(r => r.MatchScore)
+                  .Where(x => x.MatchScore >= 1)
+                  .Take(10).ToList();
+
+        }
+        private int CalculateMatchScore(JobPost job, ICollection<Skill> skills)
+        {
+            if (skills.Count() == 0) return 0;
+            var requirements = job.Requirements?.ToLower() ?? "";
+            int matched = skills.Count(x => requirements.Contains(x.Name.ToLower()));
+            return (matched * 100) / skills.Count();
         }
     }
 }
