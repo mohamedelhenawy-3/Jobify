@@ -33,7 +33,7 @@ namespace Infrastructure.DBContext
         public DbSet<EmployerProfile> EmployerProfiles { get; set; }
         public DbSet<ProfileImage> ProfileImages { get; set; }
         public DbSet<Pdf> Pdfs { get; set; }
-
+        public DbSet<SavedJobAlert> SavedJobAlerts { get; set; }
         // =========================
         // Jobs & Applications
         // =========================
