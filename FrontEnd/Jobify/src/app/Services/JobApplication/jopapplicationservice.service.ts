@@ -31,9 +31,9 @@ export class JobApplicationService {
   getApplicationDetails(applicationId: number): Observable<AppliedJobSeekerDetails> {
     return this.http.get<AppliedJobSeekerDetails>(`${this.baseUrl}/AppliedJobDetails/${applicationId}`);
   }
- applyToJob(jobId: number, application: CreateJobApplication): Observable<any> {
-    return this.http.post(`${this.baseUrl}/CreateJobApplication/${jobId}`, application);
-  }
+ applyToJob(jobId: number, application: FormData): Observable<any> {
+  return this.http.post(`${this.baseUrl}/CreateJobApplication/${jobId}`, application);
+}
   // Update application status
   // updateApplicationStatus(
   //   applicationId: number,

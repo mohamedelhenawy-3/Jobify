@@ -6,6 +6,7 @@ using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Job;
 using Domain.Entities;
+using Domain.Entities.LooksUp;
 using Infrastructure.DBContext;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -367,5 +368,41 @@ namespace Infrastructure.Implementation.JobService
             int matched = skills.Count(x => requirements.Contains(x.Name.ToLower()));
             return (matched * 100) / skills.Count();
         }
+
+
+
+        public async Task<SuccessResponse> SaveAlert(string keyword)
+        {
+            var userId = GetCurrentUserId();
+
+            var alert = new SavedJobAlert
+            {
+                UserId = userId,
+                Keyword = keyword,
+                LastChecked = DateTime.UtcNow
+            };
+
+            _db.SavedJobAlerts.Add(alert);
+
+            await _db.SaveChangesAsync();
+
+            return new SuccessResponse
+            {
+                Message = "Alert Saved"
+            };
+        }
+        public async Task<List<JobPost>> FindNewJobs(SavedJobAlert alert)
+        {
+
+            var jobs = await _db.JobPosts
+              .Where(j => j.Title.Contains(alert.Keyword))
+               .Where(j => j.CreatedAt > alert.LastChecked)
+                 .ToListAsync();
+
+            return jobs;
+
+        }
+
+    
     }
 }

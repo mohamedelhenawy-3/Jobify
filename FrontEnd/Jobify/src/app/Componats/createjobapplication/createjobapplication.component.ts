@@ -35,31 +35,43 @@ applicationForm!: FormGroup;
       coverLetter: ['', Validators.required],
       experienceSummary: ['', Validators.required],
       linkedInUrl: [''],
-      motivation: ['', Validators.required]
+      motivation: ['', Validators.required],
+          resume: [null, Validators.required]
+
     });
   }
-
-  submitApplication() {
-    if (this.applicationForm.invalid) return;
-
-    this.submitting = true;
-    this.successMessage = '';
-    this.errorMessage = '';
-
-    this.jobAppService.applyToJob(this.jobId, this.applicationForm.value)
-      .subscribe({
-        next: res => {
-          this.successMessage = res.message || 'Application submitted successfully!';
-          this.submitting = false;
-          this.applicationForm.reset();
-
-          // Optional: Navigate back to job details
-          this.router.navigate(['/job', this.jobId]);
-        },
-        error: err => {
-          this.errorMessage = err.error?.message || 'Failed to submit application.';
-          this.submitting = false;
-        }
-      });
+onFileSelected(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    this.applicationForm.patchValue({
+      resume: file
+    });
   }
+}
+submitApplication() {
+  if (this.applicationForm.invalid) return;
+
+  this.submitting = true;
+
+  const formData = new FormData();
+  formData.append('coverLetter', this.applicationForm.value.coverLetter);
+  formData.append('experienceSummary', this.applicationForm.value.experienceSummary);
+  formData.append('linkedInUrl', this.applicationForm.value.linkedInUrl);
+  formData.append('motivation', this.applicationForm.value.motivation);
+  formData.append('resume', this.applicationForm.value.resume);
+
+  this.jobAppService.applyToJob(this.jobId, formData)
+    .subscribe({
+      next: res => {
+        this.successMessage = res.message || 'Application submitted successfully!';
+        this.submitting = false;
+        this.applicationForm.reset();
+        this.router.navigate(['/job', this.jobId]);
+      },
+      error: err => {
+        this.errorMessage = err.error?.message || 'Failed to submit application.';
+        this.submitting = false;
+      }
+    });
+}
 }

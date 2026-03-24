@@ -1,6 +1,8 @@
 ﻿using Application.DTOs.JobPost;
 using Application.Interfaces.Company;
 using Application.Interfaces.Job;
+using Domain.Entities.LooksUp;
+using Infrastructure.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -117,11 +119,21 @@ namespace Jobify.Controllers
             var result = await _jobService.UpdateJob(dto,id);
             return Ok(result);
         }
+   
+
         [HttpGet("recommended")]
         public async Task<IActionResult> GetRecommendedJobs()
         {
             var jobs = await _jobService.GetRecommendedJobs();
             return Ok(jobs);
+        }
+
+        [HttpPost("SaveAlert")]
+        public async Task<IActionResult> SaveAlert(string keyword)
+        {
+
+            var job = await _jobService.SaveAlert(keyword);
+            return Ok(job);
         }
     }
 }

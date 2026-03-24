@@ -1,10 +1,14 @@
 ﻿using Application.DTOs;
 using Application.DTOs.JobApplication;
 using Application.DTOs.SuccefullOp;
+using Application.Events;
 using Application.Interfaces.JobApplication;
+using CloudinaryDotNet;
 using Domain.Entities;
+using Domain.Entities.LooksUp;
 using Infrastructure.DBContext;
 using Infrastructure.Implementation.CLoudinary;
+using Infrastructure.Implementation.FileUploadService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,15 +26,21 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
         private readonly AppDBContext _db;
         private readonly IHttpContextAccessor _httpaccessor;
         private readonly CloudinaryService _cloudinaryService;
+        private readonly SupabaseService _supabase;
+        public readonly ApplicationStatusNotifier _Notify;
 
         public JobApplicationService(
               AppDBContext context,
+              ApplicationStatusNotifier Notify,
               CloudinaryService cloudinaryService,
-              IHttpContextAccessor httpContextAccessor)
+              IHttpContextAccessor httpContextAccessor, SupabaseService supabase
+              )
         {
             _db = context;
             _cloudinaryService = cloudinaryService;
             _httpaccessor = httpContextAccessor;
+            _supabase = supabase;
+            _Notify = Notify;
         }
         private string? GetCurrentUserId()
         {
@@ -38,39 +48,80 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
             return user?.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
-        public async  Task<SuccessResponse> CreateApplication(CreateJobApplication jobdto, int id)
+        public async Task<SuccessResponse> CreateApplication(CreateJobApplication jobdto, int id)
         {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new Exception("Unauthorized");
-
-            var profile = await _db.JobSeekers
-                .FirstOrDefaultAsync(js => js.UserId == userId);
-
-            if (profile == null)
-                throw new Exception("JobSeeker profile not found");
-            var job = _db.JobPosts.Where(x => x.Id == id).Select(c => c.Id).FirstOrDefault();
-
-            var jobapplication = new JobApplication()
+            try
             {
-                CoverLetter = jobdto.CoverLetter,
-                LinkedInUrl = jobdto.LinkedInUrl,
-                Motivation = jobdto.Motivation,
-                ExperienceSummary = jobdto.ExperienceSummary
-            };
-            jobapplication.JobPostId = job;
-            jobapplication.JobSeekerId = profile.Id;
+                // 🔹 1. Validate user
+                var userId = GetCurrentUserId();
+                if (string.IsNullOrEmpty(userId))
+                    throw new Exception("Unauthorized");
 
-            await _db.AddAsync(jobapplication);
-            await _db.SaveChangesAsync();
-            return new SuccessResponse
+                // 🔹 2. Get JobSeeker profile
+                var profile = await _db.JobSeekers
+                    .FirstOrDefaultAsync(js => js.UserId == userId);
+
+                if (profile == null)
+                    throw new Exception("JobSeeker profile not found");
+
+                // 🔹 3. Validate Job
+                var job = await _db.JobPosts
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (job == null)
+                    throw new Exception("Job not found");
+
+                // 🔹 4. Handle Resume Upload (SAFE)
+                string? url = null;
+
+                if (jobdto != null && jobdto.Resume != null)
+                {
+                    try
+                    {
+                        url = await _supabase.UploadResume(jobdto.Resume);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Upload Error: " + ex.Message);
+                        throw new Exception("Resume upload failed");
+                    }
+                }
+
+                // 🔹 5. Create Application (ONLY IF ALL OK)
+                var jobapplication = new JobApplication
+                {
+                    CoverLetter = jobdto?.CoverLetter,
+                    LinkedInUrl = jobdto?.LinkedInUrl,
+                    Motivation = jobdto?.Motivation,
+                    ExperienceSummary = jobdto?.ExperienceSummary,
+                    ResumeUrl = url,
+                    JobPostId = job.Id,
+                    JobSeekerId = profile.Id,
+                    Status = ApplicationStatus.Applied, // ✅ default
+                    AppliedAt = DateTime.UtcNow
+                };
+
+                // 🔹 6. Save
+                await _db.JobApplications.AddAsync(jobapplication);
+                await _db.SaveChangesAsync();
+
+                return new SuccessResponse
+                {
+                    Message = "Application added successfully"
+                   
+                };
+            }
+            catch (Exception ex)
             {
+                // 🔥 IMPORTANT for debugging
+                Console.WriteLine("ERROR: " + ex.ToString());
 
-                Message = "Application Added successfully"
-            };
-
+                return new SuccessResponse
+                {
+                    Message = ex.Message
+                };
+            }
         }
-
         public async Task<IEnumerable<MyApplications>> GetMyApplications()
         {
             var userId = GetCurrentUserId();
@@ -134,7 +185,8 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                             JobTitle = a.JobPost.Title,
                             JoSeekerEmail = a.JobSeeker.User.Email,
                             JoSeekerFullName = a.JobSeeker.User.UserName,
-                            ProfileImageUrl = a.JobSeeker.ProfileImage.ImageUrl
+                            ProfileImageUrl = a.JobSeeker.ProfileImage.ImageUrl,
+                            ResumeUrl =a.ResumeUrl
                         }).ToListAsync();
 
             return application;
@@ -154,7 +206,8 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                     Motivation = a.Motivation,
                     ExperienceSummary = a.ExperienceSummary,
                     LinkedInUrl = a.LinkedInUrl,
-                    ResumeUrl = a.JobSeeker.Resume != null ? a.JobSeeker.Resume.PdfUrl : null
+                    ResumeUrl = a.ResumeUrl != null ? a.JobSeeker.ResumeUrl : null
+
                 }).FirstOrDefaultAsync();
 
             return applicationDetails!;
@@ -187,5 +240,43 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
             };
         }
 
+        public async  Task<SuccessResponse> UpdateJobInterviewStatus(InterviewStatus updatestatusdto, int applicationId)
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Unauthorized");
+
+            var profile = await _db.EmployerProfiles
+                .FirstOrDefaultAsync(js => js.UserId == userId);
+
+            if (profile == null)
+                throw new Exception("Employer profile not found");
+
+            var application = await _db.JobApplications
+                .FirstOrDefaultAsync(a => a.Id == applicationId && a.JobPost.EmployerProfileId == profile.Id);
+
+            if (application == null)
+                throw new Exception("Application not found or you are not authorized");
+
+
+
+            if (updatestatusdto.status != ApplicationStatus.Interviewed)
+                throw new Exception("This endpoint is only for Interview status");
+
+            if (updatestatusdto.InterviewDate == default)
+                throw new Exception("Interview date is required");
+
+            application.Status = ApplicationStatus.Interviewed;
+            application.InterviewDate = updatestatusdto.InterviewDate;
+
+            await _db.SaveChangesAsync();
+            _Notify.Notify(application);
+
+
+            return new SuccessResponse
+            {
+                Message = "Interview scheduled successfully"
+            };
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,9 @@ namespace Application.DTOs
         public string? ExperienceSummary { get; set; }
         public string? LinkedInUrl { get; set; }
         public string? Motivation { get; set; }
+        public IFormFile? Resume { get; set; }
+
+        
 
     }
 }

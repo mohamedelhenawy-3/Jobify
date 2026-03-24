@@ -20,12 +20,14 @@ namespace Domain.Entities
         public string? ExperienceSummary { get; set; }
         public string? LinkedInUrl { get; set; }
         public string? Motivation { get; set; }
-            
+        public string? ResumeUrl { get; set; }
+        public DateTime? InterviewDate { get; set; } // 👈 important
 
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Applied;
 
         public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<JobApplicationNote> ? Notes { get; set; }
+
     }
 }

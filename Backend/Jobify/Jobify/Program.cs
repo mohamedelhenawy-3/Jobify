@@ -1,6 +1,9 @@
+using Application.Events;
+using Application.Handlers;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Company;
+using Application.Interfaces.Email;
 using Application.Interfaces.Job;
 using Application.Interfaces.JobApplication;
 using Application.Interfaces.JobSeeker;
@@ -12,8 +15,10 @@ using Domain.Identity;
 using Infrastructure.DBContext;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.AuthService;
+using Infrastructure.Implementation.Background;
 using Infrastructure.Implementation.CLoudinary;
 using Infrastructure.Implementation.CompanyService;
+using Infrastructure.Implementation.Email;
 using Infrastructure.Implementation.FileUploadService;
 using Infrastructure.Implementation.JobApplicationSrevice;
 using Infrastructure.Implementation.JobService;
@@ -89,9 +94,13 @@ builder.Services.AddScoped<IJobSeekerService, JobSeekerService>();
 builder.Services.AddScoped<ISkillsService, SkillsService>();
 builder.Services.AddScoped<IJobApplication, JobApplicationService>();
 builder.Services.AddScoped<ISavedJob, SavedJobService>();
-
+builder.Services.AddSingleton<ApplicationStatusNotifier>();
+builder.Services.AddScoped<JobEmailTemplate>();
 builder.Services.AddScoped<CloudinaryService>();
+builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<SupabaseService>();
+builder.Services.AddHostedService<JobAlertBackgroundService>();
+builder.Services.AddScoped<ApplicationStatusHandler>();
 builder.Services.Configure<SupabaseSettings>(
     builder.Configuration.GetSection("Supabase"));
 builder.Services.AddControllers()
@@ -159,7 +168,16 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
+var notifier = app.Services.GetRequiredService<ApplicationStatusNotifier>();
 
+notifier.OnStatusChnaged += async (appData) =>
+{
+    using var scope = app.Services.CreateScope();
+
+    var handler = scope.ServiceProvider.GetRequiredService<ApplicationStatusHandler>();
+
+    await handler.Handler(appData);
+};
 
 using (var scope = app.Services.CreateScope())
 {

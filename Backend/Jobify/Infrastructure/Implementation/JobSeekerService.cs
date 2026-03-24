@@ -95,7 +95,7 @@ namespace Infrastructure.Implementation
                     ResumeUrl=jobSeeker.ResumeUrl,
                 PhoneNumber = jobSeeker.PhoneNumber,
                 Location = jobSeeker.Location,
-                ProfileImage = jobSeeker.ProfileImage.ImageUrl,
+                ProfileImage = jobSeeker.ProfileImage?.ImageUrl,
                 Headline = jobSeeker.Headline,
                 Resume = resume,
                 Summary = jobSeeker.Summary,

@@ -3,6 +3,8 @@ using Application.DTOs.JobPost;
 using Application.DTOs.Pagenation;
 using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
+using Domain.Entities;
+using Domain.Entities.LooksUp;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System;
 using System.Collections.Generic;
@@ -27,5 +29,8 @@ namespace Application.Interfaces.Job
        Task<PageDto<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto, int pagesize = 10, int pagenumber = 1);
 
         Task<List<RecommendedJobsDto>> GetRecommendedJobs();
+        ///
+        Task<SuccessResponse> SaveAlert(string keyword);
+        Task<List<JobPost>> FindNewJobs(SavedJobAlert alert);
     }
 }

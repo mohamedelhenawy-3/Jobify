@@ -23,9 +23,9 @@ namespace Jobify.Controllers
 
         [HttpPost("CreateJobApplication/{id}")]
 
-        public async Task<IActionResult> CreateJob([FromBody] CreateJobApplication createjob,int id)
+        public async Task<IActionResult> CreateJob([FromForm] CreateJobApplication createjob, int id)
         {
-            var result = await _IJoobService.CreateApplication(createjob,id);
+            var result = await _IJoobService.CreateApplication(createjob, id);
             return Ok(result);
 
         }

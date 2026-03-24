@@ -8,7 +8,6 @@ export interface JobSeekerProfile {
 
   location: string | null;
   profileImage: string | null;
-  resume: string | null;
 
   headline: string | null;
   summary: string | null;

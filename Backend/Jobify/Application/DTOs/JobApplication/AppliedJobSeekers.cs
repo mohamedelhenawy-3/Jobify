@@ -10,7 +10,7 @@ namespace Application.DTOs.JobApplication
     {
         public int ApplicationId { get; set; }
 
-
+        public string? ResumeUrl { get; set; }
         public string? ProfileImageUrl { get; set; }
         public string JobTitle { get; set; }
         public string JoSeekerEmail { get; set; }

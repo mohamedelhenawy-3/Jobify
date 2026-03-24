@@ -3,7 +3,19 @@
   <!-- Profile Header -->
   <div class="profile-header">
     <div class="image-wrapper">
-      <img class="profile-image" [src]="profile.profileImage || 'assets/default-user.png'" alt="Profile" />
+
+    <!-- Profile Image -->
+    <ng-container *ngIf="!editProfile; else editImage">
+      <img
+        class="profile-image"
+        [src]="profile.profileImage || 'assets/default-user.png'"
+        alt="Profile Image"
+      />
+    </ng-container>
+
+    <ng-template #editImage>
+      <input type="file" (change)="onFileSelected($event)" />
+    </ng-template>
       <span class="online-indicator"></span>
     </div>
 
@@ -141,7 +153,7 @@
       <!-- Resume -->
       <div class="card">
         <h2><i class="fas fa-file-pdf"></i> Resume</h2>
-        <ng-container *ngIf="profile.resume; else noResume">
+        <ng-container *ngIf="profile.resumeUrl; else noResume">
           <a [href]="profile.resumeUrl" target="_blank" class="btn-full">View Resume</a>
         </ng-container>
         <ng-template #noResume>

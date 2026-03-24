@@ -56,7 +56,7 @@ constructor(private router:ActivatedRoute,private savedservice:SavedjobsService,
       });
   }
     goToApply(jobId: number): void {
-    this.route.navigate(['/apply', jobId]);  // navigate to JobApplicationCreateComponent
+    this.route.navigate(['/Jobify/apply', jobId]);  // navigate to JobApplicationCreateComponent
   }
   toggleSave(jobId: number) {
   if (this.saving) return;

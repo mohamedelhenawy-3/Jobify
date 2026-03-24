@@ -28,8 +28,11 @@ applicationDetails: AppliedJobSeekerDetails | null = null;
 
   loadDetails(): void {
     this.jobService.getApplicationDetails(this.applicationId).subscribe({
-      next: (res) => this.applicationDetails = res,
-      error: (err) => console.error(err)
+      next: (res) =>{
+this.applicationDetails = res, 
+console.log("application details",res);
+      } 
+      // error: (err) => console.error(err)
     });
   }
   goBack(){

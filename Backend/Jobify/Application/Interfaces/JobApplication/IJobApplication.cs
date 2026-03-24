@@ -16,6 +16,7 @@ namespace Application.Interfaces.JobApplication
         Task<IEnumerable<AppliedJobSeekers>> GetAppliedJobSeeker();
         Task<AppliedJoSeekerDetails> GetAppliedJobSeekerDeyails(int applicationId);
         Task<SuccessResponse> UpdateJobStatus(UpdateAppliedJobStatus updatestatusdto, int applicationId);
+        Task<SuccessResponse> UpdateJobInterviewStatus(InterviewStatus updatestatusdto, int applicationId);
 
     }
 }
