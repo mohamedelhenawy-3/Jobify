@@ -18,7 +18,8 @@ namespace Domain.Entities
      
         public int? JobSeekerId { get; set; }
         public JobSeeker JobSeeker { get; set; }
-
+        public int? CompanyId { get; set; }
+        public Company? Company { get; set; }
         public int? EmployerProfileId { get; set; }
         public EmployerProfile EmployerProfile { get; set; }
 
