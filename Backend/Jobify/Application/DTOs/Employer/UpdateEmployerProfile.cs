@@ -9,10 +9,14 @@ namespace Application.DTOs.Employer
 {
     public class UpdateEmployerProfile
     {
-        public string? CompanyName { get; set; }
-        public string? CompanyWebsite { get; set; }
-        public string? Description { get; set; }
+        public string? FullName { get; set; }
+        public string? PhoneNumber { get; set; }
         public string? Location { get; set; }
-        public IFormFile? ProfileImage { get; set; } // optional
+        public string? LinkedInUrl { get; set; }
+        public string? Position { get; set; }
+        public string? Bio { get; set; }
+
+  
+        public IFormFile? ProfileImage { get; set; }
     }
 }
