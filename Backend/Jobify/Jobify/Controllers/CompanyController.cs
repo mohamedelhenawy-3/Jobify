@@ -50,7 +50,7 @@ namespace Jobify.Controllers
         }
 
         [HttpGet("{companyId}")]
-      
+
         public async Task<IActionResult> GetCompanyById(int companyId)
         {
             var result = await _companyService.GetCompanyById(companyId);
@@ -64,5 +64,14 @@ namespace Jobify.Controllers
             var result = await _companyService.GetAllCompanies();
             return Ok(result);
         }
+        [HttpGet("privatrcompany")]
+        
+        public async Task<IActionResult> PrivateCompany()
+        {
+            var result = await _companyService.PrivateCompany();
+            return Ok(result);
+        }
+ 
+
     }
 }

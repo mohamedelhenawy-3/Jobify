@@ -17,6 +17,6 @@ namespace Application.DTOs.Employer
         public string? Bio { get; set; }
 
   
-        public IFormFile? ProfileImage { get; set; }
+        public IFormFile? PImage { get; set; }
     }
 }

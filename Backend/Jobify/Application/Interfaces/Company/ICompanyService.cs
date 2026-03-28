@@ -11,6 +11,7 @@ namespace Application.Interfaces.Company
 {
     public interface ICompanyService
     {
+        Task<CompanyOwnerDto> PrivateCompany();
         Task<SuccessResponse> CreateCompany(CreateCompanyDto dto);
         Task<SuccessResponse> UpdateCompany(int companyId, UpdateCompanyDto dto);
         Task<CompanyResponseDto> GetCompanyById(int companyId);
@@ -19,7 +20,7 @@ namespace Application.Interfaces.Company
 
         // ===== MY COMPANY =====
         Task<CompanyResponseDto> GetMyCompany();
-
+       
         // ===== JOBS =====
         //Task<IEnumerable<JobPostResponseDto>> GetCompanyJobs(int companyId);
     }
