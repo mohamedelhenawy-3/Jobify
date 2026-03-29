@@ -18,8 +18,9 @@ namespace Infrastructure.DBContext
         {
 
         }
+        public DbSet<Interview> Interviews { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
-
+        public DbSet<Company> Companies { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         // =========================
         // Identity & Users
@@ -59,6 +60,12 @@ namespace Infrastructure.DBContext
             {
                 entity.Property(ep => ep.FullName)
                       .HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(ep => ep.PhoneNumber)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(ep => ep.Location)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
 
                 entity.Property(ep => ep.CreatedAt)
                       .HasDefaultValueSql("GETUTCDATE()");
@@ -98,9 +105,7 @@ namespace Infrastructure.DBContext
 
                 entity.HasKey(js => js.Id);
 
-                entity.Property(js => js.PhoneNumber)
-                      .HasMaxLength(20);
-
+          
                 entity.HasMany(x => x.Skills)
                    .WithOne(s => s.JobSeeker)
                    .HasForeignKey(s => s.JobSeekerId)
@@ -110,8 +115,7 @@ namespace Infrastructure.DBContext
                 entity.Property(js => js.ResumeUrl)
                       .HasMaxLength(500);
 
-                entity.Property(js => js.Location)
-                      .HasMaxLength(200);
+           
 
                 entity.HasOne(js => js.User)
                       .WithOne(u => u.JobSeeker)
@@ -133,20 +137,16 @@ namespace Infrastructure.DBContext
 
                 entity.HasKey(ep => ep.Id);
 
-                entity.Property(ep => ep.CompanyName)
-                      .IsRequired()
+                entity.Property(ep => ep.Position)
+
                       .HasMaxLength(200);
 
-                entity.Property(ep => ep.CompanyWebsite)
-                      .HasMaxLength(300);
-
-                entity.Property(ep => ep.Description)
-                      .HasMaxLength(2000);
-
-                entity.Property(ep => ep.Location)
-                      .HasMaxLength(200);
-
-                
+             
+                         
+                      
+                entity.Property(ep => ep.Bio)
+                   
+                     .HasMaxLength(200);
 
                 entity.HasOne(ep => ep.User)
                       .WithOne(u => u.EmployerProfile)
@@ -183,12 +183,64 @@ namespace Infrastructure.DBContext
                           .WithOne(ep => ep.ProfileImage)
                           .HasForeignKey<ProfileImage>(pi => pi.EmployerProfileId)
                           .OnDelete(DeleteBehavior.Restrict);
-                
+                entity.HasOne(p => p.Company)
+         .WithOne(c => c.Logo)
+         .HasForeignKey<ProfileImage>(p => p.CompanyId)
+         .OnDelete(DeleteBehavior.Cascade);
 
             });
-            builder.Entity<SavedJob>()
-      .HasIndex(x => new { x.UserId, x.JobId })
-      .IsUnique();
+
+            builder.Entity<Company>(entity =>
+            {
+                entity.ToTable("Companies");
+                entity.HasKey(c => c.Id);
+
+                entity.Property(c => c.CompanyName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.CompanyWebsite)
+                    .HasMaxLength(200);
+
+                entity.Property(c => c.Description)
+                    .HasMaxLength(2000);
+
+                entity.Property(c => c.Location)
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.Industry)
+                    .HasMaxLength(100);
+
+                entity.Property(c => c.CompanySize)
+                    .HasMaxLength(50);
+
+                entity.Property(c => c.Founded)
+                    .HasMaxLength(4);
+
+                entity.Property(c => c.CreatedAt)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                // One Employer = One Company
+                entity.HasOne(c => c.EmployerProfile)
+                    .WithOne(e => e.Company)
+                    .HasForeignKey<Company>(c => c.EmployerProfileId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Company -> Jobs
+                entity.HasMany(c => c.JobPosts)
+                    .WithOne(j => j.Company)
+                    .HasForeignKey(j => j.CompanyId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Company -> Logo
+                entity.HasOne(c => c.Logo)
+                    .WithOne(p => p.Company)
+                    .HasForeignKey<ProfileImage>(p => p.CompanyId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+         
 
             //Pdf
             builder.Entity<Pdf>(entity =>
@@ -305,9 +357,9 @@ namespace Infrastructure.DBContext
                 entity.Property(j => j.CreatedAt)
                       .HasDefaultValueSql("GETUTCDATE()");
 
-                entity.HasOne(j => j.EmployerProfile)
+                entity.HasOne(j => j.Company)
                       .WithMany(ep => ep.JobPosts)
-                      .HasForeignKey(j => j.EmployerProfileId)
+                      .HasForeignKey(j => j.CompanyId)
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(j => j.Industry)

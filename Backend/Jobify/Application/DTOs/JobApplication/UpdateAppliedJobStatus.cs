@@ -13,5 +13,8 @@ namespace Application.DTOs.JobApplication
         [JsonConverter(typeof(JsonStringEnumConverter))] // <-- allow string enum
 
         public ApplicationStatus status { get; set; }
+        public DateTime? InterviewDate { get; set; }
+        public string? InterviewLocation { get; set; }
+        public string? Notes { get; set; }
     }
 }
