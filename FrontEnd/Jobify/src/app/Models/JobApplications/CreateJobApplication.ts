@@ -3,4 +3,5 @@ export interface CreateJobApplication {
   experienceSummary?: string;
   linkedInUrl?: string;
   motivation?: string;
+  Resume?:String;
 }

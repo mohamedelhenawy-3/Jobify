@@ -54,12 +54,11 @@ namespace Jobify.Controllers
 
         }
         [HttpPut("AppliedJobDetails/{id}")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateAppliedJobStatus newStatus)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateAppliedJobStatus dto) // Changed from 'newStatus' to 'dto'
         {
-            var result = await _IJoobService.UpdateJobStatus(newStatus, id);
+            var result = await _IJoobService.UpdateJobStatus(dto, id);
             return Ok(result);
         }
-
 
     }
 }

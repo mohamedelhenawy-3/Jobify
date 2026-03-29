@@ -5,6 +5,7 @@ using Application.Events;
 using Application.Interfaces.JobApplication;
 using CloudinaryDotNet;
 using Domain.Entities;
+using Domain.Entities.Event;
 using Domain.Entities.LooksUp;
 using Infrastructure.DBContext;
 using Infrastructure.Implementation.CLoudinary;
@@ -13,10 +14,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Infrastructure.Implementation.JobApplicationSrevice
@@ -52,26 +56,24 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
         {
             try
             {
-                // 🔹 1. Validate user
+                
                 var userId = GetCurrentUserId();
                 if (string.IsNullOrEmpty(userId))
                     throw new Exception("Unauthorized");
 
-                // 🔹 2. Get JobSeeker profile
                 var profile = await _db.JobSeekers
                     .FirstOrDefaultAsync(js => js.UserId == userId);
 
                 if (profile == null)
                     throw new Exception("JobSeeker profile not found");
 
-                // 🔹 3. Validate Job
+               
                 var job = await _db.JobPosts
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (job == null)
                     throw new Exception("Job not found");
 
-                // 🔹 4. Handle Resume Upload (SAFE)
                 string? url = null;
 
                 if (jobdto != null && jobdto.Resume != null)
@@ -87,7 +89,6 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                     }
                 }
 
-                // 🔹 5. Create Application (ONLY IF ALL OK)
                 var jobapplication = new JobApplication
                 {
                     CoverLetter = jobdto?.CoverLetter,
@@ -97,11 +98,11 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                     ResumeUrl = url,
                     JobPostId = job.Id,
                     JobSeekerId = profile.Id,
-                    Status = ApplicationStatus.Applied, // ✅ default
+                    Status = ApplicationStatus.Applied, 
                     AppliedAt = DateTime.UtcNow
                 };
 
-                // 🔹 6. Save
+            
                 await _db.JobApplications.AddAsync(jobapplication);
                 await _db.SaveChangesAsync();
 
@@ -113,7 +114,6 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
             }
             catch (Exception ex)
             {
-                // 🔥 IMPORTANT for debugging
                 Console.WriteLine("ERROR: " + ex.ToString());
 
                 return new SuccessResponse
@@ -133,9 +133,11 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
 
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
+
             var applications = await _db.JobApplications
                 .Include(x => x.JobPost)
-                   .ThenInclude(x => x.EmployerProfile)
+                    .ThenInclude(x => x.Company)      
+                        .ThenInclude(c => c.Logo)      
                 .Include(x => x.JobPost.Industry)
                 .Include(x => x.JobPost.WorkMode)
                 .Include(x => x.JobPost.EmploymentType)
@@ -145,19 +147,17 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                     ApplicationId = a.Id,
                     Status = a.Status.ToString(),
                     AppliedAt = a.AppliedAt,
-
                     JobId = a.JobPost.Id,
                     JobTitle = a.JobPost.Title,
-                    CompanyName = a.JobPost.EmployerProfile.CompanyName,
+                    CompanyName = a.JobPost.Company.CompanyName,  
+                    Logo = a.JobPost.Company.Logo.ImageUrl, 
                     JobLocation = a.JobPost.Location,
                     WorkMode = a.JobPost.WorkMode.Name,
                     EmploymentType = a.JobPost.EmploymentType.TypeName,
                     CoverLetterUrl = a.CoverLetter
                 }).ToListAsync();
 
-
             return applications;
-
         }
 
         public async  Task<IEnumerable<AppliedJobSeekers>> GetAppliedJobSeeker()
@@ -167,28 +167,32 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                 throw new Exception("Unauthorized");
 
             var profile = await _db.EmployerProfiles
-                .FirstOrDefaultAsync(js => js.UserId == userId);
+                          .Include(e => e.Company)          
+                          .FirstOrDefaultAsync(js => js.UserId == userId);
+            if (profile == null)
+                throw new Exception("Employer profile not found");
+
+            if (profile.Company == null)
+                throw new Exception("You don't have a company yet");
 
             var application = await _db.JobApplications
-               .Where(a => a.JobPost.EmployerProfileId == profile.Id)
-                    .Include(a => a.JobPost)
-                    .Include(a => a.JobSeeker)
-                        .ThenInclude(js => js.User)
-                    .Include(x => x.JobSeeker)
-                        .ThenInclude(x => x.ProfileImage)
-
-                        .Select(a => new AppliedJobSeekers
-                        {
-                            ApplicationId = a.Id,
-                            Status = a.Status.ToString(),
-                            AppliedAt = a.AppliedAt,
-                            JobTitle = a.JobPost.Title,
-                            JoSeekerEmail = a.JobSeeker.User.Email,
-                            JoSeekerFullName = a.JobSeeker.User.UserName,
-                            ProfileImageUrl = a.JobSeeker.ProfileImage.ImageUrl,
-                            ResumeUrl =a.ResumeUrl
-                        }).ToListAsync();
-
+      .Where(a => a.JobPost.CompanyId == profile.Company.Id)
+      .Include(a => a.JobPost)
+      .Include(a => a.JobSeeker)
+          .ThenInclude(js => js.User)
+      .Include(x => x.JobSeeker)
+          .ThenInclude(x => x.ProfileImage)
+      .Select(a => new AppliedJobSeekers
+      {
+          ApplicationId = a.Id,
+          Status = a.Status.ToString(),
+          AppliedAt = a.AppliedAt,
+          JobTitle = a.JobPost.Title,
+          JoSeekerEmail = a.JobSeeker.User.Email,
+          JoSeekerFullName = a.JobSeeker.User.UserName,
+          ProfileImageUrl = a.JobSeeker.ProfileImage.ImageUrl,
+          ResumeUrl = a.ResumeUrl
+      }).ToListAsync();
             return application;
         }
 
@@ -197,7 +201,7 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
             var applicationDetails = await _db.JobApplications
                 .Where(a => a.Id == applicationId)
                 .Include(a => a.JobSeeker).ThenInclude(js => js.User)
-                .Include(a => a.JobSeeker).ThenInclude(js => js.Resume)
+                .Include(a => a.JobSeeker)
                 .Include(a => a.JobPost)
                 .Select(a => new AppliedJoSeekerDetails
                 {
@@ -206,9 +210,10 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                     Motivation = a.Motivation,
                     ExperienceSummary = a.ExperienceSummary,
                     LinkedInUrl = a.LinkedInUrl,
-                    ResumeUrl = a.ResumeUrl != null ? a.JobSeeker.ResumeUrl : null
+                    ResumeUrl = a.ResumeUrl
 
                 }).FirstOrDefaultAsync();
+            Console.WriteLine(applicationDetails.ResumeUrl);
 
             return applicationDetails!;
         }
@@ -219,64 +224,54 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
                 throw new Exception("Unauthorized");
 
             var profile = await _db.EmployerProfiles
+                .Include(e => e.Company)            
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
             if (profile == null)
                 throw new Exception("Employer profile not found");
 
+            if (profile.Company == null)
+                throw new Exception("You don't have a company yet");
+
             var application = await _db.JobApplications
-                .FirstOrDefaultAsync(a => a.Id == applicationId && a.JobPost.EmployerProfileId == profile.Id);
+                .FirstOrDefaultAsync(a =>
+                    a.Id == applicationId &&
+                    a.JobPost.CompanyId == profile.Company.Id); 
 
             if (application == null)
                 throw new Exception("Application not found or you are not authorized");
 
             application.Status = updatestatusdto.status;
+            if(application.Status == ApplicationStatus.Interviewed)
+            {
+                if (updatestatusdto.InterviewDate == null || string.IsNullOrWhiteSpace(updatestatusdto.InterviewLocation))
+                    throw new Exception("Interview data is required");
+                var B = new Interview
+                {
+                    JobApplicationId=application.Id,
+                    InterviewDate = updatestatusdto.InterviewDate.Value,
+                    Location = updatestatusdto.InterviewLocation!,
+                    Notes = updatestatusdto.Notes
+                };
 
+                _db.Interviews.Add(B);
+
+            }
             await _db.SaveChangesAsync();
+            var interview = await _db.Interviews
+      .FirstOrDefaultAsync(i => i.JobApplicationId == application.Id);
 
+            await _Notify.Notify(new ApplicationStatusEvent
+            {
+                Application = application,
+                Interview = interview
+            });
             return new SuccessResponse
             {
                 Message = "Application status updated successfully"
             };
         }
 
-        public async  Task<SuccessResponse> UpdateJobInterviewStatus(InterviewStatus updatestatusdto, int applicationId)
-        {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new Exception("Unauthorized");
-
-            var profile = await _db.EmployerProfiles
-                .FirstOrDefaultAsync(js => js.UserId == userId);
-
-            if (profile == null)
-                throw new Exception("Employer profile not found");
-
-            var application = await _db.JobApplications
-                .FirstOrDefaultAsync(a => a.Id == applicationId && a.JobPost.EmployerProfileId == profile.Id);
-
-            if (application == null)
-                throw new Exception("Application not found or you are not authorized");
-
-
-
-            if (updatestatusdto.status != ApplicationStatus.Interviewed)
-                throw new Exception("This endpoint is only for Interview status");
-
-            if (updatestatusdto.InterviewDate == default)
-                throw new Exception("Interview date is required");
-
-            application.Status = ApplicationStatus.Interviewed;
-            application.InterviewDate = updatestatusdto.InterviewDate;
-
-            await _db.SaveChangesAsync();
-            _Notify.Notify(application);
-
-
-            return new SuccessResponse
-            {
-                Message = "Interview scheduled successfully"
-            };
-        }
+       
     }
 }
