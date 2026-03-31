@@ -12,8 +12,9 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
 
-        public int EmployerProfileId { get; set; }
-        public EmployerProfile EmployerProfile { get; set; }
+        // Add this
+        public int CompanyId { get; set; }
+        public Company Company { get; set; }
 
         public string Title { get; set; }
         public string Description { get; set; }
@@ -38,6 +39,7 @@ namespace Domain.Entities
         public string CreatedByUserId { get; set; }
         public AppUser CreatedByUser { get; set; }
         public int WorkModeId { get; set; } = 1;
+        public bool isActive { get; set; } = true;
         public WorkMode WorkMode { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
 

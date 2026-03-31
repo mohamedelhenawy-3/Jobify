@@ -7,7 +7,14 @@
   margin-bottom: 2rem;
   padding: 0 10px;
 }
-
+.interview-form-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
 .header-section h4 {
   margin: 0;
   font-weight: 800;

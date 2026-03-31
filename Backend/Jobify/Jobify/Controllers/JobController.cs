@@ -2,7 +2,7 @@
 using Application.Interfaces.Company;
 using Application.Interfaces.Job;
 using Domain.Entities.LooksUp;
-using Infrastructure.Migrations;
+using Infrastructure.Implementation.CompanyService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -134,6 +134,19 @@ namespace Jobify.Controllers
 
             var job = await _jobService.SaveAlert(keyword);
             return Ok(job);
+        }
+        [HttpGet("keyword")]
+        public async Task<IActionResult> search(string keyword)
+        {
+
+            var job = await _jobService.Search(keyword);
+            return Ok(job);
+        }
+        [HttpGet("OpeningJobs")]
+        public async Task<IActionResult> OpeningJibs()
+        {
+            var result = await _jobService.AvalibleJobs();
+            return Ok(result);
         }
     }
 }

@@ -1,6 +1,10 @@
 <div class="saved-jobs-page">
 
-  <h2>⭐ My Saved Jobs</h2>
+  <!-- Header -->
+  <div class="header">
+    <h2>⭐ My Saved Jobs</h2>
+    <span class="count">{{ savedJobs.length }} Jobs</span>
+  </div>
 
   <!-- Loading -->
   <div *ngIf="loading" class="loading">
@@ -12,29 +16,60 @@
     You haven’t saved any jobs yet.
   </div>
 
-  <!-- Saved Jobs Grid -->
+  <!-- Jobs -->
   <div class="jobs-grid" *ngIf="!loading && savedJobs.length">
 
     <div class="job-card" *ngFor="let job of savedJobs">
 
       <!-- Header -->
       <div class="job-header">
-        <h3>{{ job.title }}</h3>
-        <span class="company">{{ job.location }}</span>
+
+        <div class="job-info">
+          <img 
+            class="logo"
+            [src]="job.logo || 'assets/default-user.png'"
+            alt="logo"
+          />
+
+          <div>
+            <h3 class="title">{{ job.title }}</h3>
+            <p class="company">{{ job.location }}</p>
+          </div>
+        </div>
+
+        <button class="remove-btn" (click)="unsavedJob(job.id)">✖</button>
       </div>
 
-      <!-- Description -->
-      <p class="description">{{ job.description }}</p>
+      <!-- Details -->
+      <div class="job-details">
 
-      <!-- Actions -->
-      <div class="job-actions">
+        <span>📍 {{ job.location }}</span>
+
+        <span class="badge">
+          {{ getEmploymentType(job.employmentTypeId) }}
+        </span>
+
+        <span class="badge light">
+          {{ getWorkMode(job.workModeId) }}
+        </span>
+
+        <span class="status" [ngClass]="getStatusClass(job.statusId)">
+          {{ getStatusText(job.statusId) }}
+        </span>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="job-footer">
+        <span class="match">
+          {{ job.countJobs }} Saved Jobs
+        </span>
+
         <button
-  class="view-btn"
-  [routerLink]="['/Jobify/details', job.id]">
-  View Job
-</button>
-
-        <button class="remove-btn" (click)="unsavedJob(job.id)" >Remove</button>
+          class="view-btn"
+          [routerLink]="['/Jobify/details', job.id]">
+          View Job
+        </button>
       </div>
 
     </div>

@@ -75,53 +75,76 @@ namespace Infrastructure.Implementation.AuthService
             if (!await _roleManager.RoleExistsAsync(dto.Role))
                 throw new Exception("Role does not exist");
 
+            var emailExists = await _userManager.FindByEmailAsync(dto.Email);
+            if (emailExists != null)
+                throw new Exception("Email already exists");
+
+            if (dto.Password != dto.ConfirmPassword)
+                throw new Exception("Passwords do not match");
+
             var user = new AppUser
             {
                 UserName = dto.Email,
                 Email = dto.Email,
                 FullName = dto.FullName,
-                PhoneNumber = dto.PhoneNumber
+                PhoneNumber = dto.PhoneNumber,
+                Location = dto.location,
+                CreatedAt = DateTime.UtcNow
             };
+
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
-            // 2️⃣ Assign role
+
             await _userManager.AddToRoleAsync(user, dto.Role);
+
             if (dto.Role == "JobSeeker")
             {
                 var seeker = new JobSeeker
                 {
-                    UserId = user.Id,
-                    PhoneNumber = dto.PhoneNumber
+                    UserId = user.Id
                 };
 
-                await _jobSeekerRepo.AddAsync(seeker);
-                await _jobSeekerRepo.SaveChangesAsync();
+                _context.JobSeekers.Add(seeker);
+                await _context.SaveChangesAsync();
             }
             else if (dto.Role == "Employer")
             {
                 if (string.IsNullOrWhiteSpace(dto.CompanyName))
                     throw new Exception("Company name is required");
 
+                // ✅ Step 1 - Add employer and save FIRST
                 var employer = new EmployerProfile
                 {
                     UserId = user.Id,
-                    CompanyName = dto.CompanyName!,
-                    CompanyWebsite = dto.CompanyWebsite
+                    Position = dto.Position,
+                    Bio = null,
                 };
 
-                await _employerRepo.AddAsync(employer);
-                await _employerRepo.SaveChangesAsync();
+                _context.EmployerProfiles.Add(employer);
+                await _context.SaveChangesAsync(); // employer.Id is now real
+
+                var company = new Company
+                {
+                    CompanyName = dto.CompanyName,
+                    CompanyWebsite = dto.CompanyWebsite,
+                    Industry = dto.Industry,
+                    Location = dto.CompanyLocation,
+                    EmployerProfileId = employer.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Companies.Add(company);
+                await _context.SaveChangesAsync(); // company saved with correct Id
             }
+
             return new SuccessResponseDto
             {
                 Message = "User registered successfully"
             };
-
-
         }
 
-      
+
     }
 
      

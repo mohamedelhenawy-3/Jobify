@@ -1,0 +1,191 @@
+<!-- COVER -->
+<div class="company-cover">
+  <img src="assets/cover.jpg" class="cover-img" />
+
+  <div class="overlay"></div>
+</div>
+
+<!-- HEADER CONTENT -->
+<div class="container" *ngIf="!loading && profile">
+
+  <div class="company-header">
+
+    <!-- LOGO -->
+    <div class="logo-box">
+      <img 
+        [src]="profile.logoUrl || 'assets/default-company.png'" 
+        alt="company logo"
+      />
+    </div>
+
+    <!-- INFO -->
+    <div class="company-info">
+      <h1>{{ profile.companyName }}</h1>
+
+      <div class="meta">
+        <span class="badge">{{ profile.industry }}</span>
+
+        <span class="meta-item">
+          📍 {{ profile.location }}
+        </span>
+
+        <a 
+          *ngIf="profile.companyWebsite"
+          [href]="'https://' + profile.companyWebsite"
+          target="_blank"
+          class="website"
+        >
+          🌐 {{ profile.companyWebsite }}
+        </a>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="follow-btn">
+        + Follow
+      </button>
+
+      <button class="share-btn">
+        🔗
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="stats-container" *ngIf="profile">
+
+  <div class="stats-grid">
+
+    <!-- Founded -->
+    <div class="stat-card">
+      <div class="icon-box">📅</div>
+      <div>
+        <h3>{{ profile.founded || 'N/A' }}</h3>
+        <p>Founded Year</p>
+      </div>
+    </div>
+
+    <!-- Employees -->
+    <div class="stat-card">
+      <div class="icon-box">👥</div>
+      <div>
+        <h3>{{ profile.companySize }}</h3>
+        <p>Employees</p>
+      </div>
+    </div>
+
+    <!-- Total Jobs -->
+    <div class="stat-card">
+      <div class="icon-box">💼</div>
+      <div>
+        <h3>{{ profile.totalJobsPosted }}</h3>
+        <p>Total Jobs</p>
+      </div>
+    </div>
+
+    <!-- Active Jobs -->
+    <div class="stat-card active">
+      <div class="icon-box">⚡</div>
+      <div>
+        <h3>{{ profile.activeJobs }}</h3>
+        <p>Active Jobs</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<div class="about-container" *ngIf="profile">
+
+  <h2>About Us</h2>
+
+  <div class="about-card">
+
+    <!-- DESCRIPTION -->
+    <p class="desc">
+      {{ profile.description }}
+    </p>
+
+    <!-- OPTIONAL SECOND PARAGRAPH (if you add later) -->
+    <p class="desc" *ngIf="profile.description">
+      We aim to deliver innovative solutions and build strong digital experiences for businesses worldwide.
+    </p>
+
+    <!-- TAGS -->
+    <div class="tags">
+
+      <span class="tag">Software Development</span>
+      <span class="tag">Cloud Computing</span>
+      <span class="tag">Agile</span>
+      <span class="tag">React</span>
+      <span class="tag">Node.js</span>
+      <span class="tag">AWS</span>
+      <span class="tag">Innovation</span>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- OPEN JOBS -->
+<div class="jobs-container" *ngIf="openingjobs.length > 0">
+
+  <!-- HEADER -->
+  <div class="jobs-header">
+    <h2>Open Positions</h2>
+    <span class="count">{{ openingjobs.length }}</span>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <button 
+      *ngFor="let f of filters"
+      (click)="setFilter(f)"
+      [class.active]="activeFilter === f"
+    >
+      {{ f }}
+    </button>
+  </div>
+
+  <!-- JOB LIST -->
+  <div class="job-list">
+
+    <div class="job-card" *ngFor="let job of filteredJobs">
+
+      <!-- LEFT -->
+      <div class="job-info">
+        <h3>{{ job.title }}</h3>
+
+        <div class="meta">
+          <span>📍 {{ job.location }}</span>
+
+          <span class="badge">{{ job.workModeId }}</span>
+
+          <span class="badge secondary">{{ job.employmentTypeId }}</span>
+
+          <span class="salary">
+            {{ job.minSalary }} - {{ job.maxSalary }}
+          </span>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="job-actions">
+        <span class="time">
+          ⏱ {{ job.publiched | date:'shortDate' }}
+        </span>
+
+        <button class="apply-btn" (click)="View(job.id)">
+          View
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

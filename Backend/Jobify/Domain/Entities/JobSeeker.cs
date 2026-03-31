@@ -14,10 +14,9 @@ namespace Domain.Entities
         public AppUser User { get; set; }
         public string? Headline { get; set; }
         public string? Summary { get; set; }
-        public string? PhoneNumber { get; set; }
+   
         public string? ResumeUrl { get; set; }
-        public string? Location { get; set; }
-        public string? LinkedInUrl { get; set; }
+     
         public string? GithubUrl { get; set; }
         public ICollection<Experience> Experiences { get; set; } = new List<Experience>();
         public ICollection<Education> Educations { get; set; } = new List<Education>();

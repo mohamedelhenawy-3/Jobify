@@ -31,12 +31,12 @@ export class JobseekerdashboardComponent  implements OnInit{
       ];
 
       this.appliedJobs = data.appliedJobs;
-     
-;      this.savedJobs = data.savedJobs;
- console.log( "saved",this.savedJobs)
+      console.log("aplied",this.appliedJobs)
+      this.savedJobs = data.savedJobs;
+      console.log( "saved",this.savedJobs)
     });
 
-      this.jobService.getRecommendedJobs().subscribe({
+    this.jobService.getRecommendedJobs().subscribe({
     next: (res) => {
       this.recommendedJobs = res;
     },
@@ -45,6 +45,21 @@ export class JobseekerdashboardComponent  implements OnInit{
     }
   });
   }
+  getStatusClass(status: string): string {
+  if (!status) return '';
+
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return 'status-pending';
+    case 'accepted':
+    case 'hired':
+      return 'status-accepted';
+    case 'rejected':
+      return 'status-rejected';
+    default:
+      return '';
+  }
+}
   goToJobDetails(jobId: number) {
   this.router.navigate(['/details', jobId]);
 }

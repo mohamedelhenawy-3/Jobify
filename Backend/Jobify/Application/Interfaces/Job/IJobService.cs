@@ -32,5 +32,13 @@ namespace Application.Interfaces.Job
         ///
         Task<SuccessResponse> SaveAlert(string keyword);
         Task<List<JobPost>> FindNewJobs(SavedJobAlert alert);
+
+        Task<List<OpeningJobs>> AvalibleJobs();
+
+
+
+        //NEW PART FOR search globlay
+        Task<List<SearchResponseDto>> Search(string keyword);
+
     }
 }

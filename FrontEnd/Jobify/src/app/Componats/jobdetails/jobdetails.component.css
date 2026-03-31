@@ -14,6 +14,22 @@ html, body {
   overflow: hidden; /* remove all page scroll */
   background-color: #f4f6f9;
 }
+.job-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  flex-shrink: 0;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
 
 /* ================= JOB PAGE ================= */
 .job-page {

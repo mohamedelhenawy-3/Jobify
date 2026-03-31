@@ -12,7 +12,13 @@
     <!-- HEADER -->
     <div class="job-header">
       <div class="job-title">
-        <i [class]="getJobIcon(jobs)" class="job-icon"></i>
+             <div class="job-icon">
+  <img
+    class="profile-image"
+    [src]="jobs.logo || 'assets/default-user.png'"
+    alt="Profile Image"
+  />
+</div>
         <div>
           <h1>{{ jobs.title }}</h1>
           <p class="job-location">📍 {{ jobs.location }}</p>

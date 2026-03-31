@@ -41,8 +41,9 @@ namespace Infrastructure.Implementation.JobService
         {
             var user = GetCurrentUserId();
             if (user == null) throw new Exception("User Null");
-            var employerProfile = await _db.EmployerProfiles
+            var employerProfile = await _db.EmployerProfiles.Include(c => c.Company)
                 .FirstOrDefaultAsync(e => e.UserId == user);
+            
             var Job = new JobPost
             {
 
@@ -54,12 +55,13 @@ namespace Infrastructure.Implementation.JobService
                 IndustryId = createjobdto.IndustryId,
                 EmploymentTypeId = createjobdto.EmploymentTypeId,
                 StatusId = createjobdto.StatusId,// default Draft
-                EmployerProfileId = employerProfile.Id,
+                CompanyId = employerProfile.Company.Id,
                 WorkModeId = createjobdto.WorkModeId,
                 CreatedByUserId = user,
                 EducationOrExperience = createjobdto.EducationOrExperience,
                 Requirements = createjobdto.Responsibilities,
                 Responsibilities = createjobdto.Requirements,
+                isActive=true,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -77,6 +79,7 @@ namespace Infrastructure.Implementation.JobService
         public async Task<ReturnedJobDto> GetJobById(int id)
         {
             var job = await _db.JobPosts
+                .Include(x=>x.Company).ThenInclude(x=>x.Logo)
              .Include(j => j.WorkMode)
              .Include(j => j.Industry)
              .Include(j => j.EmploymentType)
@@ -89,6 +92,9 @@ namespace Infrastructure.Implementation.JobService
             return new ReturnedJobDto
             {
                 Id = job.Id,
+                logo = job.Company != null && job.Company.Logo != null
+                ? job.Company.Logo.ImageUrl
+                : null,
                 Title = job.Title,
                 Description = job.Description,
                 Location = job.Location,
@@ -108,9 +114,14 @@ namespace Infrastructure.Implementation.JobService
         public async Task<IEnumerable<JobDto>> AllJobs()
         {
             return await _db.JobPosts
+                .Include(x=>x.Company).ThenInclude(x=>x.Logo)
                 .Select(j => new JobDto
                 {
+                    
                     Id = j.Id,
+                    logo = j.Company != null && j.Company.Logo != null
+                ? j.Company.Logo.ImageUrl
+                : null,
                     Title = j.Title,
                     Description = j.Description,
                     Location = j.Location,
@@ -132,10 +143,14 @@ namespace Infrastructure.Implementation.JobService
 
             var employer = await _db.EmployerProfiles
                             .FirstOrDefaultAsync(e => e.UserId == user);
-            var job = await _db.JobPosts.Include(x => x.WorkMode).Include(x => x.Industry).Include(x => x.EmploymentType)
-                   .FirstOrDefaultAsync(j =>
-                       j.Id == id &&
-                       j.EmployerProfileId == employer.Id);
+
+            if (employer?.Company == null)
+                throw new Exception("Company not found");
+
+            var job = await _db.JobPosts
+                .FirstOrDefaultAsync(j =>
+                    j.Id == id &&
+                    j.CompanyId == employer.Company.Id); 
 
             job.Title = updatejob.Title;
             job.Description = updatejob.Description;
@@ -160,45 +175,61 @@ namespace Infrastructure.Implementation.JobService
             var user = GetCurrentUserId();
             if (user == null) throw new Exception("User Null");
 
-            var employer = await _db.EmployerProfiles
-                            .FirstOrDefaultAsync(e => e.UserId == user);
+            var employerProfile = await _db.EmployerProfiles
+                .Include(e => e.Company)
+                .FirstOrDefaultAsync(e => e.UserId == user);
+
+            if (employerProfile?.Company == null)
+                throw new Exception("Company not found");
+
             var job = await _db.JobPosts
-                   .FirstOrDefaultAsync(j =>
-                       j.Id == id &&
-                       j.EmployerProfileId == employer.Id);
+                .FirstOrDefaultAsync(j =>
+                    j.Id == id &&
+                    j.CompanyId == employerProfile.Company.Id); 
+
+            if (job == null)
+                throw new Exception("Job not found");
 
             _db.JobPosts.Remove(job);
             await _db.SaveChangesAsync();
 
-            return new SuccessResponse
-            {
-                Message = "Deleted Succefully"
-            };
-
+            return new SuccessResponse { Message = "Deleted Successfully" };
         }
+
+        
 
         public async Task<IEnumerable<ReturnedJobDto>> AllJobsOfEmployer()
         {
-            var userid = GetCurrentUserId();
-            var employer = _db.EmployerProfiles.FirstOrDefault(x => x.UserId == userid);
+             var userid = GetCurrentUserId();
+
+    var employerProfile = await _db.EmployerProfiles
+        .Include(e => e.Company).ThenInclude(x=>x.Logo)
+        .FirstOrDefaultAsync(x => x.UserId == userid);
+
+    if (employerProfile?.Company == null)
+        throw new Exception("Company not found");
             var jobs = await _db.JobPosts
-                  .Where(j => j.EmployerProfileId == employer.Id)
-                  .Select(j => new ReturnedJobDto
-                  {
-                      Id = j.Id,
-                      Title = j.Title,
-                      Description = j.Description,
-                      Location = j.Location,
-                      MinSalary = j.MinSalary,
-                      MaxSalary = j.MaxSalary,
-                      Industry = j.Industry.IndustryName,
-                      EmploymentType = j.EmploymentType.TypeName,
-                      Status = j.Status.StatusName,
-                      WorkMode = j.WorkMode.Name
-                  })
-                  .ToListAsync();
+     .Where(j => j.CompanyId == employerProfile.Company.Id) // ✅ changed
+     .Select(j => new ReturnedJobDto
+     {
+         Id = j.Id,
+         Title = j.Title,
+         logo = j.Company != null && j.Company.Logo != null
+                ? j.Company.Logo.ImageUrl
+                : null,
+         Description = j.Description,
+         Location = j.Location,
+         MinSalary = j.MinSalary,
+         MaxSalary = j.MaxSalary,
+         Industry = j.Industry.IndustryName,
+         EmploymentType = j.EmploymentType.TypeName,
+         Status = j.Status.StatusName,
+         WorkMode = j.WorkMode.Name
+     })
+     .ToListAsync();
 
             return jobs;
+
         }
 
         public async Task<IndustryDto?> JobWithIndustry(int id)
@@ -273,6 +304,9 @@ namespace Infrastructure.Implementation.JobService
                 .Select(j => new JobDto
                 {
                     Id = j.Id,
+                    logo = j.Company != null && j.Company.Logo != null
+                ? j.Company.Logo.ImageUrl
+                : null,
                     Title = j.Title,
                     IndustryId = j.IndustryId,
                     EmploymentTypeId = j.EmploymentTypeId,
@@ -336,7 +370,13 @@ namespace Infrastructure.Implementation.JobService
             if (seeker == null)
                 return new List<RecommendedJobsDto>();
 
-            var acticejobs = await _db.JobPosts.Include(e => e.EmployerProfile).ToListAsync();
+            // Change this include
+            var acticejobs = await _db.JobPosts
+                .Include(x=>x.EmploymentType)
+                .Include(x=>x.Industry).Include(x=>x.Status)
+                .Include(x=>x.WorkMode)
+                .Include(e => e.Company).ThenInclude(x=>x.Logo) // ✅ changed from EmployerProfile
+                .ToListAsync();
             var results = new List<RecommendedJobsDto>();
 
             foreach (var job in acticejobs)
@@ -347,12 +387,18 @@ namespace Infrastructure.Implementation.JobService
                 {
                     JobId = job.Id,
                     Title = job.Title,
-                    CompanyName = job.EmployerProfile.CompanyName,
+                    logo = job.Company != null && job.Company.Logo != null
+                ? job.Company.Logo.ImageUrl
+                : null,
+                    CompanyName = job.Company?.CompanyName, // ✅ changed
                     MatchScore = score,
-
                     Location = job.Location,
                     MinSalary = job.MinSalary,
-                    MaxSalary = job.MaxSalary
+                    MaxSalary = job.MaxSalary,
+                    IndustryId = job.Industry.Id,
+                    EmploymentTypeId = job.EmploymentType.Id,
+                    WorkModeId = job.WorkMode.Id,
+                    StatusId = job.Status.Id
                 });
             }
             return results
@@ -403,6 +449,65 @@ namespace Infrastructure.Implementation.JobService
 
         }
 
-    
+       
+    public async Task<List<OpeningJobs>> AvalibleJobs()
+        {
+
+
+            var userid = GetCurrentUserId();
+
+            var employerProfile = await _db.EmployerProfiles
+                .Include(e => e.Company)
+                .FirstOrDefaultAsync(x => x.UserId == userid);
+
+            if (employerProfile?.Company == null)
+                throw new Exception("Company not found");
+            var jobs = await _db.JobPosts
+     .Where(j => j.CompanyId == employerProfile.Company.Id && j.Status.StatusName == "Published"
+             && j.isActive == true) // ✅ changed
+     .Select(j => new OpeningJobs
+     {
+         Id = j.Id,
+         Title = j.Title,
+         Description = j.Description,
+         Location = j.Location,
+         MinSalary = j.MinSalary,
+         MaxSalary = j.MaxSalary,
+         IndustryId = j.Industry.Id,
+         EmploymentTypeId = j.EmploymentType.Id,
+         StatusId = j.Status.Id,
+         WorkModeId = j.WorkMode.Id
+     })
+     .ToListAsync();
+
+            return jobs;
+
+
+
+
+        }
+
+        public async Task<List<SearchResponseDto>> Search(string keyword)
+        {
+            var jobs = await _db.JobPosts.Include(x=>x.Company)
+        .Where(j => j.Title.ToLower().Contains(keyword.ToLower()) ||
+                    j.Description.ToLower().Contains(keyword.ToLower()))
+        .Select(j => new  SearchResponseDto{
+            Id=j.Id,
+            Title=j.Title,
+            logo=j.Company.Logo.ImageUrl,
+            Location=j.Location,
+            IndustryId = j.Industry.Id,
+            EmploymentTypeId = j.EmploymentType.Id,
+            StatusId = j.Status.Id,
+            WorkModeId = j.WorkMode.Id,
+            data=j.CreatedAt
+            
+        })
+        .ToListAsync();
+
+
+            return jobs;
+        }
     }
 }

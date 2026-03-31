@@ -13,7 +13,9 @@ namespace Domain.Identity
         public JobSeeker? JobSeeker { get; set; }
         public EmployerProfile? EmployerProfile { get; set; }
         public string? FullName { get; set; }
-
+        public string? PhoneNumber { get; set; }
+        public string? Location { get; set; }
+        public string? LinkedInUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }

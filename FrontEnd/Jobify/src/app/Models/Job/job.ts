@@ -1,5 +1,7 @@
 export interface Job {
   id:number;
+
+  logo?:string;
   title: string;
   description: string;
   location: string;
@@ -9,6 +11,5 @@ export interface Job {
   industryId: number;
   employmentTypeId: number;
   statusId: number;
-    status: number;
 
 }

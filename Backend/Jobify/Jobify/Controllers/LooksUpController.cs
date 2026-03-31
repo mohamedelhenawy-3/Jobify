@@ -47,6 +47,16 @@ namespace Jobify.Controllers
 
             return Ok(modes);
         }
+        [HttpGet("Statuses")]
+        public async Task<IActionResult> GetStatus()
+        {
+            var modes = await _db.JobStatuses
+                .Select(w => new { w.Id, w.StatusName })
+                .ToListAsync();
+
+            return Ok(modes);
+        }
+
 
         // Optionally, you can return **all lookup data in one request**
         // GET: api/LooksUp/All

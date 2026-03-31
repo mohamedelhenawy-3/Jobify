@@ -48,6 +48,8 @@
       </div>
     </div>
 
+
+     
     <!-- Dropdowns Row -->
     <div class="form-row">
       <div class="form-group">
@@ -55,6 +57,13 @@
         <select id="industryId" formControlName="industryId">
           <option value="">Select Industry</option>
           <option *ngFor="let i of industries" [value]="i.id">{{ i.industryName }}</option>
+        </select>
+      </div>
+        <div class="form-group">
+        <label for="statusId">Status </label>
+        <select id="statusId" formControlName="statusId">
+          <option value="">Select Status </option>
+          <option *ngFor="let t of JobStatus" [value]="t.id">{{ t.statusName }}</option>
         </select>
       </div>
 

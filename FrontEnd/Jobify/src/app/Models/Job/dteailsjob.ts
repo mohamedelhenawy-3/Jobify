@@ -1,6 +1,7 @@
 export interface jobdetails {
   id:number;
   title: string;
+  logo?:string;
   description: string;
   location: string;
   minSalary: number;

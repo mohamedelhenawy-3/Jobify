@@ -1,0 +1,201 @@
+<div *ngIf="!loading && profile" class="container">
+
+  <!-- COVER + PROFILE -->
+ <div class="profile-header">
+
+  <!-- COVER -->
+  <div class="cover">
+    <img src="assets/cover.jpg" alt="cover" />
+
+    <!-- gradient overlay -->
+    <div class="overlay"></div>
+  </div>
+
+  <!-- PROFILE CARD -->
+  <div class="profile-card">
+
+    <!-- EDIT BUTTON -->
+    <button class="edit-btn">
+      Edit Profile
+    </button>
+
+    <div class="profile-content">
+
+      <!-- IMAGE -->
+      <div class="profile-img-wrapper">
+        <img
+          [src]="profile.profileImageUrl || 'assets/default-user.png'"
+          class="profile-img"
+        />
+      </div>
+
+      <!-- INFO -->
+      <div class="info">
+        <h1>{{ profile.fullName }}</h1>
+
+        <p class="position">
+          {{ profile.position || 'No position added' }}
+        </p>
+
+        <div class="meta">
+          <span class="location">
+            📍 {{ profile.location }}
+          </span>
+
+          <a
+            *ngIf="profile.linkedInUrl"
+            [href]="profile.linkedInUrl"
+            target="_blank"
+            class="linkedin-btn"
+          >
+            LinkedIn
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+ <div class="card" >
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <h2>Personal Information</h2>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="card-content">
+
+    <!-- ABOUT -->
+    <div class="about-section">
+      <h3>About</h3>
+      <p>
+        {{ profile.bio || 'No bio added yet.' }}
+      </p>
+    </div>
+
+    <hr />
+
+    <!-- INFO ROWS -->
+    <div class="info-row">
+      <div class="icon-box">📞</div>
+      <div>
+        <span class="label">Phone</span>
+        <p>{{ profile.phoneNumber || 'Not provided' }}</p>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="info-row">
+      <div class="icon-box">📧</div>
+      <div>
+        <span class="label">Email</span>
+        <p>{{ profile.email }}</p>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="info-row">
+      <div class="icon-box">📅</div>
+      <div>
+        <span class="label">Member Since</span>
+        <p>{{ profile.createdAt | date:'mediumDate' }}</p>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="info-row">
+      <div class="icon-box">📍</div>
+      <div>
+        <span class="label">Location</span>
+        <p>{{ profile.location }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+  <!-- GRID -->
+  <div class="company-card" *ngIf="profile.company">
+
+  <!-- HEADER -->
+  <div class="company-header">
+    <div class="logo-box">
+      <img 
+        [src]="profile.company.logoUrl || 'assets/default-company.png'" 
+        alt="company"
+      />
+    </div>
+
+    <div class="company-info">
+      <h3>{{ profile.company.companyName }}</h3>
+      <span class="badge">
+        {{ profile.company.industry }}
+      </span>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <p class="company-desc">
+    {{ profile.company.description }}
+  </p>
+
+  <hr />
+
+  <!-- DETAILS -->
+  <div class="company-details">
+
+    <div class="detail-row">
+      📍 <span>{{ profile.company.location }}</span>
+    </div>
+
+    <div class="detail-row">
+      🌐 
+      <a 
+        *ngIf="profile.company.companyWebsite"
+        [href]="profile.company.companyWebsite"
+        target="_blank"
+      >
+        {{ profile.company.companyWebsite }}
+      </a>
+    </div>
+
+    <div class="detail-row">
+      📅 <span>Founded {{ profile.company.founded || 'N/A' }}</span>
+    </div>
+
+    <div class="detail-row">
+      👥 <span>{{ profile.company.companySize }} employees</span>
+    </div>
+
+  </div>
+
+  <hr />
+
+  <!-- STATS -->
+  <div class="stats">
+
+    <div class="stat-box">
+      <h4>{{ profile.company.totalJobs }}</h4>
+      <span>Total Jobs</span>
+    </div>
+
+    <div class="stat-box active">
+      <h4>{{ profile.company.activeJobs }}</h4>
+      <span>Active Jobs</span>
+    </div>
+
+  </div>
+
+  <!-- BUTTON -->
+  <button class="view-btn" (click)="view()">
+    💼 View Company Jobs ↗
+  </button>
+
+</div>
+
+</div>

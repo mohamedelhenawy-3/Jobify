@@ -18,6 +18,8 @@ export class CreatejobComponent  implements OnInit {
   industries: any[] = [];
   employmentTypes: any[] = [];
   workModes: any[] = [];
+  JobStatus:any[]=[];
+  
   
   constructor(private Lookupservice:LookupService,private jobservice:JobService ,private fb:FormBuilder){
   }
@@ -41,13 +43,17 @@ export class CreatejobComponent  implements OnInit {
       responsibilities:['', Validators.required],
       requirements:['', Validators.required],  
       educationOrExperience:['', Validators.required],    
-      statusId: [5] // Active by default
+      statusId: [null,Validators.required] // Active by default
     })
   }
     loadLookups() {
     this.Lookupservice.getIndustries().subscribe(res => this.industries = res);
     this.Lookupservice.getEmploymentTypes().subscribe(res => this.employmentTypes = res);
     this.Lookupservice.getWorkModes().subscribe(res => this.workModes = res);
+        this.Lookupservice.getStatuses().subscribe((res )=>{
+          this.JobStatus = res;
+          console.log(this.JobStatus);
+        } );
   }
     submit() {
     if (this.jobForm.invalid) {

@@ -7,10 +7,13 @@
     <div class="job-header">
 
       <!-- ICON -->
-      <div class="job-icon">
-        <i [class]="getJobIcon(job)"></i>
-      </div>
-
+  <div class="job-icon">
+  <img
+    class="profile-image"
+    [src]="job.logo || 'assets/default-user.png'"
+    alt="Profile Image"
+  />
+   </div>
       <!-- TITLE + LOCATION -->
       <div class="job-info">
         <h3 class="job-title">{{ job.title }}</h3>

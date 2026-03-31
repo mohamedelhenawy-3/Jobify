@@ -57,7 +57,8 @@ namespace Infrastructure.Implementation
                 throw new Exception("Unauthorized");
 
             var profile = await _db.JobSeekers
-                .Include(js => js.ProfileImage) 
+                .Include(js => js.User)
+                .Include(js => js.ProfileImage)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
             if (profile == null)
@@ -65,74 +66,72 @@ namespace Infrastructure.Implementation
 
             return new JobSeekerProfile
             {
-                PhoneNumber = profile.PhoneNumber,
+                PhoneNumber = profile.User.PhoneNumber,
                 ResumeUrl = profile.ResumeUrl,
-                Location = profile.Location,
+                Location = profile.User.Location,
                 ProfileImage = profile.ProfileImage
             };
         }
+
 
         public async Task<MyProfileDto> GetMyProfile()
         {
             var userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Unauthorized");
-            var user =  _db.Users.Where(x => x.Id == userId);
+
             var jobSeeker = await _db.JobSeekers
-                .Include(js => js.Applications)
+                .Include(js => js.User)
                 .Include(js => js.ProfileImage)
                 .Include(js => js.Skills)
-                .Include(x => x.Experiences)
-                .Include(x => x.Educations)
-                .Include(x=>x.Resume)
+                .Include(js => js.Experiences)
+                .Include(js => js.Educations)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
-            var resume = _db.Pdfs.Where(x => x.JobSeekerId == jobSeeker.Id).Select(x => x.PdfUrl).FirstOrDefault();
+            if (jobSeeker == null)
+                throw new Exception("JobSeeker profile not found");
+
+            var resume = _db.Pdfs
+                .Where(x => x.JobSeekerId == jobSeeker.Id)
+                .Select(x => x.PdfUrl)
+                .FirstOrDefault();
 
             return new MyProfileDto
             {
-                    FullName =user.Select(x=>x.FullName).FirstOrDefault(),
-                    ResumeUrl=jobSeeker.ResumeUrl,
-                PhoneNumber = jobSeeker.PhoneNumber,
-                Location = jobSeeker.Location,
+                FullName = jobSeeker.User.FullName,
+                PhoneNumber = jobSeeker.User.PhoneNumber,
+                Location = jobSeeker.User.Location,
+                LinkedInUrl = jobSeeker.User.LinkedInUrl,
                 ProfileImage = jobSeeker.ProfileImage?.ImageUrl,
                 Headline = jobSeeker.Headline,
-                Resume = resume,
                 Summary = jobSeeker.Summary,
-                LinkedInUrl = jobSeeker.LinkedInUrl,
                 GithubUrl = jobSeeker.GithubUrl,
-                Skills = jobSeeker.Skills
-                .Select(s => new MySkills
+                ResumeUrl = jobSeeker.ResumeUrl,
+                Resume = resume,
+                Skills = jobSeeker.Skills.Select(s => new MySkills
                 {
                     Id = s.Id,
                     Name = s.Name
-                })
-                .ToList(),
-                Experiences = jobSeeker.Experiences?
-        .Select(e => new ExperienceDto
-        {
-            Id = e.Id,
-            CompanyName = e.CompanyName,
-            JobTitle = e.JobTitle,
-            Description = e.Description,
-            StartDate = e.StartDate,
-            EndDate = e.EndDate
-        }).ToList() ?? new List<ExperienceDto>(),
-
-                Educations = jobSeeker.Educations?
-        .Select(e => new EducationDto
-        {
-            Id = e.Id,
-            Institution = e.Institution,
-            Degree = e.Degree,
-            FieldOfStudy = e.FieldOfStudy,
-            StartDate = e.StartDate,
-            EndDate = e.EndDate
-        }).ToList() ?? new List<EducationDto>()
+                }).ToList(),
+                Experiences = jobSeeker.Experiences?.Select(e => new ExperienceDto
+                {
+                    Id = e.Id,
+                    CompanyName = e.CompanyName,
+                    JobTitle = e.JobTitle,
+                    Description = e.Description,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate
+                }).ToList() ?? new List<ExperienceDto>(),
+                Educations = jobSeeker.Educations?.Select(e => new EducationDto
+                {
+                    Id = e.Id,
+                    Institution = e.Institution,
+                    Degree = e.Degree,
+                    FieldOfStudy = e.FieldOfStudy,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate
+                }).ToList() ?? new List<EducationDto>()
             };
-
-
-
         }
 
         public async Task<SuccessResponse> UpdateMyProfile(UpdateMyProfile updateprofiledto)
@@ -141,36 +140,36 @@ namespace Infrastructure.Implementation
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Unauthorized");
 
-            // Load FULL user entity
             var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user == null)
                 throw new Exception("User not found");
 
-            // Load JobSeeker profile with related data
             var profile = await _db.JobSeekers
                 .Include(js => js.ProfileImage)
                 .Include(js => js.Skills)
-                .Include(g=>g.Experiences).Include(c=>c.Educations)
+                .Include(js => js.Experiences)
+                .Include(js => js.Educations)
                 .FirstOrDefaultAsync(js => js.UserId == userId);
 
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
 
-            // ================= BASIC INFO =================
             if (!string.IsNullOrWhiteSpace(updateprofiledto.FullName))
                 user.FullName = updateprofiledto.FullName;
 
             if (!string.IsNullOrWhiteSpace(updateprofiledto.PhoneNumber))
-                profile.PhoneNumber = updateprofiledto.PhoneNumber;
+                user.PhoneNumber = updateprofiledto.PhoneNumber;
 
             if (!string.IsNullOrWhiteSpace(updateprofiledto.Location))
-                profile.Location = updateprofiledto.Location;
+                user.Location = updateprofiledto.Location;
+
+            if (!string.IsNullOrWhiteSpace(updateprofiledto.LinkedInUrl))
+                user.LinkedInUrl = updateprofiledto.LinkedInUrl;
+
+            user.UpdatedAt = DateTime.UtcNow;
 
             if (!string.IsNullOrWhiteSpace(updateprofiledto.Headline))
                 profile.Headline = updateprofiledto.Headline;
-
-            if (!string.IsNullOrWhiteSpace(updateprofiledto.LinkedInUrl))
-                profile.LinkedInUrl = updateprofiledto.LinkedInUrl;
 
             if (!string.IsNullOrWhiteSpace(updateprofiledto.GithubUrl))
                 profile.GithubUrl = updateprofiledto.GithubUrl;
@@ -178,13 +177,10 @@ namespace Infrastructure.Implementation
             if (!string.IsNullOrWhiteSpace(updateprofiledto.Summary))
                 profile.Summary = updateprofiledto.Summary;
 
-            // ================= IMAGE =================
             if (updateprofiledto.ProfileImage != null)
             {
                 if (profile.ProfileImage != null && !string.IsNullOrEmpty(profile.ProfileImage.PublicId))
-                {
                     await _cloudinaryService.DeleteImageAsync(profile.ProfileImage.PublicId);
-                }
 
                 var (url, publicId) = await _cloudinaryService.UploadImageAsync(updateprofiledto.ProfileImage);
 
@@ -205,8 +201,7 @@ namespace Infrastructure.Implementation
                     profile.ProfileImage.CreatedAt = DateTime.UtcNow;
                 }
             }
-          
-            // ================= SKILLS =================
+
             if (updateprofiledto.Skills != null && updateprofiledto.Skills.Any())
             {
                 var existingSkills = profile.Skills.Select(s => s.Name.ToLower()).ToList();
@@ -219,13 +214,13 @@ namespace Infrastructure.Implementation
                     }).ToList();
 
                 foreach (var skill in newSkills)
-                {
                     profile.Skills.Add(skill);
-                }
             }
-                List<EducationDto> educations = string.IsNullOrEmpty(updateprofiledto.EducationsJson)
-    ? new List<EducationDto>()
-    : JsonConvert.DeserializeObject<List<EducationDto>>(updateprofiledto.EducationsJson)!;
+
+            List<EducationDto> educations = string.IsNullOrEmpty(updateprofiledto.EducationsJson)
+? new List<EducationDto>()
+: JsonConvert.DeserializeObject<List<EducationDto>>(updateprofiledto.EducationsJson)!;
+            
 
             List<ExperienceDto> experiences = string.IsNullOrEmpty(updateprofiledto.ExperiencesJson)
                 ? new List<ExperienceDto>()
@@ -234,14 +229,10 @@ namespace Infrastructure.Implementation
             // call your update methods
             UpdateEducations(profile, educations);
             UpdateExperiences(profile, experiences);
-     
 
             await _db.SaveChangesAsync();
 
-            return new SuccessResponse
-            {
-                Message = "User profile updated successfully."
-            };
+            return new SuccessResponse { Message = "Profile updated successfully." };
         }
         public async Task<SuccessResponse> UploadCv(UploadMyResume resumedto)
         {
@@ -390,6 +381,18 @@ namespace Infrastructure.Implementation
                 }
             }
         }
+        //private List<T> SafeDeserialize<T>(string? json)
+        //{
+        //    if (string.IsNullOrWhiteSpace(json)) return new List<T>();
+        //    try
+        //    {
+        //        return JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
+        //    }
+        //    catch
+        //    {
+        //        return new List<T>();
+        //    }
+        //}
     }
 
 

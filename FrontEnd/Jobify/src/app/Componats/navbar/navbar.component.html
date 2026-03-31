@@ -10,8 +10,23 @@
     <li class="item"><a routerLink="/Jobify/home">Home</a></li>
      <li class="item"><a routerLink="/Jobify/findjob">Find Job</a></li>
 
-  </ul>
 
+  </ul>
+<form (submit)="onSearch()" class="d-flex">
+
+  <input
+    type="text"
+    [(ngModel)]="keyword"
+    name="keyword"
+    class="form-control me-2"
+    placeholder="Search jobs..."
+  />
+
+  <button class="btn btn-primary">
+    Search
+  </button>
+
+</form>
   <!-- Right Side Icons -->
     <ul class="right-actions">
         <!-- Logged in -->

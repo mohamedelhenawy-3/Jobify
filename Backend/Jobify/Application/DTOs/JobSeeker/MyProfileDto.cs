@@ -20,13 +20,8 @@ namespace Application.DTOs.JobSeeker
         public string? Resume { get; set; }
         public string? Headline { get; set; }
         public string? Summary { get; set; }
-
-
         public string? ProfileImageUrl { get; set; }
         public string? ResumeUrl { get; set; }
-
-   
-
         public string? LinkedInUrl { get; set; }
         public string? GithubUrl { get; set; }
 

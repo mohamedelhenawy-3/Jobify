@@ -59,7 +59,10 @@ export class SideBarComponent implements OnInit {
         { label: 'Post Job', route: '/Jobify/createjob', icon: 'fas fa-plus-circle' },
         { label: 'My Jobs', route: '/Jobify/managejobs', icon: 'fas fa-briefcase' },
         { label: 'Applications', route: '/Jobify/jobapplications', icon: 'fas fa-clipboard-list' },
-        { label: 'Company Profile', route: 'Jobify/company', icon: 'fas fa-building' }
+        { label: 'Company Profile', route: '/Jobify/mycompany', icon: 'fas fa-building' },
+        { label: 'Profile', route: '/Jobify/employerprofile', icon: 'fas fa-building' }
+
+        
       ];
     }
   }

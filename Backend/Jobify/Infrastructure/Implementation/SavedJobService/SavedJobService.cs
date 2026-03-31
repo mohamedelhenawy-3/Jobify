@@ -39,18 +39,30 @@ namespace Infrastructure.Implementation.SavedJobService
             if (string.IsNullOrEmpty(userId))
                 throw new UnauthorizedAccessException();
 
-            var savedJobs = await _db.SavedJobs
-                .Where(x => x.UserId == userId)
-                .Include(s => s.Job)   // include the Job entity
-                .Select(x => new SavedJobDto
-                {
-                    id = x.Job.Id,
-                    title = x.Job.Title,
-                    description = x.Job.Description,
-                    location = x.Job.Location
-                })
-                .ToListAsync();
+            var savedJobsQuery = _db.SavedJobs
+                .Where(x => x.UserId == userId);
 
+            var totalCount = await savedJobsQuery.CountAsync();
+
+            var savedJobs = await savedJobsQuery
+         .Include(s => s.Job)
+             .ThenInclude(x => x.Company)
+                 .ThenInclude(x => x.Logo)
+         .Select(x => new SavedJobDto
+         {
+             id = x.Job.Id,
+             logo = x.Job.Company.Logo.ImageUrl,
+             title = x.Job.Title,
+             location = x.Job.Location,
+
+             WorkModeId = x.Job.WorkModeId,
+             IndustryId = x.Job.IndustryId,
+             EmploymentTypeId = x.Job.EmploymentTypeId,
+             StatusId = x.Job.StatusId,
+
+             countJobs = totalCount
+         })
+         .ToListAsync();
             return savedJobs;
         }
 

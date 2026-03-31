@@ -4,6 +4,7 @@ import { Industry } from '../../Models/Industry/industry';
 import { Observable } from 'rxjs';
 import { EmploymentType } from '../../Models/EmploymentType/EmploymentType ';
 import { WorkMode } from '../../Models/WorkMode/WorkMode';
+import { JobStatus } from '../../Models/JobStatus/status';
 
 @Injectable({
   providedIn: 'root'
@@ -22,5 +23,9 @@ export class LookupService {
 
   getWorkModes(): Observable<WorkMode[]> {
     return this.http.get<WorkMode[]>('https://localhost:44309/api/LooksUp/WorkModes');
+  }
+  getStatuses():Observable<JobStatus[]>{
+        return this.http.get<JobStatus[]>('https://localhost:44309/api/LooksUp/Statuses');
+
   }
 }

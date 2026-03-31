@@ -92,7 +92,6 @@ namespace Infrastructure.Implementation.AuthService
                 var seeker = new JobSeeker
                 {
                     UserId = user.Id,
-                    PhoneNumber = dto.PhoneNumber
                 };
 
                 await _jobSeekerRepo.AddAsync(seeker);
@@ -100,18 +99,29 @@ namespace Infrastructure.Implementation.AuthService
             }
             else if (dto.Role == "Employer")
             {
-                if (string.IsNullOrWhiteSpace(dto.CompanyName))
-                    throw new Exception("Company name is required");
+          
 
                 var employer = new EmployerProfile
                 {
                     UserId = user.Id,
-                    CompanyName = dto.CompanyName!,
-                    CompanyWebsite = dto.CompanyWebsite
+                    Position = dto.Position!,
                 };
 
-                await _employerRepo.AddAsync(employer);
-                await _employerRepo.SaveChangesAsync();
+                _context.EmployerProfiles.Add(employer);
+                await _context.SaveChangesAsync(); // employer.Id is now real
+
+                var company = new Company
+                {
+                    CompanyName = dto.CompanyName,
+                    CompanyWebsite = dto.CompanyWebsite,
+                    Industry = dto.Industry,
+                    Location = dto.CompanyLocation,
+                    EmployerProfileId = employer.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Companies.Add(company);
+                await _context.SaveChangesAsync();
             }
             return new SuccessResponseDto
             {

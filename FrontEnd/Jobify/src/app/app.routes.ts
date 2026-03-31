@@ -21,6 +21,9 @@ import { JobseekerapplicationsComponent } from './Componats/jobseekerapplication
 import { SavedjobsComponent } from './Componats/savedjobs/savedjobs.component';
 import { JobseekerdashboardComponent } from './Componats/jobseekerdashboard/jobseekerdashboard.component';
 import { EmployerdashboardComponent } from './Componats/employerdashboard/employerdashboard.component';
+import { EmployerprofileComponent } from './Componats/EmployerProfile/employerprofile/employerprofile.component';
+import { CompanyProfileComponent } from './Componats/Company/company-profile/company-profile.component';
+import { JobsearchComponent } from './Componats/jobsearch/jobsearch.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -29,6 +32,7 @@ export const routes: Routes = [
       component: MainLayoutComponent,
      children: [
         { path: 'applications', component: ApplicationsComponent },
+        {path: 'jobsearch', component: JobsearchComponent },
         {path:'seeker',component:SeekerprofileComponent},
         { path: 'home', component: HomeComponent },
         { path: 'findjob', component: JobspagesComponent },
@@ -43,6 +47,9 @@ export const routes: Routes = [
         { path: 'savedjobs', component: SavedjobsComponent },
         { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
         { path: 'employerdashboard', component: EmployerdashboardComponent },
+        { path: 'employerprofile', component: EmployerprofileComponent },
+        { path: 'mycompany',component :CompanyProfileComponent}
+
 
 
 

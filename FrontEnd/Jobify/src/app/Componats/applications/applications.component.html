@@ -38,15 +38,44 @@
           <span class="status-badge" [ngClass]="app.status">
             {{ app.status }}
           </span>
-          <select class="status-select" 
-                  [(ngModel)]="app.status" 
-                  (change)="changeStatus(app.applicationId, app.status)">
-            <option value="Applied">Applied</option>
-            <option value="UnderReview">Under Review</option>
-            <option value="Interviewed">Interviewed</option>
-            <option value="Hired">Hired</option>
-            <option value="Rejected">Rejected</option>
-          </select>
+       <select class="status-select" 
+          [ngModel]="app.status" 
+          (ngModelChange)="onStatusChange(app.applicationId, $event)">
+    <option value="Applied">Applied</option>
+    <option value="UnderReview">Under Review</option>
+    <option value="Interviewed">Interviewed</option>
+    <option value="Hired">Hired</option>
+    <option value="Rejected">Rejected</option>
+  </select>
+        </div>
+       <div class="mt-3 p-3 bg-light border-start border-warning border-4 rounded" 
+             *ngIf="editingInterviewId === app.applicationId">
+          <h6><i class="fas fa-calendar-check me-2"></i>Schedule Interview</h6>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="small fw-bold">Date & Time</label>
+              <input type="datetime-local" class="form-control form-control-sm" 
+                     [(ngModel)]="interviewForm.interviewDate">
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-bold">Location</label>
+              <input type="text" class="form-control form-control-sm" 
+                     placeholder="Office or Link" [(ngModel)]="interviewForm.interviewLocation">
+            </div>
+            <div class="col-12">
+              <label class="small fw-bold">Internal Notes</label>
+              <textarea class="form-control form-control-sm" rows="2" 
+                        [(ngModel)]="interviewForm.notes"></textarea>
+            </div>
+          </div>
+          <div class="mt-3 d-flex gap-2">
+            <button class="btn btn-success btn-sm" (click)="saveStatus(app.applicationId, interviewForm)">
+              Confirm Status
+            </button>
+            <button class="btn btn-link btn-sm text-secondary" (click)="editingInterviewId = null">
+              Cancel
+            </button>
+          </div>
         </div>
         
         <button class="view-btn" (click)="viewDetails(app.applicationId)">

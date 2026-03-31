@@ -7,12 +7,14 @@ import { createjob } from '../../Models/Job/createjob';
 import { Job } from '../../Models/Job/job';
 import { jobdetails } from '../../Models/Job/dteailsjob';
 import { JobRecommendation } from '../../Models/Job/recommendedjob';
+import { OpeningJobs } from '../../Models/Job/openjobsmodel';
+import { SearchJob } from '../../Models/Job/search';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JobService {
-
+private apiUrl = 'https://localhost:44309/api/Job';
 
    constructor(private HttpClient:HttpClient) { }
 
@@ -21,8 +23,11 @@ export class JobService {
   GetAllIndustriesWithJobCount():Observable<industrieswithjobcount[]>{
     return this.HttpClient.get<industrieswithjobcount[]>(`https://localhost:44309/api/Job/GetAllIndustriesWithJobCount`)
   }
-  
-private apiUrl = 'https://localhost:44309/api/Job';
+  getopeningjobs():Observable<OpeningJobs[]>{
+    return this.HttpClient.get<OpeningJobs[]>(`https://localhost:44309/api/Job/OpeningJobs`)
+
+  }
+
 
 
  
@@ -67,5 +72,17 @@ updateJob(id: number, data: any): Observable<any> {
 
   getRecommendedJobs(): Observable<JobRecommendation[]> {
     return this.HttpClient.get<JobRecommendation[]>(`https://localhost:44309/api/Job/recommended`);
+  }
+
+
+
+search(keyword: string) {
+  return this.HttpClient.get<SearchJob[]>(
+    `https://localhost:44309/api/Job/keyword?keyword=${keyword}`
+  );
+}
+
+  saveAlert(keyword: string) {
+    return this.HttpClient.post('/api/alerts', { keyword });
   }
 }

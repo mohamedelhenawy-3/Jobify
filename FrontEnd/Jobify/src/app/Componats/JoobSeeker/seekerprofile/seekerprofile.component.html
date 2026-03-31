@@ -141,13 +141,43 @@
     <div class="profile-right">
       <!-- Social -->
       <div class="social-links-grid">
-        <a *ngIf="profile.githubUrl" [href]="profile.githubUrl" target="_blank" class="social-btn github">
-          <i class="fab fa-github"></i> GitHub
-        </a>
-        <a *ngIf="profile.linkedInUrl" [href]="profile.linkedInUrl" target="_blank" class="social-btn linkedin">
-          <i class="fab fa-linkedin"></i> LinkedIn
-        </a>
-        <p *ngIf="!profile.githubUrl && !profile.linkedInUrl" class="muted">No social links added yet</p>
+     <!-- VIEW MODE -->
+  <ng-container *ngIf="!editProfile; else editSocial">
+
+    <a *ngIf="profile.githubUrl"
+       [href]="profile.githubUrl"
+       target="_blank"
+       class="social-btn github">
+      <i class="fab fa-github"></i> GitHub
+    </a>
+
+    <a *ngIf="profile.linkedInUrl"
+       [href]="profile.linkedInUrl"
+       target="_blank"
+       class="social-btn linkedin">
+      <i class="fab fa-linkedin"></i> LinkedIn
+    </a>
+
+    <p *ngIf="!profile.githubUrl && !profile.linkedInUrl" class="muted">
+      No social links added yet
+    </p>
+
+  </ng-container>
+
+  <!-- EDIT MODE -->
+  <ng-template #editSocial>
+    <input type="text"
+           [(ngModel)]="profile.githubUrl"
+           placeholder="GitHub URL"
+           class="edit-input" />
+
+    <input type="text"
+           [(ngModel)]="profile.linkedInUrl"
+           placeholder="LinkedIn URL"
+           class="edit-input" />
+  </ng-template>
+
+        
       </div>
 
       <!-- Resume -->
