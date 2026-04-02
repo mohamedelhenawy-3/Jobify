@@ -12,21 +12,46 @@
 
 
   </ul>
-<form (submit)="onSearch()" class="d-flex">
+    <!-- SEARCH BAR -->
+<div class="search-container"  #searchBox>
+
+  <div class="search-bar" [class.focused]="isFocused">
+
+    <!-- Icon -->
+    <span class="icon">🔍</span>
 
   <input
-    type="text"
-    [(ngModel)]="keyword"
-    name="keyword"
-    class="form-control me-2"
-    placeholder="Search jobs..."
-  />
+  type="text"
+  [(ngModel)]="keyword"
+  name="keyword"
+  placeholder="Search jobs, companies..."
+  (input)="onInputChange()"
+  (focus)="onFocus()"
+  (blur)="onBlur()"
+  (keyup.enter)="onSearch()"
+/>
 
-  <button class="btn btn-primary">
-    Search
-  </button>
+    <!-- Location -->
+    <div class="location">
+      📍 Anywhere
+    </div>
 
-</form>
+  </div>
+
+  <!-- 🔥 Suggestions -->
+  <div class="suggestions" *ngIf="showSuggestions && filteredSuggestions.length">
+
+    <div 
+      *ngFor="let item of filteredSuggestions"
+      class="suggestion-item"
+      (mousedown)="selectSuggestion(item)"
+    >
+      🔍 {{ item }}
+    </div>
+
+  </div>
+
+</div>
   <!-- Right Side Icons -->
     <ul class="right-actions">
         <!-- Logged in -->

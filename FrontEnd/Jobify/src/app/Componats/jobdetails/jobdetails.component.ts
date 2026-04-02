@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { jobdetails } from '../../Models/Job/dteailsjob';
 import { JobService } from '../../Services/JobService/job.service';
@@ -12,15 +12,40 @@ import { SavedjobsService } from '../../Services/Savedjobsservice/savedjobs.serv
   templateUrl: './jobdetails.component.html',
   styleUrl: './jobdetails.component.css'
 })
-export class JobdetailsComponent implements OnInit{
+export class JobdetailsComponent implements OnInit ,OnChanges{
   loading: boolean = true;
 isSaved = false;
 saving = false;
 
   jobs!:jobdetails;
+
+  @Input() job: any | null = null;
+
+
 constructor(private router:ActivatedRoute,private savedservice:SavedjobsService,private jobservice:JobService ,private route:Router){
 
 }
+  ngOnChanges(changes: SimpleChanges): void {
+if (changes['job'] && this.job) {
+      this.loading = true;
+      this.loadJobById(this.job.id);
+    }  }
+
+
+
+    loadJobById(id: number) {
+    this.jobservice.getJobDetails(id).subscribe(res => {
+      this.jobs = res;
+      this.loading = false;
+      this.checkSaveStatus(id);
+    });
+  }
+
+  checkSaveStatus(id: number) {
+    this.savedservice.isJobSaved(id).subscribe(res => {
+      this.isSaved = res;
+    });
+  }
   getJobIcon(job: jobdetails): string {
   const title = job.title?.toLowerCase() || '';
 

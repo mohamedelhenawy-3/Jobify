@@ -1,0 +1,49 @@
+<div class="filter-wrapper">
+  <div class="filter-container">
+    
+    <div class="search-context" *ngIf="currentKeyword">
+      <span class="text-muted small">Searching:</span>
+      <span class="keyword-tag">"{{ currentKeyword }}"</span>
+    </div>
+
+    <div class="filter-item">
+      <select class="filter-select" [(ngModel)]="selectedDays" (change)="emitFilters()">
+        <option [ngValue]="null">Date Posted</option>
+        <option [ngValue]="1">Past 24 hours</option>
+        <option [ngValue]="7">Past week</option>
+        <option [ngValue]="30">Past month</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <select class="filter-select" [(ngModel)]="selectedIndId" (change)="emitFilters()">
+        <option [ngValue]="null">Industry</option>
+        <option *ngFor="let ind of industries" [ngValue]="ind.id">
+          {{ ind.industryName }}
+        </option>
+      </select>
+    </div>
+      <div class="filter-item">
+      <select class="filter-select" [(ngModel)]="selectedEmpTypeId" (change)="emitFilters()">
+        <option [ngValue]="null"> Employment Type</option>
+        <option *ngFor="let emp of EmploymentTypeIds" [ngValue]="emp.id">
+          {{ emp.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <select class="filter-select" [(ngModel)]="selectedModeId" (change)="emitFilters()">
+        <option [ngValue]="null">Work Mode</option>
+        <option *ngFor="let mode of workModes" [ngValue]="mode.id">
+          {{ mode.name }}
+        </option>
+      </select>
+    </div>
+
+    <button class="btn-reset" (click)="resetFilters()">
+      Reset all
+    </button>
+
+  </div>
+</div>

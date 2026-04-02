@@ -1,45 +1,150 @@
-<div class="container mt-4">
+<div class="search-results-container">
 
-  <h4 *ngIf="keyword" class="mb-3">
-    Results for "{{ keyword }}"
-  </h4>
-
-  <!-- Loading -->
-  <div *ngIf="loading" class="text-center">
-    Loading...
-  </div>
-
-  <!-- No jobs found -->
-  <div *ngIf="!loading && jobs.length === 0" class="text-center">
-    No jobs found 😢
-  </div>
-
-  <!-- Jobs List -->
-  <div *ngFor="let job of jobs" class="card p-3 mb-3 d-flex flex-row align-items-center gap-3 shadow-sm">
-
-    <!-- Logo -->
-    <img 
-      [src]="job.logo || 'assets/default-user.png'" 
-      alt="Company Logo" 
-      class="job-logo"
-    />
-
-    <!-- Job Info -->
-    <div class="flex-grow-1">
-      <h5 class="mb-1">{{ job.title }}</h5>
-      <p class="mb-1 text-muted">{{ job.location }}</p>
-      <p class="mb-1 text-muted">
-        WorkModeId: {{ job.workModeId }} | IndustryId: {{ job.industryId }} | EmploymentTypeId: {{ job.employmentTypeId }} | StatusId: {{ job.statusId }}
+  <!-- Header with results count -->
+  <div class="results-header" *ngIf="!loading">
+    <div class="header-content">
+      <h2>Found <span>{{ jobs.length }}</span> jobs</h2>
+      <p class="text-muted" *ngIf="filter.keyword">
+        Showing results for <strong>"{{ filter.keyword }}"</strong>
       </p>
-      <small class="text-muted">Posted: {{ job.date | date:'medium' }}</small>
-      <p *ngIf="job.description" class="mt-2">{{ job.description }}</p>
     </div>
-
-    <!-- Save button -->
-    <div class="text-end">
-      <button class="btn btn-sm btn-outline-primary">Save</button>
+    <div class="header-actions">
+      <button class="btn-filter"><i class="fas fa-sliders-h"></i> Filters</button>
     </div>
-
   </div>
 
+  <!-- Loader -->
+  <div *ngIf="loading" class="loader-wrapper">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Searching the best opportunities for you...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && jobs.length === 0" class="empty-state">
+    <img src="assets/no-results.png" alt="No jobs" />
+    <h3>No jobs found</h3>
+    <p>Try adjusting your search or filters to find what you're looking for.</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar" *ngIf="!loading">
+
+    <!-- Work Mode -->
+    <div class="filter-group">
+      <span>Work Mode:</span>
+      <button 
+        *ngFor="let w of workmode"
+        class="filter-btn"
+        [class.active]="filter.workModeIds.includes(w.id)"
+        (click)="toggleSelection(filter.workModeIds, w.id)">
+        {{ w.name }}
+      </button>
+    </div>
+
+    <!-- Employment Type -->
+    <div class="filter-group">
+      <span>Employment Type:</span>
+      <button 
+        *ngFor="let e of employmentTypes"
+        class="filter-btn"
+        [class.active]="filter.employmentTypeIds.includes(e.id)"
+        (click)="toggleSelection(filter.employmentTypeIds, e.id)">
+        {{ e.typeName }}
+      </button>
+    </div>
+
+    <!-- Industry -->
+    <div class="filter-group">
+      <span>Industry:</span>
+      <button 
+        *ngFor="let i of industries"
+        class="filter-btn"
+        [class.active]="filter.industryIds.includes(i.id)"
+        (click)="toggleSelection(filter.industryIds, i.id)">
+        {{ i.industryName }}
+      </button>
+    </div>
+
+    <!-- Date Posted -->
+    <div class="filter-group">
+      <span>Posted:</span>
+      <button 
+        class="filter-btn"
+        [class.active]="filter.postedWithinDays === 1"
+        (click)="setDays(1)">
+        Today
+      </button>
+      <button 
+        class="filter-btn"
+        [class.active]="filter.postedWithinDays === 7"
+        (click)="setDays(7)">
+        Last 7 Days
+      </button>
+      <button 
+        class="filter-btn"
+        [class.active]="filter.postedWithinDays === 30"
+        (click)="setDays(30)">
+        Last 30 Days
+      </button>
+    </div>
+
+    <!-- Clear all filters -->
+    <button class="clear-btn" (click)="clearFilters()">Clear All</button>
+  </div>
+
+  <!-- Job Feed -->
+  <div class="job-feed" *ngIf="!loading">
+    <div *ngFor="let job of jobs" class="job-card-premium">
+
+      <!-- Card main -->
+      <div class="card-main">
+        <div class="logo-container">
+          <img [src]="job.logo || 'assets/default-user.png'" 
+               (error)="$any($event.target).src='assets/default-user.png'" 
+               alt="Logo" />
+        </div>
+
+        <div class="job-details">
+          <div class="title-row">
+            <h3 class="job-title">{{ job.title }}</h3>
+            <span class="posted-date">{{ job.date | date:'mediumDate' }}</span>
+          </div>
+
+          <p class="company-location">
+            <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+          </p>
+
+          <div class="badge-group">
+            <span class="job-badge industry">
+              <i class="fas fa-building"></i> {{ getIndustryName(job.industryId) }}
+            </span>
+            <span class="job-badge" [ngClass]="getWorkModeClass(job.workModeId)">
+              <i class="fas fa-laptop-house"></i> {{ getWorkModeName(job.workModeId) }}
+            </span>
+            <span class="job-badge" [ngClass]="getEmploymentTypeClass(job.employmentTypeId)">
+              <i class="fas fa-clock"></i> {{ getEmploymentTypeName(job.employmentTypeId) }}
+            </span>
+          </div>
+
+          <p class="job-excerpt" *ngIf="job.description">
+            {{ (job.description.length > 150) ? (job.description | slice:0:150) + '...' : job.description }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Card footer -->
+      <div class="card-footer">
+        <div class="salary-info">
+          <span class="salary-tag">$Negotiable</span>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-save" title="Save Job">
+            <i class="far fa-bookmark"></i>
+          </button>
+          <button class="btn-apply">View Details</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>

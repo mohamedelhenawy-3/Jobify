@@ -487,25 +487,45 @@ namespace Infrastructure.Implementation.JobService
 
         }
 
-        public async Task<List<SearchResponseDto>> Search(string keyword)
+        public async Task<List<SearchResponseDto>> Search(JobFilterDto jobfiltereddto)
         {
-            var jobs = await _db.JobPosts.Include(x=>x.Company)
-        .Where(j => j.Title.ToLower().Contains(keyword.ToLower()) ||
-                    j.Description.ToLower().Contains(keyword.ToLower()))
-        .Select(j => new  SearchResponseDto{
-            Id=j.Id,
-            Title=j.Title,
-            logo=j.Company.Logo.ImageUrl,
-            Location=j.Location,
-            IndustryId = j.Industry.Id,
-            EmploymentTypeId = j.EmploymentType.Id,
-            StatusId = j.Status.Id,
-            WorkModeId = j.WorkMode.Id,
-            data=j.CreatedAt
-            
-        })
-        .ToListAsync();
 
+            var query = _db.JobPosts.AsQueryable();
+
+            if (!string.IsNullOrEmpty(jobfiltereddto.Keyword))
+                query = query.Where(j => j.Title.Contains(jobfiltereddto.Keyword));
+
+            if (jobfiltereddto.IndustryIds != null && jobfiltereddto.IndustryIds.Any())
+                query = query.Where(x => jobfiltereddto.IndustryIds.Contains(x.IndustryId));
+
+            if (jobfiltereddto.EmploymentTypeIds != null && jobfiltereddto.EmploymentTypeIds.Any())
+                query = query.Where(x => jobfiltereddto.EmploymentTypeIds.Contains(x.EmploymentTypeId));
+
+            if (jobfiltereddto.WorkModeIds != null && jobfiltereddto.WorkModeIds.Any())
+                query = query.Where(x => jobfiltereddto.WorkModeIds.Contains(x.WorkModeId));
+
+            if (jobfiltereddto.PostedWithinDays.HasValue)
+            {
+                var date = DateTime.UtcNow.AddDays(-jobfiltereddto.PostedWithinDays.Value);
+                query = query.Where(j => j.CreatedAt >= date);
+            }
+            var jobs = await query
+       .OrderByDescending(x => x.CreatedAt)
+       .Select(j => new SearchResponseDto
+       {
+           Id = j.Id,
+           logo = j.Company != null && j.Company.Logo != null
+               ? j.Company.Logo.ImageUrl
+               : null,
+           Title = j.Title,
+           IndustryId = j.IndustryId,
+           EmploymentTypeId = j.EmploymentTypeId,
+           Description = j.Description,
+           Location = j.Location,
+           WorkModeId = j.WorkModeId,
+          
+       })
+       .ToListAsync();
 
             return jobs;
         }

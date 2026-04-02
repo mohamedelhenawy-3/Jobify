@@ -33,7 +33,7 @@ private apiUrl = 'https://localhost:44309/api/Job';
  
 
   
-    getJobs(page: number, pageSize: number, filters: any): Observable<JobResponse> {
+    getJobs(page: any, pageSize: number, filters: any): Observable<JobResponse> {
     let params = new HttpParams()
       .set('page', page)
       .set('pageSize', pageSize);
@@ -76,13 +76,19 @@ updateJob(id: number, data: any): Observable<any> {
 
 
 
-search(keyword: string) {
-  return this.HttpClient.get<SearchJob[]>(
-    `https://localhost:44309/api/Job/keyword?keyword=${keyword}`
+
+
+search(filter: any) {
+  return this.HttpClient.post<any[]>(
+    `https://localhost:44309/api/Job/filter`,
+    filter
   );
 }
+// Inside JobService
+saveJobAlert(keyword: string): Observable<any> {
+  return this.HttpClient.post(`${this.apiUrl}/SaveAlert`, JSON.stringify(keyword), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
-  saveAlert(keyword: string) {
-    return this.HttpClient.post('/api/alerts', { keyword });
-  }
 }

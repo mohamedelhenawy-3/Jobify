@@ -38,7 +38,7 @@ namespace Application.Interfaces.Job
 
 
         //NEW PART FOR search globlay
-        Task<List<SearchResponseDto>> Search(string keyword);
+        Task<List<SearchResponseDto>> Search(JobFilterDto jobfiltereddto);
 
     }
 }

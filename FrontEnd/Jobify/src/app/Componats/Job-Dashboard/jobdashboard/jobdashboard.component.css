@@ -1,0 +1,143 @@
+/* 1. Main Wrapper: Forces the dashboard to fit the screen height */
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full screen height */
+  background-color: #f3f2ef; /* LinkedIn-style background */
+  overflow: hidden; /* Prevents the whole page from scrolling */
+}
+
+/* 2. The Filter Bar stays at the top */
+.top-filter-section {
+  flex-shrink: 0; /* Prevents the filter bar from squishing */
+  z-index: 10;
+}
+
+/* 3. The Split-View Container */
+.main-split-content {
+  display: flex;
+  flex: 1; /* Takes up all remaining height */
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  gap: 15px;
+  padding: 15px;
+  overflow: hidden; /* Important: keeps children scrolling, not the parent */
+}
+
+/* 4. Left Column: The Job List */
+.job-list-side {
+  flex: 0 0 400px; /* Fixed width of 400px, won't grow or shrink */
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow-y: auto; /* Makes the list scrollable */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 5. Right Column: The Job Details */
+.job-details-side {
+  flex: 1; /* Takes all the remaining horizontal space */
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  overflow-y: auto; /* Makes the details scrollable */
+}
+
+/* Custom Scrollbar for a modern Look */
+.job-list-side::-webkit-scrollbar,
+.job-details-side::-webkit-scrollbar {
+  width: 6px;
+}
+
+.job-list-side::-webkit-scrollbar-thumb,
+.job-details-side::-webkit-scrollbar-thumb {
+  background: #cfcfcf;
+  border-radius: 10px;
+}
+
+.job-list-side {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+}
+
+/* Make this box stay at the top while the cards scroll */
+.alert-subscription-box {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f8faff; /* Light blue tint */
+  border-radius: 8px;
+  border: 1px solid #e1e9f4;
+}
+
+.alert-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-info i {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.active-bell {
+  color: #0a66c2 !important; /* LinkedIn Blue */
+}
+
+.alert-info p {
+  font-size: 0.9rem;
+  color: #191919;
+}
+
+/* Ensure the cards container is scrollable */
+.cards-container {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Switch Styling (Pill Style) */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider { background-color: #0a66c2; }
+input:checked + .slider:before { transform: translateX(14px); }

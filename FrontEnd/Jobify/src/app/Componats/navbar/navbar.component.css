@@ -12,7 +12,75 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   z-index: 10;
 }
+.search-container {
+  position: relative;
+  width: 350px;
+}
 
+/* BAR */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 30px;
+  padding: 0 15px;
+  height: 42px;
+  transition: 0.2s;
+}
+
+.search-bar.focused {
+  background: white;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* INPUT */
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+/* ICON */
+.icon {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* LOCATION */
+.location {
+  border-left: 1px solid #ddd;
+  padding-left: 10px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* DROPDOWN */
+.suggestions {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* ITEM */
+.suggestion-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.suggestion-item:hover {
+  background: #f3f4f6;
+}
 
 /* Brand */
 .brand {

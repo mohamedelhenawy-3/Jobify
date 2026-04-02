@@ -129,18 +129,17 @@ namespace Jobify.Controllers
         }
 
         [HttpPost("SaveAlert")]
-        public async Task<IActionResult> SaveAlert(string keyword)
+        public async Task<IActionResult> SaveAlert([FromBody]string keyword)
         {
 
             var job = await _jobService.SaveAlert(keyword);
             return Ok(job);
         }
-        [HttpGet("keyword")]
-        public async Task<IActionResult> search(string keyword)
+        [HttpPost("filter")]
+        public async Task<IActionResult> FilteredJobs([FromBody] JobFilterDto dto)
         {
-
-            var job = await _jobService.Search(keyword);
-            return Ok(job);
+            var result = await _jobService.Search(dto);
+            return Ok(result);
         }
         [HttpGet("OpeningJobs")]
         public async Task<IActionResult> OpeningJibs()

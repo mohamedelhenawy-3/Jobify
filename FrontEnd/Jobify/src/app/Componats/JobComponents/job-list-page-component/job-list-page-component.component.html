@@ -1,20 +1,12 @@
-
-<div  class="job-list">
+<div class="job-list">
 
   <div *ngFor="let job of jobs" class="job-card">
 
-    <!-- HEADER -->
     <div class="job-header">
 
-      <!-- ICON -->
-  <div class="job-icon">
-  <img
-    class="profile-image"
-    [src]="job.logo || 'assets/default-user.png'"
-    alt="Profile Image"
-  />
-   </div>
-      <!-- TITLE + LOCATION -->
+      <div class="job-icon">
+        <img class="profile-image" [src]="job.logo || 'assets/default-user.png'" alt="Profile Image" />
+      </div>
       <div class="job-info">
         <h3 class="job-title">{{ job.title }}</h3>
         <span class="job-location">
@@ -63,9 +55,8 @@
 <div class="pagination">
   <button (click)="changePage(page - 1)" [disabled]="page === 1">Prev</button>
 
-  <button *ngFor="let i of [].constructor(totalPages); let idx = index"
-          (click)="changePage(idx + 1)"
-          [class.active]="page === idx + 1">
+  <button *ngFor="let i of [].constructor(totalPages); let idx = index" (click)="changePage(idx + 1)"
+    [class.active]="page === idx + 1">
     {{ idx + 1 }}
   </button>
 

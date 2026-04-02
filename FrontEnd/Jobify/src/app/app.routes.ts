@@ -24,6 +24,8 @@ import { EmployerdashboardComponent } from './Componats/employerdashboard/employ
 import { EmployerprofileComponent } from './Componats/EmployerProfile/employerprofile/employerprofile.component';
 import { CompanyProfileComponent } from './Componats/Company/company-profile/company-profile.component';
 import { JobsearchComponent } from './Componats/jobsearch/jobsearch.component';
+import { JobbarfilterComponent } from './Componats/Job-Dashboard/jobbarfilter/jobbarfilter.component';
+import { JobdashboardComponent } from './Componats/Job-Dashboard/jobdashboard/jobdashboard.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -48,9 +50,9 @@ export const routes: Routes = [
         { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
         { path: 'employerdashboard', component: EmployerdashboardComponent },
         { path: 'employerprofile', component: EmployerprofileComponent },
-        { path: 'mycompany',component :CompanyProfileComponent}
+        { path: 'mycompany',component :CompanyProfileComponent},
 
-
+            { path: 'jobbashoard',component :JobdashboardComponent}
 
 
 

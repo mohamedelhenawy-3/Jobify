@@ -35,10 +35,49 @@ ngOnInit(): void {
 onSearch() {
   if (!this.keyword.trim()) return;
 
-  this.router.navigate(['/Jobify/jobsearch'], {
+  this.router.navigate(['/Jobify/jobbashoard'], {
     queryParams: { keyword: this.keyword }
   });
 }
+isFocused = false;
+showSuggestions = false;
+
+suggestions: string[] = [
+  'Backend Developer',
+  'Frontend Developer',
+  'Fullstack Developer',
+  'Angular Developer',
+  'Remote Jobs',
+  'Java Developer'
+];
+
+filteredSuggestions: string[] = [];
+
+onInputChange() {
+  this.filteredSuggestions = this.suggestions.filter(x =>
+    x.toLowerCase().includes(this.keyword.toLowerCase())
+  );
+
+  this.showSuggestions = true;
+}
+
+onFocus() {
+  this.isFocused = true;
+  this.showSuggestions = true;
+}
+
+onBlur() {
+  this.isFocused = false;
+  setTimeout(() => this.showSuggestions = false, 200);
+}
+
+selectSuggestion(value: string) {
+  this.keyword = value;
+  this.showSuggestions = false;
+  this.onSearch();
+}
+
+
  logout() {
     this.auth.logout();
     this.router.navigateByUrl('/login');
