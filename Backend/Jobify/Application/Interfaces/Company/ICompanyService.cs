@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Auth.AuthResponse;
 using Application.DTOs.Comapny;
 using Application.DTOs.SuccefullOp;
+using Application.SearchFeature.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,10 @@ namespace Application.Interfaces.Company
 
         // ===== MY COMPANY =====
         Task<CompanyResponseDto> GetMyCompany();
-       
+
         // ===== JOBS =====
         //Task<IEnumerable<JobPostResponseDto>> GetCompanyJobs(int companyId);
+        Task<List<SearchCompanyDto>> SearchCompaniesAsync(GlobalSearchDto dto);
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.JobSeeker;
 using Application.DTOs.SuccefullOp;
+using Application.SearchFeature.Dtos;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,9 @@ namespace Application.Interfaces.JobSeeker
         Task<JobSeekerProfile> GetJobSeekerProfile(int id);
         Task<MyProfileDto> GetMyProfile();
         Task<SuccessResponse> UpdateMyProfile(UpdateMyProfile updateprofiledto);
+        Task<SuccessResponse> UpdateProfilePrivacvy(UpdatePrivacyDto updateprivancy);
+
+        Task<List<UserSeachDto>> SearchUsersAsync(GlobalSearchDto dto);
+
     }
 }

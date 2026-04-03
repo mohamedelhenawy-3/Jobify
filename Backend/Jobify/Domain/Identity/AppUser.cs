@@ -16,6 +16,7 @@ namespace Domain.Identity
         public string? PhoneNumber { get; set; }
         public string? Location { get; set; }
         public string? LinkedInUrl { get; set; }
+        public bool IsProfilePublic { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }

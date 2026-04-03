@@ -5,6 +5,7 @@ using Application.DTOs.JobSeeker;
 using Application.DTOs.Skills;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.JobSeeker;
+using Application.SearchFeature.Dtos;
 using CloudinaryDotNet;
 using Domain.Entities;
 using Infrastructure.DBContext;
@@ -52,33 +53,68 @@ namespace Infrastructure.Implementation
 
         public async Task<JobSeekerProfile> GetJobSeekerProfile(int id)
         {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new Exception("Unauthorized");
+
+            var user = await _db.Users.FindAsync(id);
 
             var profile = await _db.JobSeekers
                 .Include(js => js.User)
                 .Include(js => js.ProfileImage)
-                .FirstOrDefaultAsync(js => js.UserId == userId);
+                .Include(js => js.Skills)
+                .Include(js => js.Experiences)
+                .Include(js => js.Educations)
+                .FirstOrDefaultAsync(js => js.Id == id);
 
             if (profile == null)
                 throw new Exception("JobSeeker profile not found");
+
+            if (!user.IsProfilePublic)
+            {
+                return new JobSeekerProfile
+                {
+                    IsPrivate = true,
+                    Message = "This profile is private"
+                };
+            }
 
             return new JobSeekerProfile
             {
                 PhoneNumber = profile.User.PhoneNumber,
                 ResumeUrl = profile.ResumeUrl,
                 Location = profile.User.Location,
-                ProfileImage = profile.ProfileImage
+                ProfileImage = profile.ProfileImage,
+                Skills = profile.Skills.Select(s => new MySkills
+                {
+                    Id = s.Id,
+                    Name = s.Name
+                }).ToList(),
+                Experiences = profile.Experiences?.Select(e => new ExperienceDto
+                {
+                    Id = e.Id,
+                    CompanyName = e.CompanyName,
+                    JobTitle = e.JobTitle,
+                    Description = e.Description,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate
+                }).ToList(),
+                Educations = profile.Educations?.Select(e => new EducationDto
+                {
+                    Id = e.Id,
+                    Institution = e.Institution,
+                    Degree = e.Degree,
+                    FieldOfStudy = e.FieldOfStudy,
+                    StartDate = e.StartDate,
+                    EndDate = e.EndDate
+                }).ToList()
             };
         }
-
 
         public async Task<MyProfileDto> GetMyProfile()
         {
             var userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Unauthorized");
+
+            var user = await _db.Users.FindAsync(userId);
 
             var jobSeeker = await _db.JobSeekers
                 .Include(js => js.User)
@@ -108,6 +144,7 @@ namespace Infrastructure.Implementation
                 GithubUrl = jobSeeker.GithubUrl,
                 ResumeUrl = jobSeeker.ResumeUrl,
                 Resume = resume,
+                isPrivate=user.IsProfilePublic,
                 Skills = jobSeeker.Skills.Select(s => new MySkills
                 {
                     Id = s.Id,
@@ -381,18 +418,49 @@ namespace Infrastructure.Implementation
                 }
             }
         }
-        //private List<T> SafeDeserialize<T>(string? json)
-        //{
-        //    if (string.IsNullOrWhiteSpace(json)) return new List<T>();
-        //    try
-        //    {
-        //        return JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
-        //    }
-        //    catch
-        //    {
-        //        return new List<T>();
-        //    }
-        //}
+
+        public async  Task<SuccessResponse> UpdateProfilePrivacvy(UpdatePrivacyDto updateprivancy)
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Unauthorized");
+
+            var user = await _db.Users
+                .FirstOrDefaultAsync(js => js.Id == userId);
+
+
+            user.IsProfilePublic =updateprivancy.IsProfilePublic ;
+          await _db.SaveChangesAsync();
+            return new SuccessResponse
+            {
+                Message = "Privacy Updated Succfully"
+            };
+
+        }
+
+        public async Task<List<UserSeachDto>> SearchUsersAsync(GlobalSearchDto dto)
+        {
+            var query = _db.Users.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                query = query.Where(u => u.FullName.Contains(dto.Keyword));
+            var result = await query
+                .Include(u => u.JobSeeker)
+                .ThenInclude(x => x.ProfileImage)
+                .ToListAsync();
+
+            return await query.Select(u => new UserSeachDto
+            {
+                Id = u.Id,
+                ProfileImageUrl=u.JobSeeker.ProfileImage.ImageUrl,
+                FullName = u.FullName,
+                Headline = u.JobSeeker.Headline,
+                Location = u.Location
+            }).ToListAsync();
+
+
+        }
+
     }
 
 

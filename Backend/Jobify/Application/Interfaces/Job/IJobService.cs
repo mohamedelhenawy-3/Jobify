@@ -3,6 +3,7 @@ using Application.DTOs.JobPost;
 using Application.DTOs.Pagenation;
 using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
+using Application.SearchFeature.Dtos;
 using Domain.Entities;
 using Domain.Entities.LooksUp;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -34,11 +35,10 @@ namespace Application.Interfaces.Job
         Task<List<JobPost>> FindNewJobs(SavedJobAlert alert);
 
         Task<List<OpeningJobs>> AvalibleJobs();
-
-
-
-        //NEW PART FOR search globlay
         Task<List<SearchResponseDto>> Search(JobFilterDto jobfiltereddto);
+        ////////////Apply Search Globaly/////////////
+        Task<List<SearchResponseDto>> SearchJobsAsync(GlobalSearchDto dto);
+
 
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Application.DTOs.Comapny;
+using Application.DTOs.JobSeeker;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Company;
+using Application.SearchFeature.Dtos;
 using Domain.Entities;
 using Domain.Entities.LooksUp;
 using Infrastructure.DBContext;
@@ -307,6 +309,44 @@ namespace Infrastructure.Implementation.CompanyService
                 InterviewScheduled = allApplications
           .Count(a => a.Status == ApplicationStatus.Interviewed)
             };
+        }
+
+        public async Task<List<SearchCompanyDto>> SearchCompaniesAsync(GlobalSearchDto dto)
+        {
+            var query = _db.Companies
+                   .AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                query = query.Where(u => u.CompanyName.Contains(dto.Keyword));
+            var result = await query
+                .Include(u => u.Logo)
+                .ToListAsync();
+
+
+            if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                query = query.Where(c => c.CompanyName.ToLower().Contains(dto.Keyword.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(dto.Industry))
+                query = query.Where(c => c.Industry != null &&
+                                         c.Industry.ToLower().Contains(dto.Industry.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(dto.CompanySize))
+                query = query.Where(c => c.CompanySize != null &&
+                                         c.CompanySize.ToLower().Contains(dto.CompanySize.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(dto.Location))
+                query = query.Where(c => c.Location != null &&
+                                         c.Location.ToLower().Contains(dto.Location.ToLower()));
+            return await query.Select(u => new SearchCompanyDto
+            {
+                Id = u.Id,
+                LogoUrl = u.Logo.ImageUrl,
+                CompanyName = u.CompanyName,
+                Description = u.Description,
+                Location = u.Location,
+                CompanySize=u.CompanySize
+            }).ToListAsync();
+
         }
     }
 }

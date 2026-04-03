@@ -5,6 +5,7 @@ using Application.DTOs.Pagenation;
 using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Job;
+using Application.SearchFeature.Dtos;
 using Domain.Entities;
 using Domain.Entities.LooksUp;
 using Infrastructure.DBContext;
@@ -528,6 +529,60 @@ namespace Infrastructure.Implementation.JobService
        .ToListAsync();
 
             return jobs;
+        }
+
+        public async Task<List<SearchResponseDto>> SearchJobsAsync(GlobalSearchDto dto)
+        {
+            var query = _db.JobPosts.AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                query = query.Where(j => j.Title.ToLower().Contains(dto.Keyword.ToLower()));
+
+            if (dto.IndustryIds?.Any() == true)
+                query = query.Where(j => dto.IndustryIds.Contains(j.IndustryId));
+
+            if (dto.WorkModeIds?.Any() == true)
+                query = query.Where(j => dto.WorkModeIds.Contains(j.WorkModeId));
+
+            if (dto.EmploymentTypeIds?.Any() == true)
+                query = query.Where(j => dto.EmploymentTypeIds.Contains(j.EmploymentTypeId));
+
+            if (dto.PostedWithinDays.HasValue)
+            {
+                var date = DateTime.UtcNow.AddDays(-dto.PostedWithinDays.Value);
+                query = query.Where(j => j.CreatedAt >= date);
+            }
+
+            if (dto.IndustryIds?.Any() == true)
+                query = query.Where(j => dto.IndustryIds.Contains(j.IndustryId));
+
+            if (dto.WorkModeIds?.Any() == true)
+                query = query.Where(j => dto.WorkModeIds.Contains(j.WorkModeId));
+
+            if (dto.EmploymentTypeIds?.Any() == true)
+                query = query.Where(j => dto.EmploymentTypeIds.Contains(j.EmploymentTypeId));
+
+            if (dto.PostedWithinDays.HasValue)
+            {
+                var date = DateTime.UtcNow.AddDays(-dto.PostedWithinDays.Value);
+                query = query.Where(j => j.CreatedAt >= date);
+            }
+            return await query
+       .OrderByDescending(j => j.CreatedAt)
+          .Select(j => new SearchResponseDto
+          {
+              Id = j.Id,
+              logo = j.Company != null && j.Company.Logo != null
+               ? j.Company.Logo.ImageUrl
+               : null,
+              Title = j.Title,
+              IndustryId = j.IndustryId,
+              EmploymentTypeId = j.EmploymentTypeId,
+              Description = j.Description,
+              Location = j.Location,
+              WorkModeId = j.WorkModeId,
+
+          })
+       .ToListAsync();
         }
     }
 }

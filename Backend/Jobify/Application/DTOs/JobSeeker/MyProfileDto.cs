@@ -24,7 +24,7 @@ namespace Application.DTOs.JobSeeker
         public string? ResumeUrl { get; set; }
         public string? LinkedInUrl { get; set; }
         public string? GithubUrl { get; set; }
-
+        public bool isPrivate { get; set; }
         public List<MySkills> Skills { get; set; } = new();
 
         public List<ExperienceDto> Experiences { get; set; } = new();

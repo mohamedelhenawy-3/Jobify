@@ -17,7 +17,14 @@ namespace Jobify.Controllers
             _jobSeekerService = jobSeekerService;
         }
 
+        [HttpPut("privacy")]
+        public async Task<IActionResult> UpdatePrivacy([FromBody] UpdatePrivacyDto dto)
+        {
 
+            await _jobSeekerService.UpdateProfilePrivacvy(dto);
+
+            return Ok(new { message = "Privacy updated successfully" });
+        }
 
         [HttpGet("me")]
         public async Task<IActionResult> GetMyProfile()
