@@ -1,0 +1,26 @@
+.dashboard-wrapper {
+  margin-top: 40px; /* pushes dashboard below navbar */
+}
+
+.main-split-content {
+  display: flex;
+  margin-top: 20px;
+}
+
+.job-list-side {
+  width: 35%;
+  border-right: 1px solid #eee;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.job-details-side {
+  width: 80%;
+  padding: 2px;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

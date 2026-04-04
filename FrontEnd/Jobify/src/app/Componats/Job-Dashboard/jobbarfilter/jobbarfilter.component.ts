@@ -23,9 +23,14 @@ export class JobbarfilterComponent {
   selectedEmpTypeId:number | null =null;
 
 
+  constructor(){
+          console.log("currentkeyword :-",this.currentKeyword);
+
+  }
+
   emitFilters() {
-    const filterDto = {
-      keyword: this.currentKeyword, 
+    const filterDto = { 
+      
       industryIds: this.selectedIndId ? [this.selectedIndId] : [],
       workModeIds: this.selectedModeId ? [this.selectedModeId] : [],
       employmentTypeIds: this.selectedEmpTypeId ? [this.selectedEmpTypeId] : [],

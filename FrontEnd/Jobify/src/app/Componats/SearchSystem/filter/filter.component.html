@@ -1,0 +1,29 @@
+<div class="filter-bar">
+
+  <div class="type-selector">
+    <button 
+      [class.active]="searchDto.type === 'all'"
+      (click)="onTypeChange('all')">
+      All
+    </button>
+
+    <button 
+      [class.active]="searchDto.type === 'job'"
+      (click)="onTypeChange('job')">
+      Jobs
+    </button>
+
+    <button 
+      [class.active]="searchDto.type === 'user'"
+      (click)="onTypeChange('user')">
+      Users
+    </button>
+
+    <button 
+      [class.active]="searchDto.type === 'company'"
+      (click)="onTypeChange('company')">
+      Companies
+    </button>
+  </div>
+
+</div>

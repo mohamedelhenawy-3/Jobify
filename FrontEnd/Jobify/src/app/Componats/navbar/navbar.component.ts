@@ -9,7 +9,7 @@ import { FormsModule, NgModel } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, RouterLink,FormsModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
  isLoggedIn: boolean = false;
@@ -35,8 +35,8 @@ ngOnInit(): void {
 onSearch() {
   if (!this.keyword.trim()) return;
 
-  this.router.navigate(['/Jobify/jobbashoard'], {
-    queryParams: { keyword: this.keyword }
+  this.router.navigate(['/Jobify/Searchsystem'], {
+    queryParams: { keyword: this.keyword,type:'all' }
   });
 }
 isFocused = false;

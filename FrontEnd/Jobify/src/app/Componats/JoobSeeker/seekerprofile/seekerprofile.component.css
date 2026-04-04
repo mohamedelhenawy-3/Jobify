@@ -380,3 +380,11 @@ input:focus, textarea:focus {
 .card .btn-full i {
   font-size: 18px;
 }
+
+.private-profile {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ff5555;
+}

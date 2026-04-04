@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { JobSeekerProfile } from '../../../Models/jobseeker/JobSeekerProfile';
 import { JobseekerService } from '../../../Services/JobSeekerservice/jobseeker.service';
+import { UpdatePrivacyDto } from '../../../Models/jobseeker/UpdatePrivacy';
 
 @Component({
   selector: 'app-seekerprofile',
@@ -13,10 +14,11 @@ import { JobseekerService } from '../../../Services/JobSeekerservice/jobseeker.s
   styleUrl: './seekerprofile.component.css'
 })
 export class SeekerprofileComponent implements OnInit {
-
+privacyToggle: boolean = true; // default, will be synced from backend
   profile!: JobSeekerProfile;
   loading = true;
   editProfile = false;
+  isMyProfile = true; 
 
   skillsInput = '';
 
@@ -50,6 +52,7 @@ export class SeekerprofileComponent implements OnInit {
     this.profileService.getMyProfile().subscribe({
       next: res => {
         this.profile = res;
+        this.privacyToggle = !res.isPrivate;
         console.log("PROFILE", res);
         this.loading = false;
 
@@ -194,5 +197,21 @@ export class SeekerprofileComponent implements OnInit {
     this.selectedFile = null;
 
   }
+  updatePrivacy() {
+  const dto: UpdatePrivacyDto = {
+    isProfilePublic: this.privacyToggle
+  };
 
+  this.profileService.updateProfilePrivacy(dto).subscribe({
+    next: res => {
+      this.profile.isPrivate = !this.privacyToggle; 
+      console.log("private",this.profile.isPrivate )
+      alert(res.message);
+    },
+    error: err => {
+      console.error('Failed to update privacy', err);
+      this.privacyToggle = !this.privacyToggle;
+    }
+  });
+}
 }

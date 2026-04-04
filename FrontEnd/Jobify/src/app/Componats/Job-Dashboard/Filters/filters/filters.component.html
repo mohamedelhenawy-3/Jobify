@@ -1,0 +1,7 @@
+<!-- Global type selection -->
+<select [(ngModel)]="searchDto.type" (change)="onTypeChange()">
+  <option value="all">All</option>
+  <option value="job">Jobs</option>
+  <option value="user">Users</option>
+  <option value="company">Companies</option>
+</select>

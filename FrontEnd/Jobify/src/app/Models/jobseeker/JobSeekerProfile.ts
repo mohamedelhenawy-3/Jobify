@@ -3,6 +3,8 @@ import { Experience } from "../Experince/Experience";
 import { Skill } from "../Skill/skill";
 
 export interface JobSeekerProfile {
+   isPrivate: boolean;
+  message?: string;
   fullName: string;
   phoneNumber: string;
 

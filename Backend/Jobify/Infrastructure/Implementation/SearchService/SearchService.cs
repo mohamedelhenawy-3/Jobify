@@ -36,17 +36,11 @@ namespace Infrastructure.Implementation.SearchService
            dto.Industry == null &&
            dto.PostedWithinDays == null;
 
-            if (onlyKeyword || dto.Type == "all")
+            if (dto.Type == "all" || string.IsNullOrEmpty(dto.Type))
             {
-                var jobsTask = await _jobService.SearchJobsAsync(dto);
-                var usersTask = await _seekerservice.SearchUsersAsync(dto);
-                var companiesTask = await _companysrvice.SearchCompaniesAsync(dto);
-
-           
-
-                response.Jobs = jobsTask;
-                response.Users = usersTask;
-                response.Companies = companiesTask;
+                response.Jobs = await _jobService.SearchJobsAsync(dto);
+                response.Users = await _seekerservice.SearchUsersAsync(dto);
+                response.Companies = await _companysrvice.SearchCompaniesAsync(dto);
 
                 return response;
             }

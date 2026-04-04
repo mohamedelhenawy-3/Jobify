@@ -1,7 +1,19 @@
-<div class="profile-page" *ngIf="!loading && profile">
+
+<div *ngIf="!loading && !isMyProfile && profile.isPrivate" class="private-profile">
+  🔒 This profile is private
+</div>
+
+
+
+<div div class="profile-page" *ngIf="!loading && (isMyProfile || !profile.isPrivate)">
 
   <!-- Profile Header -->
   <div class="profile-header">
+
+       <label class="privacy-toggle">
+  <input type="checkbox" [(ngModel)]="privacyToggle" (change)="updatePrivacy()" />
+  Make my profile public
+</label>
     <div class="image-wrapper">
 
     <!-- Profile Image -->

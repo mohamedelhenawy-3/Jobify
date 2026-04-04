@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { JobSeekerProfile } from '../../Models/jobseeker/JobSeekerProfile';
 import { Observable } from 'rxjs';
+import { UpdatePrivacyDto } from '../../Models/jobseeker/UpdatePrivacy';
 
 @Injectable({
   providedIn: 'root'
@@ -19,4 +20,7 @@ export class JobseekerService {
    updateProfile(formData: FormData): Observable<any> {
     return this.http.put(`${this.baseUrl}/me`, formData);
   }
+  updateProfilePrivacy(dto: UpdatePrivacyDto) {
+  return this.http.put<{ message: string }>('https://localhost:44309/api/JobSeeker/privacy', dto);
+}
 }

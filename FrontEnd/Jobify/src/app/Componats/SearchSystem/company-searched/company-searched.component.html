@@ -1,0 +1,19 @@
+<div class="companies-container" *ngIf="companies.length > 0; else empty">
+  <div class="company-card" *ngFor="let c of companies">
+    <img [src]="c.logoUrl" alt="{{c.companyName}}" class="company-logo">
+    <div class="company-info">
+      <h3>{{ c.companyName }}</h3>
+      <p class="description">{{ c.description }}</p>
+      <div class="company-meta">
+        <span class="location">{{ c.location }}</span>
+        <span class="size">{{ c.companySize }} employees</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #empty>
+  <div class="empty">
+    No companies found.
+  </div>
+</ng-template>

@@ -26,6 +26,8 @@ import { CompanyProfileComponent } from './Componats/Company/company-profile/com
 import { JobsearchComponent } from './Componats/jobsearch/jobsearch.component';
 import { JobbarfilterComponent } from './Componats/Job-Dashboard/jobbarfilter/jobbarfilter.component';
 import { JobdashboardComponent } from './Componats/Job-Dashboard/jobdashboard/jobdashboard.component';
+import { SearchsystemService } from './Services/SearchSystem/searchsystem.service';
+import { DashboardComponent } from './Componats/SearchSystem/dashboard/dashboard.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -51,6 +53,7 @@ export const routes: Routes = [
         { path: 'employerdashboard', component: EmployerdashboardComponent },
         { path: 'employerprofile', component: EmployerprofileComponent },
         { path: 'mycompany',component :CompanyProfileComponent},
+          { path: 'Searchsystem',component :DashboardComponent},
 
             { path: 'jobbashoard',component :JobdashboardComponent}
 

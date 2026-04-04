@@ -8,18 +8,30 @@ import { JobdetailsComponent } from "../../jobdetails/jobdetails.component";
 import { JobFilterComponent } from "../../JobComponents/job-filter/job-filter.component";
 import { JobbarfilterComponent } from "../jobbarfilter/jobbarfilter.component";
 import { JobcardComponent } from "../jobcard/jobcard.component";
-import { DetailsComponent } from "../details/details.component";
 import { FormsModule } from '@angular/forms';
+import { FiltersComponent } from "../Filters/filters/filters.component";
+import { GlobalSearchDto } from '../../../Models/SearchSystem/GlobalSearchDto';
 
 @Component({
   selector: 'app-jobdashboard',
   standalone: true,
-  imports: [CommonModule,FormsModule, JobdetailsComponent, JobFilterComponent, JobbarfilterComponent, JobcardComponent, DetailsComponent],
+  imports: [CommonModule, FormsModule, JobdetailsComponent, JobFilterComponent, JobbarfilterComponent, JobcardComponent, FiltersComponent],
   templateUrl: './jobdashboard.component.html',
-  styleUrl: './jobdashboard.component.css'
+  styleUrls: ['./jobdashboard.component.css']
 })
 export class JobdashboardComponent implements OnInit {
-jobs: SearchJob[] = [];
+
+    searchDto: GlobalSearchDto = {
+    keyword: '',
+    type: 'all',
+    workModeIds: [],
+    employmentTypeIds: [],
+    industryIds: [],
+    location: '',
+    companySize: ''
+  };
+
+ jobs: SearchJob[] = [];
   selectedJob: SearchJob | null = null; // For the Description Component
   
   industries: any[] = [];
@@ -85,4 +97,8 @@ alert("job alert succefully");      },
     
   }
 }
+
+
+
+ 
 }

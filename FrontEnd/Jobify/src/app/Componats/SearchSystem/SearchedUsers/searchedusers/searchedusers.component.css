@@ -1,0 +1,59 @@
+.users-container {
+  display: flex;
+  flex-direction: column; /* vertical list */
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.user-card:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.user-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.headline {
+  font-size: 13px;
+  color: #555;
+  margin: 2px 0;
+}
+
+.location {
+  font-size: 12px;
+  color: #888;
+}
+
+.empty {
+  text-align: center;
+  margin-top: 30px;
+  color: gray;
+}
