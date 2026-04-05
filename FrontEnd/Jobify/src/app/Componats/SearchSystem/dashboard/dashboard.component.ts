@@ -22,6 +22,12 @@ import { CompanySearchedComponent } from "../company-searched/company-searched.c
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+viewCompany(arg0: any) {
+throw new Error('Method not implemented.');
+}
+viewUserProfile(arg0: any) {
+throw new Error('Method not implemented.');
+}
 searchDto: GlobalSearchDto = { type: 'all', keyword: '' };
 
   industries: any[] = [];
@@ -107,5 +113,32 @@ onJobFilterChange(filters: any) {
 
   this.performSearch();
 }
-  
+  getIndustryName(industryId: number): string {
+  return this.industries.find(i => i.id === industryId)?.industryName  || 'Unknown';
+}
+
+getEmploymentTypeName(typeId: number): string {
+  return this.EmploymentTypeIds.find(t => t.id === typeId)?.typeName || 'Unknown';
+}
+
+getWorkModeName(modeId: number): string {
+  return this.workModes.find(w => w.id === modeId)?.name || 'Unknown';
+}
+getEmploymentTypeClass(typeId: number): string {
+  switch (typeId) {
+    case 1: return 'badge-fulltime';   // Full Time
+    case 2: return 'badge-parttime';   // Part Time
+    case 3: return 'badge-contract';   // Contract
+    default: return 'badge-default';
+  }
+}
+getWorkModeClass(modeId: number): string {
+  switch (modeId) {
+    case 1: return 'badge-onsite';
+    case 2: return 'badge-remote';
+    case 3: return 'badge-hybrid';
+    default: return 'badge-default';
+  }
+}
+
 }

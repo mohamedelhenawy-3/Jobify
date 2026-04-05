@@ -9,6 +9,9 @@ import { Component, Input } from '@angular/core';
   styleUrl: './company-searched.component.css'
 })
 export class CompanySearchedComponent {
+viewCompany(arg0: any) {
+throw new Error('Method not implemented.');
+}
   @Input() companies: any[] = [];
 
 }

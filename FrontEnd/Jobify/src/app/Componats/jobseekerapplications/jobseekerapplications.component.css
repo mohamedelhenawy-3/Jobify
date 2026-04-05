@@ -1,70 +1,88 @@
-/* --- Root Container --- */
-.applications-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
+:root {
+  --primary-blue: #2563eb;
+  --slate-50: #f8fafc;
+  --slate-200: #e2e8f0;
+  --slate-600: #475569;
+  --slate-900: #0f172a;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
-/* --- The Grid --- */
+.applications-container {
+  max-width: 1300px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+/* 🟢 THE GRID: Shows 3-4 cards per line on desktop */
 .applications-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 28px;
+  gap: 24px;
 }
 
-/* --- The Modern Card --- */
 .application-card {
-  background: #ffffff;
-  border: 1px solid #eef2f6;
-  border-radius: 24px;
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: 20px;
   padding: 24px;
   display: flex;
   flex-direction: column;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  position: relative;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .application-card:hover {
-  transform: translateY(-8px);
-  border-color: #2563eb33;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-5px);
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-md);
 }
 
-/* --- Header Styling --- */
+/* 🟢 LOGO: The "Perfect Way" */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.company-placeholder {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+.logo-box {
+  width: px;
+  height: 80px;
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 20px;
-  color: rgba(30, 41, 59, 0.8);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* Clips any overflow */
+  padding: 6px;
 }
 
-/* --- Status Badges --- */
+.company-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* CRITICAL: Prevents stretching */
+}
+
+.logo-placeholder {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--slate-600);
+}
+
+/* 🟢 STATUS BADGE */
 .status-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 100px;
-  font-size: 12px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
 .status-dot {
@@ -73,138 +91,94 @@
   border-radius: 50%;
 }
 
+/* Status Colors (Using your classes) */
 .pending { background: #fff7ed; color: #c2410c; }
 .pending .status-dot { background: #f97316; }
-
 .accepted { background: #f0fdf4; color: #15803d; }
 .accepted .status-dot { background: #22c55e; }
-
 .rejected { background: #fef2f2; color: #b91c1c; }
 .rejected .status-dot { background: #ef4444; }
 
-/* --- Job Content --- */
+/* 🟢 CONTENT */
 .job-info {
-  flex-grow: 1; /* Pushes footer to the bottom */
+  flex-grow: 1; /* Pushes footer to the bottom so cards look even */
 }
 
 .job-title {
-  font-size: 19px;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 6px 0;
-  line-height: 1.4;
+  color: var(--slate-900);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
 }
 
 .company-name {
-  color: #64748b;
-  font-size: 15px;
+  color: var(--slate-600);
+  font-size: 0.95rem;
   font-weight: 500;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .meta-row {
   display: flex;
+  gap: 8px;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
 .meta-pill {
-  background: #f8fafc;
-  color: #475569;
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-size: 13px;
+  background: var(--slate-50);
+  color: var(--slate-600);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 600;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--slate-200);
 }
 
-.icon {
-  margin-right: 4px;
-  filter: grayscale(1);
-}
-
-/* --- Footer --- */
+/* 🟢 FOOTER */
 .card-footer {
   margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+  border-top: 1px solid var(--slate-50);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.date-info {
+.date-group {
   display: flex;
   flex-direction: column;
 }
 
-.date-info .label {
-  font-size: 11px;
-  color: #94a3b8;
-  font-weight: 700;
+.label {
+  font-size: 10px;
   text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 800;
 }
 
-.date-info .value {
+.date {
   font-size: 13px;
-  color: #475569;
+  color: var(--slate-600);
   font-weight: 600;
 }
 
-.view-btn {
-  background: #f1f5f9;
+.view-details-btn {
+  background: var(--slate-50);
+  color: var(--primary-blue);
   border: none;
-  color: #2563eb;
   font-weight: 700;
   font-size: 13px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 10px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   transition: all 0.2s;
 }
 
-.view-btn:hover {
-  background: #2563eb;
-  color: #ffffff;
-}
-
-/* --- States --- */
-.loading-wrapper, .empty-state-card {
-  text-align: center;
-  padding: 80px 20px;
-  background: #ffffff;
-  border-radius: 30px;
-  border: 1px solid #eef2f6;
-}
-
-.empty-illustration { font-size: 50px; margin-bottom: 20px; }
-
-.btn-primary {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 12px 30px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #2563eb;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin { 100% { transform: rotate(360deg); } }
-
-/* --- Mobile Fixes --- */
-@media (max-width: 480px) {
-  .applications-grid {
-    grid-template-columns: 1fr;
-  }
+.view-details-btn:hover {
+  background: var(--primary-blue);
+  color: var(--white);
 }

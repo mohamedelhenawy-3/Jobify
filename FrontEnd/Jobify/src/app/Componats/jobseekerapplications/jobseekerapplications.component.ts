@@ -21,6 +21,7 @@ export class JobseekerapplicationsComponent {
       next: (res) => {
         console.log(res);
         this.applications = res;
+        console.log("my applications",res);
         this.loading = false;
       },
       error: () => {

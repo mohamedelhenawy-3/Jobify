@@ -1,10 +1,9 @@
 <div class="dashboard-wrapper">
 
-  <!-- Top filters -->
-  <div class="top-filter-section">
+  <header class="top-filter-section">
     <app-filter
-     [searchDto]="searchDto"
-     (filtersChange)="onGlobalFilterChange($event)">
+      [searchDto]="searchDto"
+      (filtersChange)="onGlobalFilterChange($event)">
     </app-filter>
 
     <app-jobbarfilter
@@ -13,40 +12,106 @@
       [workModes]="workModes"
       [EmploymentTypeIds]="EmploymentTypeIds"
       (filterChanged)="onJobFilterChange($event)">
-     </app-jobbarfilter>
+    </app-jobbarfilter>
+  </header>
+
+  <div *ngIf="searchDto.type === 'job'" class="main-split-content">
+    <aside class="job-list-side">
+      <div class="cards-stack">
+        <app-jobcard 
+          *ngFor="let j of jobs"
+          [job]="j"
+          [isActive]="selectedJob?.id === j.id"
+          (clicked)="selectedJob = j">
+        </app-jobcard>
+      </div>
+
+      <div *ngIf="jobs.length === 0" class="empty-state">
+        <p>No jobs found.</p>
+      </div>
+    </aside>
+
+    <main class="job-details-side">
+      <app-jobdetails [job]="selectedJob"></app-jobdetails>
+    </main>
+  </div>
+
+  <div *ngIf="searchDto.type === 'user'" class="grid-container">
+    <app-searchedusers [users]="users"></app-searchedusers>
+  </div>
+
+  <div *ngIf="searchDto.type === 'company'" class="grid-container">
+    <app-company-searched [companies]="companies"></app-company-searched>
+  </div>
+
+  <div *ngIf="searchDto.type === 'all'" class="all-mode-container">
+
+    <section class="content-section">
+      <div class="section-header">
+        <h3>Featured Jobs</h3>
+        <button class="btn-text" (click)="searchDto.type='job'; performSearch()">
+          View all jobs <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="jobs-list-vertical">
+        <div *ngFor="let j of jobs" class="job-item-card horizontal">
+          <div class="card-body">
+            <img [src]="j.logo" alt="{{j.title}}" class="item-logo"/>
+            <div class="item-info">
+              <h4 class="item-title">{{j.title}}</h4>
+              <p class="item-meta"><i class="fas fa-map-marker-alt"></i> {{j.location}}</p>
+              <div class="badge-row">
+                <span class="badge industry">{{ getIndustryName(j.industryId) }}</span>
+                <span class="badge" [ngClass]="getWorkModeClass(j.workModeId)">{{ getWorkModeName(j.workModeId) }}</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-cta outline" (click)="selectedJob = j; searchDto.type='job'">
+            See Details
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-header">
+        <h3>Talent</h3>
+        <button class="btn-text" (click)="searchDto.type='user'; performSearch()">View all</button>
+      </div>
+      <div class="cards-grid">
+        <div *ngFor="let u of users" class="profile-card">
+          <div class="card-content">
+            <img [src]="u.profileImageUrl || 'assets/default-user.png'" class="profile-img"/>
+            <h4 class="item-title">{{u.fullName}}</h4>
+            <p class="item-subtitle">{{u.headline}}</p>
+            <p class="item-meta">{{u.location}}</p>
+          </div>
+          <button class="btn-cta primary full-width" (click)="viewUserProfile(u.id)">
+            View Profile
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-header">
+        <h3>Companies</h3>
+        <button class="btn-text" (click)="searchDto.type='company'; performSearch()">View all</button> 
+      </div>
+      <div class="cards-grid">
+        <div *ngFor="let c of companies" class="company-card">
+          <div class="card-content">
+            <img [src]="c.logoUrl" class="brand-logo"/>
+            <h4 class="item-title">{{c.companyName}}</h4>
+            <p class="item-description">{{c.description}}</p>
+          </div>
+          <button class="btn-cta secondary full-width" (click)="viewCompany(c.id)">
+            Visit Company
+          </button>
+        </div>
+      </div>
+    </section>
 
   </div>
-  <div *ngIf="searchDto.type === 'job'" class="main-split-content">
-
-  <!-- LEFT SIDE (LIST) -->
-  <aside class="job-list-side">
-
-    <div class="cards-container">
-      <app-jobcard 
-        *ngFor="let j of jobs"
-        [job]="j"
-        [isActive]="selectedJob?.id === j.id"
-        (clicked)="selectedJob = j">
-      </app-jobcard>
-    </div>
-
-    <div *ngIf="jobs.length === 0" class="p-4 text-center text-muted">
-      No jobs found.
-    </div>
-
-  </aside>
-
-  <!-- ✅ RIGHT SIDE (DETAILS) OUTSIDE -->
-  <main class="job-details-side">
-    <app-jobdetails [job]="selectedJob"></app-jobdetails>
-  </main>
-
-</div>
-<app-searchedusers *ngIf="searchDto.type === 'user'"
-  [users]="users">
-</app-searchedusers>
-<app-company-searched
-  *ngIf="searchDto.type === 'company'"
-  [companies]="companies">
-</app-company-searched>
 </div>

@@ -11,9 +11,9 @@
 }
 
 .logo-wrapper img {
-  width: 42px;
-  height: 42px;
-  border-radius: 6px;
+  width: 80px;
+  height: 80px;
+  border-radius:20px;
   object-fit: contain;
   border: 1px solid #f0f0f0;
 }
@@ -39,7 +39,7 @@
 
 /* Area for Location and Badges below the logo/title line */
 .job-details-area {
-  padding-left: 54px; /* Matches logo width (42px) + gap (12px) */
+  padding-left: 90px; /* Matches logo width (42px) + gap (12px) */
 }
 
 .location {

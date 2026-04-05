@@ -1,50 +1,45 @@
-<div class="applications-container">
+<div class="application-card" *ngFor="let app of applications">
   
-  <div *ngIf="loading" class="loading-wrapper">
-    <div class="spinner"></div>
-    <p>Syncing your applications...</p>
-  </div>
-
-  <div *ngIf="!loading && applications.length === 0" class="empty-state-card">
-    <div class="empty-illustration">📂</div>
-    <h3>No applications yet</h3>
-    <p>Your application history will appear here once you start applying.</p>
-    <button class="btn-primary" routerLink="/jobs">Browse Jobs</button>
-  </div>
-
-  <div class="applications-grid" *ngIf="!loading && applications.length">
-    <div class="application-card" *ngFor="let app of applications">
-      
-      <div class="card-header">
-
-        <span class="status-badge" [ngClass]="getStatusClass(app.status)">
-          <span class="status-dot"></span>
-          {{ app.status }}
-        </span>
+  <div class="card-top-row">
+    <div class="job-brand-wrapper">
+      <div class="logo-box">
+        <img *ngIf="app.logo; else noLogo" 
+             [src]="app.logo" 
+             alt="{{ app.companyName }}" 
+             class="company-logo">
+        <ng-template #noLogo>
+          <div class="logo-placeholder">{{ app.companyName?.charAt(0) }}</div>
+        </ng-template>
       </div>
-
-      <div class="job-info">
+      
+      <div class="title-column">
         <h3 class="job-title">{{ app.jobTitle }}</h3>
         <p class="company-name">{{ app.companyName }}</p>
-        
-        <div class="meta-row">
-          <span class="meta-pill">
-            <span class="icon">📍</span> {{ app.jobLocation }}
-          </span>
-          <span class="meta-pill">
-            <span class="icon">🏠</span> {{ app.workMode }}
-          </span>
-        </div>
       </div>
-
-      <div class="card-footer">
-        <div class="date-info">
-          <span class="label">Applied</span>
-          <span class="value">{{ app.appliedAt | date: 'mediumDate' }}</span>
-        </div>
-        <button class="view-btn">View Details</button>
-      </div>
-
     </div>
+
+    <span class="status-badge" [ngClass]="getStatusClass(app.status)">
+      <span class="status-dot"></span>
+      {{ app.status }}
+    </span>
+  </div>
+
+  <div class="meta-row">
+    <span class="meta-pill">
+      <i class="fas fa-map-marker-alt"></i> {{ app.jobLocation }}
+    </span>
+    <span class="meta-pill">
+      <i class="fas fa-briefcase"></i> {{ app.workMode }}
+    </span>
+  </div>
+
+  <div class="card-footer">
+    <div class="date-group">
+      <span class="label">Applied on</span>
+      <span class="date">{{ app.appliedAt | date: 'mediumDate' }}</span>
+    </div>
+    <button class="view-details-btn">
+      Details <i class="fas fa-chevron-right"></i>
+    </button>
   </div>
 </div>
