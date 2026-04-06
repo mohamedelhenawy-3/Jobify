@@ -52,8 +52,18 @@
 </div>
 
 <ng-template #loadingOrEmpty>
-  <div class="text-center mt-5">
-    <p *ngIf="!applicationDetails">Loading details...</p>
-    <p *ngIf="applicationDetails === null">No details found for this application.</p>
+  <div class="centered-state-wrapper">
+    <div class="text-center">
+      <div *ngIf="!applicationDetails">
+        <div class="spinner-border text-primary mb-3" role="status"></div>
+        <p class="text-muted">Loading details...</p>
+      </div>
+
+      <div *ngIf="applicationDetails === null">
+        <i class="fas fa-folder-open fa-3x text-secondary mb-3"></i>
+        <p class="fw-bold">No details found for this application.</p>
+        <button class="btn btn-outline-primary btn-sm" (click)="goBack()">Go Back</button>
+      </div>
+    </div>
   </div>
 </ng-template>

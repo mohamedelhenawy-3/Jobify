@@ -272,6 +272,109 @@ namespace Infrastructure.Implementation.JobApplicationSrevice
             };
         }
 
-       
+        public async Task<IEnumerable<MyApplicationDto>> GetMyApplications(ApplicationFilterDto filterdto)
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Unauthorized");
+
+            var profile = await _db.JobSeekers
+                .FirstOrDefaultAsync(js => js.UserId == userId);
+
+            if (profile == null)
+                throw new Exception("JobSeeker profile not found");
+
+            var query = _db.JobApplications
+                     .Include(a => a.JobPost)
+                        .ThenInclude(j => j.Company)
+                                .Where(a => a.JobSeekerId == profile.Id)
+                                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filterdto.Status) && filterdto.Status.ToLower() != "all")
+            {
+                if (Enum.TryParse<ApplicationStatus>(filterdto.Status, true, out var statusEnum))
+                {
+                    query = query.Where(a => a.Status == statusEnum);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(filterdto.Search))
+            {
+                string term = filterdto.Search.ToLower();
+                query = query.Where(a =>
+                    a.JobPost.Title.ToLower().Contains(term) ||
+                    a.JobPost.Company.CompanyName.ToLower().Contains(term)
+                );
+            }
+
+            return await query
+        .OrderByDescending(a => a.AppliedAt)
+        .Select(a => new MyApplicationDto
+        {
+            ApplicationId = a.Id,
+            Status = a.Status.ToString(),
+            AppliedAt = a.AppliedAt,
+            JobTitle = a.JobPost.Title,
+            CompanyName = a.JobPost.Company.CompanyName,
+            Logo = a.JobPost.Company.Logo.ImageUrl,
+            JobLocation = a.JobPost.Location,
+            WorkMode = a.JobPost.WorkMode.Name,
+            EmploymentType = a.JobPost.EmploymentType.TypeName
+        })
+        .ToListAsync();
+        }
+
+        public async Task<IEnumerable<AppliedJobSeekerDto>> appliedapplications(ApplicationFilterDto filterdto)
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Unauthorized");
+
+            var profile = await _db.EmployerProfiles.Include(x=>x.Company)
+                          .FirstOrDefaultAsync(js => js.UserId == userId);
+            if (profile == null)
+                throw new Exception("Employer profile not found");
+
+            if (profile.Company == null)
+                throw new Exception("You don't have a company yet");
+
+            var query = _db.JobApplications.Where(a => a.JobPost.CompanyId == profile.Company.Id)
+                 .Include(x => x.JobPost)
+                 .Include(x=>x.JobSeeker).ThenInclude(x=>x.ProfileImage)
+                 .Include(a => a.JobSeeker)
+                 .ThenInclude(js => js.User)
+                
+                 .AsQueryable();
+
+            // Reuse the same status logic
+            if (!string.IsNullOrWhiteSpace(filterdto.Status) && filterdto.Status.ToLower() != "all")
+            {
+                if (Enum.TryParse<ApplicationStatus>(filterdto.Status, true, out var statusEnum))
+                {
+                    query = query.Where(a => a.Status == statusEnum);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(filterdto.Search))
+            {
+                string term = filterdto.Search.ToLower();
+                query = query.Where(a => a.JobSeeker.User.FullName.ToLower().Contains(term)
+                || a.JobSeeker.User.Email.ToLower().Contains(term) || a.JobPost.Title.ToLower().Contains(term)
+                || a.JobPost.Company.CompanyName.ToLower().Contains(term));
+            }
+            return await query
+      .OrderByDescending(a => a.AppliedAt)
+      .Select(a => new AppliedJobSeekerDto
+      {
+          ApplicationId = a.Id,
+          Status = a.Status.ToString(),
+          AppliedAt = a.AppliedAt,
+          JobTitle = a.JobPost.Title,
+          JobSeekerEmail = a.JobSeeker.User.Email,
+          JobSeekerFullName = a.JobSeeker.User.UserName,
+          ProfileImageUrl = a.JobSeeker.ProfileImage.ImageUrl,
+          ResumeUrl = a.ResumeUrl
+      })
+      .ToListAsync();
+        }
     }
 }

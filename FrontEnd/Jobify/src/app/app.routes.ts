@@ -28,6 +28,7 @@ import { JobbarfilterComponent } from './Componats/Job-Dashboard/jobbarfilter/jo
 import { JobdashboardComponent } from './Componats/Job-Dashboard/jobdashboard/jobdashboard.component';
 import { SearchsystemService } from './Services/SearchSystem/searchsystem.service';
 import { DashboardComponent } from './Componats/SearchSystem/dashboard/dashboard.component';
+import { ApplicationsShellComponent } from './Componats/ApplicationsDashBoard/applications-shell/applications-shell.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -42,20 +43,19 @@ export const routes: Routes = [
         { path: 'findjob', component: JobspagesComponent },
         { path: 'createjob', component: CreatejobComponent },
         { path: 'managejobs', component: ManagejobsComponent },
-        {path:'jobapplications',component:ApplicationsComponent},
+        {path:'jobapplications',component:ApplicationsShellComponent},
         {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
         {path:'updateJob/:id',component:UpdateJobComponent},
         {path:'details/:id',component:JobdetailsComponent},
         { path: 'apply/:id', component: CreatejobapplicationComponent },
-        { path: 'myapplications', component: JobseekerapplicationsComponent },
+        { path: 'myapplications', component:ApplicationsShellComponent  },
         { path: 'savedjobs', component: SavedjobsComponent },
         { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
         { path: 'employerdashboard', component: EmployerdashboardComponent },
         { path: 'employerprofile', component: EmployerprofileComponent },
         { path: 'mycompany',component :CompanyProfileComponent},
-          { path: 'Searchsystem',component :DashboardComponent},
-
-            { path: 'jobbashoard',component :JobdashboardComponent}
+        { path: 'Searchsystem',component :DashboardComponent},
+        { path: 'jobbashoard',component :JobdashboardComponent}
 
 
 

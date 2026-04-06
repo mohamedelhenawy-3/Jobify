@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApplicationStatus } from '../../Models/JobApplications/ApplicationStatus';
 import { AppliedJobSeekerListItem } from '../../Models/JobApplications/AppliedJobSeekers';
@@ -7,6 +7,8 @@ import { AppliedJobSeekerDetails } from '../../Models/JobApplications/appliedSee
 import { CreateJobApplication } from '../../Models/JobApplications/CreateJobApplication';
 import { JobSeekerApplication } from '../../Models/JobApplications/JobSeekerApplication';
 import { UpdateStatus } from '../../Models/JobApplications/UpdateStatus';
+import { ApplicationFilter } from '../../Models/JobApplications/ApplicationsFilters/jobappfilters';
+import { MyApplicationDto } from '../../Models/JobApplications/ApplicationsFilters/MyApplicationDto';
 
 
 @Injectable({
@@ -19,46 +21,42 @@ export class JobApplicationService {
 
   constructor(private http: HttpClient) {}
 
-  /* ============================
-     Employer
-     ============================ */
 
-  // Get all applications for employer jobs
+
   getEmployerApplications(): Observable<AppliedJobSeekerListItem[]> {
     return this.http.get<AppliedJobSeekerListItem []>(`${this.baseUrl}`);
   }
 
-  // Get details of a specific application
   getApplicationDetails(applicationId: number): Observable<AppliedJobSeekerDetails> {
     return this.http.get<AppliedJobSeekerDetails>(`${this.baseUrl}/AppliedJobDetails/${applicationId}`);
   }
- applyToJob(jobId: number, application: FormData): Observable<any> {
+  applyToJob(jobId: number, application: FormData): Observable<any> {
   return this.http.post(`${this.baseUrl}/CreateJobApplication/${jobId}`, application);
-}
-  // Update application status
-  // updateApplicationStatus(
-  //   applicationId: number,
-  //   status: ApplicationStatus
-  // ): Observable<any> {
-  //   return this.http.put(`${this.baseUrl}/AppliedJobDetails/${applicationId}`, {
-  //     status: status
-  //   });
-  // }
+  }
 
-  /* ============================
-     Job Seeker
-     ============================ */
-
-  // // Get my applications (job seeker)
   getMyApplications(): Observable<JobSeekerApplication[]> {
     return this.http.get<JobSeekerApplication[]>(`${this.baseUrl}/MyApplications`);
   }
 
-  // // Withdraw application
-  // withdrawApplication(applicationId: number): Observable<any> {
-  //   return this.http.put(`${this.baseUrl}/${applicationId}/withdraw`, {});
-  // }
-    updateApplicationStatus(applicationId: number, status: UpdateStatus): Observable<any> {
-  return this.http.put(`${this.baseUrl}/AppliedJobDetails/${applicationId}`, status);
+  updateApplicationStatus(applicationId: number, status: UpdateStatus): Observable<any> {
+     return this.http.put(`${this.baseUrl}/AppliedJobDetails/${applicationId}`, status);
+   }
+
+  MyApplications(filter: ApplicationFilter): Observable<MyApplicationDto[]> {
+      const params=new HttpParams().set('status',filter.status);
+      if(filter.search){
+        params.set('search',filter.search);
+      }
+
+      return this.http.get<MyApplicationDto[]>(`${this.baseUrl}/my-applications`,{params});
+}
+getEmpApplications(filter: ApplicationFilter): Observable<AppliedJobSeekerListItem[]> {
+  let params = new HttpParams().set('status', filter.status);
+  
+  if (filter.search) {
+    params = params.set('search', filter.search);
+  }
+
+  return this.http.get<AppliedJobSeekerListItem[]>(`${this.baseUrl}/appliedseekers`, { params });
 }
 }

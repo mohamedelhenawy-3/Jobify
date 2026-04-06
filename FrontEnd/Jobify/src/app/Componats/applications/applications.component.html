@@ -9,9 +9,16 @@
     <p>Loading applications...</p>
   </div>
 
-  <div *ngIf="!isLoading && !applications.length" class="no-data-card">
-    <i class="fas fa-folder-open"></i>
-    <p>No applications found yet.</p>
+  <div *ngIf="!isLoading && !applications.length" class="centered-state">
+    <div class="empty-illustration">
+      <div class="icon-stack">
+        <i class="fas fa-folder-open main-icon"></i>
+        <i class="fas fa-search sub-icon"></i>
+      </div>
+      <h5 class="mt-4">No applications found</h5>
+      <p class="text-muted">Try adjusting your filters or search terms to find what you're looking for.</p>
+  
+    </div>
   </div>
 
   <div class="applications-list" *ngIf="!isLoading && applications.length">
@@ -23,8 +30,8 @@
           <span class="status-indicator" [ngClass]="app.status"></span>
         </div>
         <div class="candidate-text">
-          <div class="name">{{ app.joSeekerFullName }}</div>
-          <div class="email"><i class="far fa-envelope"></i> {{ app.joSeekerEmail }}</div>
+          <div class="name">{{ app.jobSeekerFullName }}</div>
+          <div class="email"><i class="far fa-envelope"></i> {{ app.jobSeekerEmail }}</div>
         </div>
       </div>
 

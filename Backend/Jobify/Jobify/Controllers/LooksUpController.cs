@@ -15,7 +15,6 @@ namespace Jobify.Controllers
             _db = db;
         }
 
-        // GET: api/LooksUp/Industries
         [HttpGet("Industries")]
         public async Task<IActionResult> GetIndustries()
         {
@@ -26,8 +25,7 @@ namespace Jobify.Controllers
             return Ok(industries);
         }
 
-        //GET: api/LooksUp/EmploymentTypes
-       [HttpGet("EmploymentTypes")]
+        [HttpGet("EmploymentTypes")]
         public async Task<IActionResult> GetEmploymentTypes()
         {
             var types = await _db.EmploymentTypes
@@ -37,7 +35,7 @@ namespace Jobify.Controllers
             return Ok(types);
         }
 
-        // GET: api/LooksUp/WorkModes
+       
         [HttpGet("WorkModes")]
         public async Task<IActionResult> GetWorkModes()
         {
@@ -58,8 +56,7 @@ namespace Jobify.Controllers
         }
 
 
-        // Optionally, you can return **all lookup data in one request**
-        // GET: api/LooksUp/All
+     
         [HttpGet("All")]
         public async Task<IActionResult> GetAllLookups()
         {

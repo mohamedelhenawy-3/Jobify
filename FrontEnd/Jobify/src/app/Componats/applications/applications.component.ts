@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,22 +15,28 @@ import { UpdateStatus } from '../../Models/JobApplications/UpdateStatus';
   styleUrls: ['./applications.component.css']
 })
 export class ApplicationsComponent implements OnInit {
-  isLoading = true;
-  applications: AppliedJobSeekerListItem[] = [];
+resetFilters() {
+throw new Error('Method not implemented.');
+}
+
+
+  @Input() applications: any[] = [];
+  @Input() isLoading = false;
+  @Output() onStatusUpdated = new EventEmitter<void>();
   appStatus = ApplicationStatus;
   defaultProfile = 'assets/default-user.png';
 
   // State for the conditional Interview form
+  // appStatus = ApplicationStatus;
   editingInterviewId: number | null = null;
   interviewForm: UpdateStatus = this.getInitialFormState();
-
   constructor(
     private applicationService: JobApplicationService, 
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadApplications();
+    // this.loadApplications();
   }
 
   loadApplications(): void {
@@ -38,6 +44,7 @@ export class ApplicationsComponent implements OnInit {
     this.applicationService.getEmployerApplications().subscribe({
       next: (res) => {
         this.applications = res;
+        console.log("application loaded",this.applications);
         this.isLoading = false;
       },
       error: (err) => {
@@ -47,55 +54,38 @@ export class ApplicationsComponent implements OnInit {
     });
   }
 
-  // Logic to handle dropdown changes
-  onStatusChange(applicationId: number, newStatus: string): void {
+
+ onStatusChange(applicationId: number, newStatus: string): void {
     if (newStatus === 'Interviewed') {
-      // Open the form for this specific candidate
       this.editingInterviewId = applicationId;
       this.interviewForm = this.getInitialFormState();
     } else {
-      // Immediate update for any other status
       this.editingInterviewId = null;
-      const quickUpdate: UpdateStatus = { status: newStatus as ApplicationStatus };
-      this.saveStatus(applicationId, quickUpdate);
+      this.saveStatus(applicationId, { status: newStatus as ApplicationStatus });
     }
   }
 
-  // Logic to send data to C# API
 saveStatus(applicationId: number, data: UpdateStatus) {
-  // 1. Create a clean payload to send to the API
-  const payload: any = {
-    status: data.status,
-    interviewLocation: data.interviewLocation || null,
-    notes: data.notes || null,
-    // 2. Ensure Date is in the format: YYYY-MM-DDTHH:mm:ss
-    interviewDate: data.interviewDate ? new Date(data.interviewDate).toISOString().split('.')[0] : null
-  };
-
-  console.log('Sending Payload:', payload); // Check this in your console!
-
-  this.applicationService.updateApplicationStatus(applicationId, payload)
-    .subscribe({
-      next: (res) => {
-        this.editingInterviewId = null; 
-        this.loadApplications(); 
-        alert("Status updated to Interviewed!");
-      },
-      error: (err) => {
-        console.error('API Error details:', err.error);
-        // This alert will show you EXACTLY why the backend rejected it
-        alert("Backend Error: " + JSON.stringify(err.error?.errors || err.error));
-      }
-    });
-}
-
-  private getInitialFormState(): UpdateStatus {
-    return {
-      status: ApplicationStatus.Interviewed,
-      interviewDate: '',
-      interviewLocation: '',
-      notes: ''
+    const payload: any = {
+      status: data.status,
+      interviewLocation: data.interviewLocation || null,
+      notes: data.notes || null,
+      interviewDate: data.interviewDate ? new Date(data.interviewDate).toISOString().split('.')[0] : null
     };
+
+    this.applicationService.updateApplicationStatus(applicationId, payload)
+      .subscribe({
+        next: () => {
+          this.editingInterviewId = null; 
+          this.onStatusUpdated.emit(); // 3. Notify Parent to refresh list
+          alert("Status updated!");
+        },
+        error: (err) => alert("Error: " + JSON.stringify(err.error))
+      });
+  }
+
+ private getInitialFormState(): UpdateStatus {
+    return { status: ApplicationStatus.Interviewed, interviewDate: '', interviewLocation: '', notes: '' };
   }
 
   viewDetails(applicationId: number): void {

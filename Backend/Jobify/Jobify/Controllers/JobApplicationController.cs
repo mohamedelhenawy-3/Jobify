@@ -60,5 +60,19 @@ namespace Jobify.Controllers
             return Ok(result);
         }
 
+        [HttpGet("my-applications")]
+        public async Task<ActionResult> GetMyApplications([FromQuery] ApplicationFilterDto filter)
+        {
+
+            var result = await _IJoobService.GetMyApplications(filter);
+            return Ok(result);
+        }
+        [HttpGet("appliedseekers")]
+        public async Task<ActionResult> AppliedSeekers([FromQuery] ApplicationFilterDto filter)
+        {
+
+            var result = await _IJoobService.appliedapplications(filter);
+            return Ok(result);
+        }
     }
 }

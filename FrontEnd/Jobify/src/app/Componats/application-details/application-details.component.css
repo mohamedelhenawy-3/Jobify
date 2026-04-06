@@ -110,6 +110,25 @@ button.btn-secondary:hover {
   text-align: right;
 }
 
+
+.centered-state-wrapper {
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  align-items: center;     /* Vertical centering */
+  min-height: 70vh;        /* Adjusted so it doesn't overlap header/footer */
+  width: 100%;
+}
+
+/* Optional: Make the text and icons look more professional */
+.centered-state-wrapper i {
+  display: block;
+  opacity: 0.5;
+}
+
+.centered-state-wrapper p {
+  font-size: 1.1rem;
+  color: #6c757d;
+}
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1024px) {
   .app-layout {

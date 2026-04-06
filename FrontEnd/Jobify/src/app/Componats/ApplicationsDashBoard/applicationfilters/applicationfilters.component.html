@@ -1,0 +1,25 @@
+<div class="filter-wrapper">
+  
+  <div class="search-container">
+    <span class="search-icon">🔍</span>
+    <input 
+      type="text" 
+      [formControl]="searchControl"
+      placeholder="Search by job or company..."
+      class="search-input"
+    >
+  </div>
+
+  <div class="status-group">
+    <button 
+      *ngFor="let s of statuses" 
+     
+      [class.active]="activeStatus === s"
+      class="status-tab"
+      (click)="selectStatus(s)"
+    >
+      {{ s  }}
+    </button>
+  </div>
+
+</div>

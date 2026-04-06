@@ -17,6 +17,12 @@ namespace Application.Interfaces.JobApplication
         Task<AppliedJoSeekerDetails> GetAppliedJobSeekerDeyails(int applicationId);
         Task<SuccessResponse> UpdateJobStatus(UpdateAppliedJobStatus updatestatusdto, int applicationId);
         //Task<SuccessResponse> UpdateJobInterviewStatus(InterviewStatus updatestatusdto, int applicationId);
+        Task<IEnumerable<MyApplicationDto>> GetMyApplications(ApplicationFilterDto filterdto);
+        Task<IEnumerable<AppliedJobSeekerDto>> appliedapplications(ApplicationFilterDto filterdto);
+
+
+
+
 
     }
 }

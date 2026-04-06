@@ -1,45 +1,39 @@
-<div class="application-card" *ngFor="let app of applications">
-  
-  <div class="card-top-row">
-    <div class="job-brand-wrapper">
-      <div class="logo-box">
-        <img *ngIf="app.logo; else noLogo" 
-             [src]="app.logo" 
-             alt="{{ app.companyName }}" 
+<div class="card-container">
+  <div class="card-header">
+    <div class="brand-section">
+      <div class="logo-wrapper">
+        <img [src]="data.logo || 'assets/images/default-company.png'" 
+             [alt]="data.companyName"
              class="company-logo">
-        <ng-template #noLogo>
-          <div class="logo-placeholder">{{ app.companyName?.charAt(0) }}</div>
-        </ng-template>
       </div>
-      
-      <div class="title-column">
-        <h3 class="job-title">{{ app.jobTitle }}</h3>
-        <p class="company-name">{{ app.companyName }}</p>
+      <div class="title-meta">
+        <h3 class="job-title" [title]="data.jobTitle">{{ data.jobTitle }}</h3>
+        <p class="company-name">{{ data.companyName }}</p>
       </div>
     </div>
-
-    <span class="status-badge" [ngClass]="getStatusClass(app.status)">
-      <span class="status-dot"></span>
-      {{ app.status }}
-    </span>
+    
+    <div class="status-indicator" [ngClass]="getStatusClass(data.status)">
+      <span class="dot"></span>
+      {{ data.status }}
+    </div>
   </div>
 
-  <div class="meta-row">
-    <span class="meta-pill">
-      <i class="fas fa-map-marker-alt"></i> {{ app.jobLocation }}
-    </span>
-    <span class="meta-pill">
-      <i class="fas fa-briefcase"></i> {{ app.workMode }}
-    </span>
+  <div class="card-body">
+    <div class="info-pill">
+      <span>📍 {{ data.jobLocation }}</span>
+    </div>
+    <div class="info-pill">
+      <span>💼 {{ data.workMode }}</span>
+    </div>
+    <div class="info-pill">
+      <span>⏱️ {{ data.employmentType }}</span>
+    </div>
   </div>
 
   <div class="card-footer">
-    <div class="date-group">
-      <span class="label">Applied on</span>
-      <span class="date">{{ app.appliedAt | date: 'mediumDate' }}</span>
-    </div>
-    <button class="view-details-btn">
-      Details <i class="fas fa-chevron-right"></i>
+    <span class="applied-at">Applied on {{ data.appliedAt | date:'mediumDate' }}</span>
+    <button class="details-btn">
+      View Details
     </button>
   </div>
 </div>
