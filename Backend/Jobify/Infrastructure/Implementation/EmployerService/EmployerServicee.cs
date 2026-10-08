@@ -2,9 +2,15 @@
 using Application.DTOs.Comapny;
 using Application.DTOs.Employer;
 using Application.Interfaces.Employer;
+using Application.Interfaces.Permisions;
+using Application.Interfaces.User;
 using Domain.Entities;
-using Infrastructure.DBContext;
+using Domain.Entities.LooksUp;
+using Domain.Entities.LooksUp.EmployerPermisions;
+using Infrastructure.CurrentUserService;
+using Infrastructure.Implementation.AuthService;
 using Infrastructure.Implementation.CLoudinary;
+using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,70 +28,74 @@ namespace Infrastructure.Implementation.EmployerService
         private readonly ILogger<EmployerServicee> _log;
         private readonly AppDBContext _context;
         private readonly CloudinaryService _cloudinaryService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICurrentUser _currentUserService;
+        private readonly IEmployerPermissionService _Ipermision;
+
 
         public EmployerServicee(
             AppDBContext context,
             CloudinaryService cloudinaryService,
-            IHttpContextAccessor httpContextAccessor,ILogger<EmployerServicee> log)
+            ICurrentUser currentUserService, ILogger<EmployerServicee> log, IEmployerPermissionService Ipermision)
         {
             _context = context;
             _cloudinaryService = cloudinaryService;
-            _httpContextAccessor = httpContextAccessor;
             _log = log;
+            _currentUserService = currentUserService;
+            _Ipermision = Ipermision;
         }
-        private string GetCurrentUserId()
-        {
-            var user = _httpContextAccessor.HttpContext?.User;
-            return user?.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
-        public async Task<EmployerProfileResponseDto> MyProfile()
-        {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new Exception("Unauthorized");
 
-            var profile = await _context.EmployerProfiles.Include(x => x.User)
-                .Include(x => x.ProfileImage)
-                .Include(x => x.Company).ThenInclude(x => x.Logo)
-                .Include(x => x.Company).ThenInclude(x => x.JobPosts)
-                .FirstOrDefaultAsync(x => x.UserId == userId);
+        public async Task<EmployerProfileDto?> GetOwnerProfileAsync()
+        {
+            var employer = await _Ipermision.GetCurrentEmployerAsync();
+            if (employer?.User == null || employer.Company == null)
+                return null;
 
-            if (profile == null)
-                throw new Exception("Employer profile not found");
-            return new EmployerProfileResponseDto
+            var canSeeCompanyWide = employer.Permissions.Contains(EmployerPermissions.ViewAnalytics)
+                                  || employer.Role is EmployerCompanyRole.Owner or EmployerCompanyRole.Admin;
+
+            int jobsPostedCount;
+            int activeJobsCount;
+            int totalApplicants;
+
+            if (canSeeCompanyWide)
             {
-                FullName = profile.User.FullName,
-                Email = profile.User.Email,
-                PhoneNumber = profile.User.PhoneNumber,
-                Location = profile.User.Location,
-                LinkedInUrl = profile.User.LinkedInUrl,
-                Position = profile.Position,
-                Bio = profile.Bio,
-                ProfileImageUrl = profile.ProfileImage?.ImageUrl
-                ,
-                Company=profile.Company == null ? null : new CompanyDto
-                {
-                    Id = profile.Company.Id,
-                    CompanyName = profile.Company.CompanyName,
-                    CompanyWebsite = profile.Company.CompanyWebsite,
-                    Description = profile.Company.Description,
-                    Industry = profile.Company.Industry,
-                    Location = profile.Company.Location,
-                    CompanySize = profile.Company.CompanySize,
-                    Founded = profile.Company.Founded,
-                    LogoUrl = profile.Company.Logo?.ImageUrl,
-                    TotalJobs =profile.Company.JobPosts?.Count ?? 0,
-                    ActiveJobs=profile.Company.JobPosts.Count(x=>x.isActive)
-                
-                }
-
-            };
+                // Owner/Admin/anyone with analytics: company-wide numbers
+                jobsPostedCount = await _context.JobPosts.CountAsync(j => j.CompanyId == employer.CompanyId);
+                activeJobsCount = await _context.JobPosts.CountAsync(j => j.CompanyId == employer.CompanyId && j.IsActive);
+                totalApplicants = await _context.JobApplications.CountAsync(a => a.JobPost!.CompanyId == employer.CompanyId);
             }
+            else
+            {
+                // Recruiter/Employer without analytics: only their own numbers
+                jobsPostedCount = await _context.JobPosts.CountAsync(j => j.PostedByEmployerId == employer.Id);
+                activeJobsCount = await _context.JobPosts.CountAsync(j => j.PostedByEmployerId == employer.Id && j.IsActive);
+                totalApplicants = await _context.JobApplications.CountAsync(a => a.JobPost!.PostedByEmployerId == employer.Id);
+            }
+
+            return new EmployerProfileDto
+            {
+                FullName = employer.User.FullName,
+                LinkedIn =employer.User.LinkedInUrl,
+                Bio = employer.Bio,
+                Email = employer.User.Email,
+                Phone = employer.User.PhoneNumber,
+                Location = employer.User.Location,
+                PhotoUrl = employer.ProfileImage?.ImageUrl,
+                CompanyName = employer.Company.CompanyName,
+                CompanyIndustry = employer.Company.Industry,
+                CompanyWebsite = employer.Company.CompanyWebsite,
+                JobsPostedCount = jobsPostedCount,
+                ActiveJobsCount = activeJobsCount,
+                TotalApplicants = totalApplicants,
+                Role = employer.Role.ToString(),
+                Permissions = employer.Permissions
+            };
+        }
+
 
         public async Task<SuccessResponseDto> UpdateAsync(UpdateEmployerProfile model)
         {
-            var userId = GetCurrentUserId();
+            var userId = _currentUserService.UserId;
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Unauthorized");
 
@@ -102,18 +112,21 @@ namespace Infrastructure.Implementation.EmployerService
             if (profile == null)
                 throw new Exception("Employer profile not found");
             if (!string.IsNullOrWhiteSpace(model.FullName))
-                user.FullName = model.FullName;
+                user.FullName = model.FullName ?? user.FullName;
 
             if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
-                user.PhoneNumber = model.PhoneNumber;
+                user.PhoneNumber = model.PhoneNumber ?? user.PhoneNumber;
 
             if (!string.IsNullOrWhiteSpace(model.Location))
-                user.Location = model.Location;
+                user.Location = model.Location ?? user.Location;
+
+            if (!string.IsNullOrWhiteSpace(model.Position))
+                profile.Position = model.Position ?? profile.Position;
 
             if (!string.IsNullOrWhiteSpace(model.LinkedInUrl))
                 user.LinkedInUrl = model.LinkedInUrl;
             if (!string.IsNullOrWhiteSpace(model.Bio))
-                profile.Bio = model.Bio;
+                profile.Bio = model.Bio ?? profile.Bio;
 
             user.UpdatedAt = DateTime.UtcNow;
 
@@ -145,13 +158,17 @@ namespace Infrastructure.Implementation.EmployerService
                 }
             }
 
-            _context.EmployerProfiles.Update(profile);
             await _context.SaveChangesAsync();
 
             return new SuccessResponseDto
             {
-                Message = "Company profile updated successfully."
+                Message = "User profile updated successfully."
             };
+        }
+
+        public Task<bool> UpdateProfileAsync(UpdateEmployerProfile dto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

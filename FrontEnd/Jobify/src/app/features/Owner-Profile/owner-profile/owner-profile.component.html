@@ -1,0 +1,244 @@
+<p class="page-loading" *ngIf="loading">Loading...</p>
+<p class="page-error" *ngIf="error">{{ error }}</p>
+
+<main class="profile-page" *ngIf="!loading && !error && profile as p">
+
+  <!-- Header -->
+  <section class="header">
+    <img [src]="p.photoUrl || 'assets/default-avatar.png'" alt="Profile photo" class="avatar" />
+    <div class="header-text">
+      <div class="name-row">
+        <h1>{{ p.fullName }}</h1>
+        <span class="badge">{{ p.role }}</span>
+        <button type="button" class="btn-outline" (click)="openEditProfile()">Edit profile</button>
+      </div>
+      <p class="headline" *ngIf="p.headline">{{ p.headline }}</p>
+      <p class="headline" *ngIf="p.companyName">
+        <i class="fas fa-building"></i> {{ p.companyName }}
+      </p>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <nav class="tabs" role="tablist">
+    <button *ngFor="let t of tabs" type="button" role="tab" class="tab"
+            [class.active]="activeTab === t.value"
+            [attr.aria-selected]="activeTab === t.value"
+            (click)="setTab(t.value)">
+      {{ t.label }}
+      <span class="tab-count" *ngIf="t.count !== undefined && t.count !== null">{{ t.count }}</span>
+    </button>
+  </nav>
+
+  <!-- ================= OVERVIEW ================= -->
+  <!-- ================= OVERVIEW ================= -->
+  <ng-container *ngIf="activeTab === 'overview'">
+
+    <section class="stats">
+      <div class="stat-card">
+        <span class="stat-label">{{ isOwnerOrAdmin ? 'Company Jobs Posted' : 'My Jobs Posted' }}</span>
+        <strong>{{ p.jobsPostedCount }}</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">{{ isOwnerOrAdmin ? 'Total Company Applicants' : 'My Applicants' }}</span>
+        <strong>{{ p.totalApplicants }}</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Active Job Listings</span>
+        <strong>{{ p.activeJobsCount }}</strong>
+      </div>
+    </section>
+
+    <!-- NEW: Hiring pipeline + Recent applicants (side by side) -->
+    <section class="layout" *ngIf="hasPermission('ManageApplicants')">
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Hiring pipeline</h2>
+          <span class="muted" *ngIf="pipeline">{{ pipelineTotal }} total</span>
+        </div>
+
+        <p class="state" *ngIf="hiringLoading && !pipeline">Loading...</p>
+        <p class="state" *ngIf="pipeline && pipelineTotal === 0">No applicants yet.</p>
+
+        <div class="bar-row" *ngFor="let r of pipelineRows">
+          <span class="bar-label">{{ r.label }}</span>
+          <div class="bar-track">
+            <div class="bar-fill" [ngClass]="r.cls" [style.width.%]="r.percent"></div>
+          </div>
+          <strong class="bar-count">{{ r.count }}</strong>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Recent applicants</h2>
+          <a class="link-btn" routerLink="/Jobify/applicants">View all</a>
+        </div>
+
+        <p class="state" *ngIf="hiringLoading && recentApplicants.length === 0">Loading...</p>
+        <p class="state" *ngIf="!hiringLoading && recentApplicants.length === 0">No recent applicants.</p>
+
+        <a class="applicant" *ngFor="let a of recentApplicants"
+           [routerLink]="['/Jobify/applicants', a.id]">
+          <img *ngIf="a.photoUrl" [src]="a.photoUrl" class="applicant-avatar" alt="" />
+          <div *ngIf="!a.photoUrl" class="applicant-avatar placeholder">{{ a.applicantName.charAt(0) }}</div>
+
+          <div class="applicant-info">
+            <strong>{{ a.applicantName }}</strong>
+            <small>{{ a.jobTitle }}</small>
+          </div>
+
+          <div class="applicant-side">
+            <span class="status-chip" [ngClass]="a.status.toLowerCase()">{{ a.status }}</span>
+            <small>{{ timeAgo(a.appliedAt) }}</small>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel">
+        <h2>Contact info</h2>
+        <div class="info-row"><span>Email</span><p>{{ p.email }}</p></div>
+        <div class="info-row" *ngIf="p.phone"><span>Phone</span><p>{{ p.phone }}</p></div>
+        <div class="info-row" *ngIf="p.location"><span>Location</span><p>{{ p.location }}</p></div>
+      </aside>
+
+      <aside class="panel">
+        <h2>My Company</h2>
+        <p class="company-name">{{ p.companyName }}</p>
+        <p class="company-industry" *ngIf="p.companyIndustry">{{ p.companyIndustry }}</p>
+        <p class="company-website" *ngIf="p.companyWebsite">{{ p.companyWebsite }}</p>
+
+        <button routerLink="/Jobify/mycompany">
+          {{ hasPermission('ManageCompanyProfile') ? 'Edit company profile' : 'View company profile' }}
+        </button>
+      </aside>
+    </section>
+
+    <!-- Your access, Team management, About: unchanged -->
+  </ng-container>
+
+  <!-- ================= JOBS ================= -->
+  <section class="panel" *ngIf="activeTab === 'jobs'">
+    <div class="panel-head">
+      <h2>{{ isOwnerOrAdmin ? 'Company jobs' : 'My jobs' }}</h2>
+      <a *ngIf="hasPermission('PostJobs')" class="btn-primary" routerLink="/Jobify/post-job">
+        <i class="fas fa-plus"></i>&nbsp;Post a job
+      </a>
+    </div>
+
+    <div class="filter-row">
+      <button type="button" class="pill" [class.active]="jobFilter === 'all'"    (click)="jobFilter = 'all'">All</button>
+      <button type="button" class="pill" [class.active]="jobFilter === 'active'" (click)="jobFilter = 'active'">Active</button>
+      <button type="button" class="pill" [class.active]="jobFilter === 'closed'" (click)="jobFilter = 'closed'">Closed</button>
+    </div>
+
+    <p class="state" *ngIf="jobsLoading">Loading jobs...</p>
+    <p class="state error" *ngIf="jobsError">{{ jobsError }}</p>
+    <p class="state" *ngIf="!jobsLoading && !jobsError && filteredJobs.length === 0">
+      No jobs here yet.
+    </p>
+
+    <a class="row" *ngFor="let j of filteredJobs" [routerLink]="['/Jobify/jobs', j.id]">
+      <div class="row-main">
+        <strong>{{ j.title }}</strong>
+        <div class="chips">
+          <span class="chip" *ngIf="j.location"><i class="fas fa-map-marker-alt"></i> {{ j.location }}</span>
+          <span class="chip"><i class="fas fa-briefcase"></i> {{ j.jobType }}</span>
+          <span class="chip"><i class="fas fa-layer-group"></i> {{ j.experienceLevel }}</span>
+          <span class="chip" *ngIf="j.postedBy"><i class="fas fa-user"></i> {{ j.postedBy }}</span>
+        </div>
+      </div>
+      <div class="row-side">
+        <span class="status" [class.on]="j.isActive">{{ j.isActive ? 'Active' : 'Closed' }}</span>
+        <small>{{ j.applicantsCount }} applicants · {{ j.createdAt | date: 'mediumDate' }}</small>
+      </div>
+    </a>
+  </section>
+
+  <!-- ================= PERMISSIONS ================= -->
+  <section class="panel" *ngIf="activeTab === 'permissions'">
+    <div class="panel-head">
+      <h2>Your permissions</h2>
+      <span class="badge">{{ p.role }}</span>
+    </div>
+    <p class="muted">
+      These control what you can do in {{ p.companyName || 'your company' }}.
+      Only the company owner can change roles.
+    </p>
+
+    <div class="perm-grid">
+      <div class="perm" *ngFor="let perm of permissionCatalog" [class.granted]="hasPermission(perm.key)">
+        <div class="perm-icon"><i class="fas" [ngClass]="perm.icon"></i></div>
+        <div class="perm-text">
+          <strong>{{ perm.label }}</strong>
+          <small>{{ perm.desc }}</small>
+        </div>
+        <span class="perm-state">
+          <i class="fas" [ngClass]="hasPermission(perm.key) ? 'fa-circle-check' : 'fa-lock'"></i>
+          {{ hasPermission(perm.key) ? 'Allowed' : 'Not allowed' }}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team tab: add later -->
+</main>
+
+<!-- Edit profile modal (outside <main> so .profile-page > * rules don't affect it) -->
+<div class="modal-backdrop" *ngIf="showEditProfile" (click)="closeEditProfile()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-title"
+       (click)="$event.stopPropagation()">
+    <h2 id="edit-title">Edit profile</h2>
+
+    <form (ngSubmit)="submitProfile()" #f="ngForm">
+      <div class="photo-row">
+        <img class="avatar-sm"
+             [src]="imagePreview || profile?.photoUrl || 'assets/default-avatar.png'"
+             alt="Profile photo preview" />
+        <label class="file-label">
+          Change photo
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Full name</span>
+        <input name="fullName" [(ngModel)]="profileForm.fullName" required maxlength="100" />
+      </label>
+
+      <label class="field">
+        <span>Position / headline</span>
+        <input name="position" [(ngModel)]="profileForm.position" maxlength="100" />
+      </label>
+
+      <label class="field">
+        <span>Phone</span>
+        <input name="phoneNumber" type="tel" [(ngModel)]="profileForm.phoneNumber" maxlength="30" />
+      </label>
+
+      <label class="field">
+        <span>Location</span>
+        <input name="location" [(ngModel)]="profileForm.location" maxlength="100" />
+      </label>
+
+      <label class="field">
+        <span>Bio</span>
+        <textarea name="bio" rows="4" [(ngModel)]="profileForm.bio" maxlength="1000"></textarea>
+      </label>
+
+      <p class="form-error" *ngIf="saveError">{{ saveError }}</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" (click)="closeEditProfile()" [disabled]="savingProfile">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="savingProfile || f.invalid">
+          {{ savingProfile ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -8,20 +8,23 @@ namespace Application.DTOs.Employer
 {
     public class EmployerProfileDto
     {
-        public int Id { get; set; }
-
+        public string FullName { get; set; } = default!;
   
-        public string? FullName { get; set; }
-        public string? Email { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? Location { get; set; }
-        public string? LinkedInUrl { get; set; }
-        public string? ProfileImageUrl { get; set; }
-        public string? Position { get; set; }
         public string? Bio { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public int? CompanyId { get; set; }
-        public string? CompanyName { get; set; }
-        public string? CompanyLogoUrl { get; set; }
+        public string Email { get; set; } = default!;
+        public string? Phone { get; set; }
+        public string? Location { get; set; }
+        public string?  LinkedIn { get; set; }
+        public string? PhotoUrl { get; set; }
+        public string CompanyName { get; set; } = default!;
+        public string? CompanyIndustry { get; set; }
+        public string? CompanyWebsite { get; set; }
+
+        public int JobsPostedCount { get; set; }
+        public int TotalApplicants { get; set; }
+        public int ActiveJobsCount { get; set; }
+
+        public string Role { get; set; } = default!;
+        public List<string> Permissions { get; set; } = new();
     }
 }
