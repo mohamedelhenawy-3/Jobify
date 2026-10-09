@@ -15,8 +15,6 @@ namespace Application.DTOs.Employer
         public string? LinkedInUrl { get; set; }
         public string? Position { get; set; }
         public string? Bio { get; set; }
-
-  
         public IFormFile? PImage { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Entities.LooksUp;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
