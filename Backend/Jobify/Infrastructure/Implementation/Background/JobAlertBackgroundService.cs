@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Email;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Infrastructure.Implementation.Email;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -28,45 +29,58 @@ namespace Infrastructure.Implementation.Background
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _Log.LogInformation("BackgroundService Created");
+                try { await CheckAlerts(stoppingToken); }
+                catch (Exception ex) { _Log.LogError(ex, "Job alert check failed"); }  
 
-                await CheckAlerts();
-                _Log.LogInformation("Checks OK");
                 await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
             }
         }
 
-        private async Task CheckAlerts()
+        private async Task CheckAlerts(CancellationToken ct)
         {
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDBContext>();
-            var emailservice = scope.ServiceProvider.GetRequiredService<IEmailService>();
-            var  template = scope.ServiceProvider.GetRequiredService<JobEmailTemplate>();
+            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            var template = scope.ServiceProvider.GetRequiredService<JobEmailTemplate>();
 
-            var alerts = db.SavedJobAlerts.ToList();
+            var now = DateTime.UtcNow;   // captured once, before querying
 
+            var alerts = await db.SavedJobAlerts.Where(a => a.IsActive).ToListAsync(ct);
 
             foreach (var alert in alerts)
             {
-                var newJobs = db.JobPosts
-          .Where(j => j.Title.Contains(alert.Keyword)
-                   && j.CreatedAt > alert.LastChecked)
-          .ToList();
-
-                if (newJobs.Any())
+                try
                 {
-                    var user =  db.Users.FirstOrDefault(u => u.Id == alert.UserId);
-                    var body = template.BuildEmailBody(newJobs, user.FullName);
-                    _Log.LogInformation("Found Jobs Ok And Sending Email");
-                    await emailservice.SendEmail(user.Email, "New Jobs For User", body);
+                    var newJobs = await db.JobPosts
+                        .AsNoTracking()
+                        .Where(j => j.CreatedAt > alert.LastChecked
+                                 && j.CreatedAt <= now
+                                 && j.Title.Contains(alert.Keyword))
+                        .OrderByDescending(j => j.CreatedAt)
+                        .Take(20)
+                        .ToListAsync(ct);
 
+                    if (newJobs.Count > 0)
+                    {
+                        var user = await db.Users.AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.Id == alert.UserId, ct);
+
+                        if (user != null && !string.IsNullOrWhiteSpace(user.Email))
+                        {
+                            var body = template.BuildEmailBody(newJobs, user.FullName);
+                            await emailService.SendEmail(user.Email, $"New jobs for \"{alert.Keyword}\"", body);
+                            _Log.LogInformation("Alert {Id} sent to {Email}", alert.Id, user.Email);
+                        }
+                    }
+
+                    alert.LastChecked = now;              
+                    await db.SaveChangesAsync(ct);
                 }
-                alert.LastChecked = DateTime.UtcNow;
-
+                catch (Exception ex)
+                {
+                    _Log.LogError(ex, "Alert {Id} failed, will retry next cycle", alert.Id);
+                }
             }
-            await db.SaveChangesAsync();
-
         }
-
-    }
+     }
 }

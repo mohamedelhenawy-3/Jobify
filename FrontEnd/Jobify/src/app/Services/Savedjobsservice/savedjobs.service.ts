@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SavedjobsService  {
-private apiUrl = 'https://localhost:44309/api/SavedJob';
+private apiUrl = 'https://localhost:7026/api/SavedJob';
     constructor(private HttpClient:HttpClient) { }
   getSavedJobs() {
     return this.HttpClient.get(`${this.apiUrl}`);

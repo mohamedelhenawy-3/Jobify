@@ -48,19 +48,20 @@ export class SideBarComponent implements OnInit {
       this.sidebarItems = [
         { label: 'home', route: '/Jobify/home', icon: 'fas fa-home' },
         { label: 'Dashboard', route: '/Jobify/jobseekerdashboard', icon: 'fas fa-home' },
-        { label: 'Find Jobs', route: '/Jobify/findjob', icon: 'fas fa-search' },
-        { label: 'My Applications', route: '/Jobify/myapplications', icon: 'fas fa-clipboard-list' },
-        { label: 'Saved Jobs', route: '/Jobify/savedjobs', icon: 'fas fa-bookmark' },
-        { label: 'Profile', route: '/Jobify/seeker', icon: 'fas fa-user' }
+        { label: 'Find Jobs', route: '/Jobify/jobs', icon: 'fas fa-search' },
+        { label: 'My Applications', route: '/Jobify/seeker-applications', icon: 'fas fa-clipboard-list' },
+        { label: 'Saved Jobs', route: '/Jobify/SavedJobs', icon: 'fas fa-bookmark' },
+        { label: 'Alert Jobs', route: '/Jobify/AlertJobs', icon: 'fas fa-bell' },
+        { label: 'Profile', route: '/Jobify/ownseekerprofile', icon: 'fas fa-user' },
+        { label: 'Company Profile', route: '/Jobify/mycompany', icon: 'fas fa-building' },
+
       ];
     } else if (this.userRole === 'Employer') {
       this.sidebarItems = [
         { label: 'Dashboard', route: '/Jobify/employerdashboard', icon: 'fas fa-home' },
-        { label: 'Post Job', route: '/Jobify/createjob', icon: 'fas fa-plus-circle' },
-        { label: 'My Jobs', route: '/Jobify/managejobs', icon: 'fas fa-briefcase' },
-        { label: 'Applications', route: '/Jobify/jobapplications', icon: 'fas fa-clipboard-list' },
+        { label: 'My Jobs', route: '/Jobify/employerjobs', icon: 'fas fa-briefcase' },
         { label: 'Company Profile', route: '/Jobify/mycompany', icon: 'fas fa-building' },
-        { label: 'Profile', route: '/Jobify/employerprofile', icon: 'fas fa-building' }
+        { label: 'Profile', route: '/Jobify/employer/profile', icon: 'fas fa-building' }
 
         
       ];

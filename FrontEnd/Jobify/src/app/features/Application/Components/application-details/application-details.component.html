@@ -1,0 +1,55 @@
+<div class="page">
+  <a class="back" routerLink="/employer/applications">Back to applications</a>
+
+  <div class="state" *ngIf="loading">
+    <div class="spinner"></div>
+    Loading application...
+  </div>
+
+  <div class="error" *ngIf="error">{{ error }}</div>
+
+  <ng-container *ngIf="details">
+    <header class="head">
+      <img class="avatar" [src]="details.logo || 'assets/avatar.png'" alt="" />
+      <div class="head-text">
+        <h1>{{ details.fullName }}</h1>
+        <p>Applied for {{ details.jobTitle }} on {{ details.appliedAt | date:'mediumDate' }}</p>
+      </div>
+      <span class="badge" [ngClass]="'status-' + statusName(details.status).toLowerCase()">
+        {{ statusLabel(details.status) }}
+      </span>
+    </header>
+
+    <section class="card">
+      <h2>Contact</h2>
+      <dl>
+        <dt>Email</dt>
+        <dd><a [href]="'mailto:' + details.email">{{ details.email }}</a></dd>
+        <dt>Phone</dt>
+        <dd>{{ details.phone || 'Not provided' }}</dd>
+      </dl>
+    </section>
+
+    <section class="card" *ngIf="details.coverLetter">
+      <h2>Cover letter</h2>
+      <p class="letter">{{ details.coverLetter }}</p>
+    </section>
+
+    <section class="card" *ngIf="details.resumeUrl">
+      <h2>Resume</h2>
+      <a class="btn" [href]="details.resumeUrl" target="_blank" rel="noopener">Open resume</a>
+    </section>
+
+    <section class="card" *ngIf="details.interview">
+      <h2>Interview</h2>
+      <dl>
+        <dt>When</dt>
+        <dd>{{ details.interview.interviewDate | date:'medium' }}</dd>
+        <dt>Where</dt>
+        <dd>{{ details.interview.location }}</dd>
+        <dt>Notes</dt>
+        <dd>{{ details.interview.notes || 'None' }}</dd>
+      </dl>
+    </section>
+  </ng-container>
+</div>

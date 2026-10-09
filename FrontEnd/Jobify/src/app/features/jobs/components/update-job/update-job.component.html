@@ -1,0 +1,105 @@
+<div class="page-content">
+  <div class="job-form-container">
+    <h2 class="form-title">Update Job Post</h2>
+
+    <form class="job-form" [formGroup]="jobForm" (ngSubmit)="submit()">
+
+      <!-- Job Title -->
+      <div class="form-group">
+        <label for="title">Job Title</label>
+        <input id="title" formControlName="title" placeholder="e.g., Senior .NET Developer" />
+        <span class="error-msg" *ngIf="jobForm.get('title')?.touched && jobForm.get('title')?.invalid">
+          Title is required.
+        </span>
+      </div>
+
+      <!-- Job Description -->
+      <div class="form-group">
+        <label for="description">Job Description</label>
+        <textarea id="description" formControlName="description" rows="5" placeholder="Describe responsibilities and requirements"></textarea>
+        <span class="error-msg" *ngIf="jobForm.get('description')?.touched && jobForm.get('description')?.invalid">
+          Description is required.
+        </span>
+      </div>
+
+        <div class="form-group">
+        <label for="responsibilities">Job Responsibilities</label>
+        <textarea id="responsibilities" formControlName="responsibilities" rows="5" placeholder="List required qualifications and skills"></textarea>
+        <span class="error-msg" *ngIf="jobForm.get('responsibilities')?.touched && jobForm.get('responsibilities')?.invalid">
+          Responsibilities are required.
+        </span>
+      </div>
+
+        <div class="form-group">
+        <label for="requirements">Job Requirements</label>
+        <textarea id="requirements" formControlName="requirements" rows="5" placeholder="List required qualifications and skills"></textarea>
+        <span class="error-msg" *ngIf="jobForm.get('requirements')?.touched && jobForm.get('requirements')?.invalid">
+          Requirements are required.
+        </span>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input id="location" formControlName="location" placeholder="e.g., Cairo, Egypt" />
+        <span class="error-msg" *ngIf="jobForm.get('location')?.touched && jobForm.get('location')?.invalid">
+          Location is required.
+        </span>
+      </div>
+
+      <!-- Salary Row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="minSalary">Min Salary</label>
+          <input type="number" id="minSalary" formControlName="minSalary" />
+        </div>
+        <div class="form-group">
+          <label for="maxSalary">Max Salary</label>
+          <input type="number" id="maxSalary" formControlName="maxSalary" />
+        </div>
+      </div>
+
+      <!-- Dropdowns Row -->
+      <div class="form-row">
+        
+        <!-- Job Type / Employment Type -->
+        <div class="form-group">
+          <label for="jobType">Job Type</label>
+          <select id="jobType" formControlName="jobType">
+            <option [ngValue]="null" disabled>Select Job Type</option>
+            <option *ngFor="let type of jobTypes" [value]="type.id">
+              {{ type.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Experience Level -->
+        <div class="form-group">
+          <label for="experienceLevel">Experience Level</label>
+          <select id="experienceLevel" formControlName="experienceLevel">
+            <option [ngValue]="null" disabled>Select Experience Level</option>
+            <option *ngFor="let exp of experienceLevels" [value]="exp.id">
+              {{ exp.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Status / IsActive -->
+        <div class="form-group">
+          <label for="isActive">Status</label>
+          <select id="isActive" formControlName="isActive">
+            <option [ngValue]="true">Active</option>
+            <option [ngValue]="false">Inactive</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn" [disabled]="jobForm.invalid">
+        Update Job
+      </button>
+
+    </form>
+  </div>
+</div>

@@ -14,18 +14,18 @@ export class LookupService {
     constructor(private http: HttpClient) {}
 
   getIndustries(): Observable<Industry[]> {
-    return this.http.get<Industry[]>('https://localhost:44309/api/LooksUp/Industries');
+    return this.http.get<Industry[]>('https://localhost:7026/api/LooksUp/Industries');
   }
 
   getEmploymentTypes(): Observable<EmploymentType[]> {
-    return this.http.get<EmploymentType[]>('https://localhost:44309/api/LooksUp/EmploymentTypes');
+    return this.http.get<EmploymentType[]>('https://localhost:7026/api/LooksUp/EmploymentTypes');
   }
 
   getWorkModes(): Observable<WorkMode[]> {
-    return this.http.get<WorkMode[]>('https://localhost:44309/api/LooksUp/WorkModes');
+    return this.http.get<WorkMode[]>('https://localhost:7026/api/LooksUp/WorkModes');
   }
   getStatuses():Observable<JobStatus[]>{
-        return this.http.get<JobStatus[]>('https://localhost:44309/api/LooksUp/Statuses');
+        return this.http.get<JobStatus[]>('https://localhost:7026/api/LooksUp/Statuses');
 
   }
 }

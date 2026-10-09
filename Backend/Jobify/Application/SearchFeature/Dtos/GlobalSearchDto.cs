@@ -10,10 +10,9 @@ namespace Application.SearchFeature.Dtos
     {
         public string? Keyword { get; set; }
         public string Type { get; set; } = "all";
+        public string? EmploymentType { get; set; }   // matches your JobType enum as string
+        public string? ExperienceLevel { get; set; }
 
-        public List<int>? IndustryIds { get; set; }
-        public List<int>? WorkModeIds { get; set; }
-        public List<int>? EmploymentTypeIds { get; set; }
         public int? PostedWithinDays { get; set; }
 
         public string? Industry { get; set; }

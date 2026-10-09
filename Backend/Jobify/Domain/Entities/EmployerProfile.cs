@@ -15,7 +15,7 @@ namespace Domain.Entities
         public AppUser User { get; set; }
         public string? Bio { get; set; }
         public string? Position { get; set; }
-
+        public bool IsPublic { get; set; } = true;
         public EmployerCompanyRole? Role { get; set; }
         public List<string> Permissions { get; set; } = new();
 

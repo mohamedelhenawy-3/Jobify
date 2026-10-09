@@ -1,0 +1,71 @@
+<div class="head">
+  <div>
+    <h2>Job alerts</h2>
+    <p class="sub">We email you when new jobs match a keyword.</p>
+  </div>
+  <span class="counter">{{ alerts.length }} of {{ max }} used</span>
+</div>
+
+<p class="loading" *ngIf="loading">Loading...</p>
+<p class="error" *ngIf="error">{{ error }}</p>
+
+<!-- list -->
+<div class="list" *ngIf="!loading">
+  <div class="alert" *ngFor="let a of alerts" [class.paused]="!a.isActive">
+    <div class="icon"><i [ngClass]="a.isActive ? 'far fa-bell' : 'far fa-bell-slash'"></i></div>
+
+    <div class="info">
+      <strong>{{ a.keyword }}</strong>
+      <small>
+        Created {{ a.createdAt | date: 'mediumDate' }}
+        <span class="tag" *ngIf="!a.isActive">Paused</span>
+      </small>
+    </div>
+
+<a class="view" routerLink="/Jobify/searchsystem" [queryParams]="{ keyword: a.keyword }">View jobs</a>
+    <button type="button" class="switch" role="switch"
+            [class.on]="a.isActive" [attr.aria-checked]="a.isActive"
+            [attr.aria-label]="a.isActive ? 'Pause alert' : 'Turn on alert'"
+            [title]="a.isActive ? 'Pause alert' : 'Turn on alert'"
+            (click)="toggle(a)"></button>
+
+    <button type="button" class="trash" aria-label="Delete alert" title="Delete alert" (click)="askDelete(a)">
+      <i class="far fa-trash-alt"></i>
+    </button>
+  </div>
+
+  <!-- empty state -->
+  <div class="empty" *ngIf="alerts.length === 0 && !error">
+    <i class="far fa-bell"></i>
+    <h3>No alerts yet</h3>
+    <p>Search for a job in the search bar and choose "Create alert" to get new matches by email.</p>
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast" *ngIf="toast">{{ toast }}</div>
+
+<!-- delete confirm modal -->
+<div class="backdrop" *ngIf="target" (click)="close()">
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <div class="warn"><i class="fas fa-exclamation"></i></div>
+      <div>
+        <h3>Delete alert</h3>
+        <small>{{ target.keyword }}</small>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <p>You will stop getting emails for "{{ target.keyword }}". To keep it for later, use the switch to pause it instead.</p>
+      <p class="error" *ngIf="modalError">{{ modalError }}</p>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" (click)="close()" [disabled]="deleting">Cancel</button>
+      <button type="button" class="danger-btn" (click)="confirmDelete()" [disabled]="deleting">
+        {{ deleting ? 'Deleting…' : 'Delete' }}
+      </button>
+    </div>
+  </div>
+</div>

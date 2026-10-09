@@ -1,0 +1,39 @@
+<div class="page">
+  <header class="page-header">
+    <h1>My applications</h1>
+    <p>Track the status of every job you applied to.</p>
+  </header>
+
+  <div class="filters">
+    <input [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+           placeholder="Search by job title or company" />
+    <select [(ngModel)]="status" (ngModelChange)="load()">
+      <option *ngFor="let o of statusOptions" [ngValue]="o.value">{{ o.label }}</option>
+    </select>
+  </div>
+
+  <div class="error" *ngIf="error">{{ error }}</div>
+
+  <div class="state" *ngIf="loading">
+    <div class="spinner"></div>
+    Loading your applications...
+  </div>
+
+  <div class="app-list" *ngIf="!loading">
+    <article class="app-card" *ngFor="let app of applications">
+      <img class="avatar" [src]="app.logo || 'assets/default-logo.png'" alt="Company logo" />
+      <div class="info">
+        <h4 class="title">{{ app.jobTitle }}</h4>
+        <span class="meta">Applied {{ app.appliedAt | date:'mediumDate' }}</span>
+      </div>
+   <span class="badge" [ngClass]="'status-' + statusName(app.status).toLowerCase()">
+  {{ statusLabel(app.status) }}
+</span>
+    </article>
+  </div>
+
+  <div class="state" *ngIf="!loading && applications.length === 0">
+    <strong>No applications found</strong>
+    Try a different search or status, or browse jobs to apply.
+  </div>
+</div>

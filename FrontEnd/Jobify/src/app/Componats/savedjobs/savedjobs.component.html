@@ -2,7 +2,6 @@
 
   <!-- Header -->
   <div class="header">
-    <h2>⭐ My Saved Jobs</h2>
     <span class="count">{{ savedJobs.length }} Jobs</span>
   </div>
 
@@ -46,17 +45,14 @@
         <span>📍 {{ job.location }}</span>
 
         <span class="badge">
-          {{ getEmploymentType(job.employmentTypeId) }}
+          {{ job.jobType}}
         </span>
 
         <span class="badge light">
-          {{ getWorkMode(job.workModeId) }}
+          {{job.experienceLevel}}
         </span>
 
-        <span class="status" [ngClass]="getStatusClass(job.statusId)">
-          {{ getStatusText(job.statusId) }}
-        </span>
-
+       
       </div>
 
       <!-- Footer -->
@@ -67,7 +63,7 @@
 
         <button
           class="view-btn"
-          [routerLink]="['/Jobify/details', job.id]">
+          [routerLink]="['/Jobify/jobs', job.id]">
           View Job
         </button>
       </div>

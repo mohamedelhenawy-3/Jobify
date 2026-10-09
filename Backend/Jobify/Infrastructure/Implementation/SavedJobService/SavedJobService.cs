@@ -1,7 +1,11 @@
-﻿using Application.DTOs.SavedJobDto;
+﻿using Application.DTOs.Auth.AuthResponse;
+using Application.DTOs.JobPost.JobDTO;
+using Application.DTOs.SavedJobDto;
 using Application.Interfaces.SavedJob;
 using Domain.Entities;
-using Infrastructure.DBContext;
+using Domain.Entities.LooksUp;
+using Infrastructure.CurrentUserService;
+using Infrastructure.Implementation.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,96 +20,78 @@ namespace Infrastructure.Implementation.SavedJobService
     public class SavedJobService : ISavedJob
     {
         private readonly AppDBContext _db;
-        private readonly IHttpContextAccessor _httpaccessor;
+        private readonly ICurrentUser _currentUser;
 
-        public SavedJobService(
-            AppDBContext context,
-            IHttpContextAccessor httpContextAccessor)
+        public SavedJobService(AppDBContext context, ICurrentUser currentUser)
         {
             _db = context;
-            _httpaccessor = httpContextAccessor;
+            _currentUser = currentUser;
         }
 
-        private string? GetCurrentUserId()
+        public async Task<PagedResult<SavedJobDto>> GetSavedJobsAsync(int pageNumber, int pageSize)
         {
-            return _httpaccessor.HttpContext?
-                .User?
-                .FindFirstValue(ClaimTypes.NameIdentifier);
+            pageNumber = Math.Max(pageNumber, 1);
+            pageSize = Math.Clamp(pageSize, 1, 50);
+
+            var q = _db.SavedJobs
+                .AsNoTracking()
+                .Where(x => x.UserId == _currentUser.UserId);
+
+            var total = await q.CountAsync();
+
+            var items = await q
+                .OrderByDescending(x => x.CreatedAt).ThenBy(x => x.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new SavedJobDto
+                {
+                    id = x.Job.Id,
+                    logo = x.Job.Company.Logo.ImageUrl,
+                    title = x.Job.Title,
+                    location = x.Job.Location,
+                    JobType = x.Job.JobType,
+                    ExperienceLevel = x.Job.ExperienceLevel,
+                    SavedAt = x.CreatedAt
+                })
+                .ToListAsync();
+
+            return new PagedResult<SavedJobDto>
+            {
+                Items = items,
+                TotalCount = total,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
-        public async Task<List<SavedJobDto>> GetSavedJobsAsync()
-        {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException();
-
-            var savedJobsQuery = _db.SavedJobs
-                .Where(x => x.UserId == userId);
-
-            var totalCount = await savedJobsQuery.CountAsync();
-
-            var savedJobs = await savedJobsQuery
-         .Include(s => s.Job)
-             .ThenInclude(x => x.Company)
-                 .ThenInclude(x => x.Logo)
-         .Select(x => new SavedJobDto
-         {
-             id = x.Job.Id,
-             logo = x.Job.Company.Logo.ImageUrl,
-             title = x.Job.Title,
-             location = x.Job.Location,
-
-             WorkModeId = x.Job.WorkModeId,
-             IndustryId = x.Job.IndustryId,
-             EmploymentTypeId = x.Job.EmploymentTypeId,
-             StatusId = x.Job.StatusId,
-
-             countJobs = totalCount
-         })
-         .ToListAsync();
-            return savedJobs;
-        }
-
-        public async  Task<bool> IsJobSavedAsync(int jobId)
-        {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException();
-            return await _db.SavedJobs
-                       .AnyAsync(x => x.UserId == userId && x.JobId == jobId);
-        }
+        public async Task<bool> IsJobSavedAsync(int jobId) =>
+            await _db.SavedJobs.AnyAsync(x => x.UserId == _currentUser.UserId && x.JobId == jobId);
 
         public async Task SaveJobAsync(int jobId)
         {
-            var userId = GetCurrentUserId();
+            var userId = _currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("Log in to save jobs.");
 
-           
-            if (await _db.SavedJobs
-                     .AnyAsync(x => x.UserId == userId && x.JobId == jobId))
-                return;
+            if (!await _db.JobPosts.AnyAsync(j => j.Id == jobId))
+                throw new KeyNotFoundException("Job not found.");
 
-            _db.SavedJobs.Add(new Domain.Entities.SavedJob
-            {
-                UserId = userId,
-                JobId = jobId
-            });
+            if (await _db.SavedJobs.AnyAsync(x => x.UserId == userId && x.JobId == jobId))
+                return;                                   // already saved, nothing to do
 
-            await _db.SaveChangesAsync();
+            _db.SavedJobs.Add(new SavedJob { UserId = userId, JobId = jobId, IsActive = true });
+
+            try { await _db.SaveChangesAsync(); }
+            catch (DbUpdateException) { /* double click: the unique index rejected the 2nd insert, it is already saved */ }
         }
 
         public async Task UnsaveJobAsync(int jobId)
         {
-            var userId = GetCurrentUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException();
-            var savedJob = await _db.SavedJobs
-         .FirstOrDefaultAsync(x => x.UserId == userId && x.JobId == jobId);
+            var saved = await _db.SavedJobs
+                .FirstOrDefaultAsync(x => x.UserId == _currentUser.UserId && x.JobId == jobId);
+            if (saved == null) return;
 
-            if (savedJob == null) return;
-
-            _db.SavedJobs.Remove(savedJob);
+            _db.SavedJobs.Remove(saved);
             await _db.SaveChangesAsync();
         }
     }

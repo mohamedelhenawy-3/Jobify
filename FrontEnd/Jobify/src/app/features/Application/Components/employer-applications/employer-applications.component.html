@@ -1,0 +1,117 @@
+<div class="page">
+
+  <header class="page-header">
+    <h1>Applications</h1>
+    <p>Review candidates and update their status.</p>
+  </header>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input
+      type="search"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="load()"
+      placeholder="Search by job, name or email" />
+
+    <select [(ngModel)]="status" (ngModelChange)="load()">
+      <option [ngValue]="null">All statuses</option>
+      <option *ngFor="let s of filterStatuses" [ngValue]="s">{{ label(s) }}</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div class="state" *ngIf="loading">
+    <div class="spinner"></div>
+    Loading applications...
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" *ngIf="!loading && applications.length > 0">
+    <table class="apps-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Job</th>
+          <th>Applied</th>
+          <th>Status</th>
+          <th>Change status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let app of applications"  (click)="openDetails(app)"
+    (keyup.enter)="openDetails(app)">
+          <td>
+            <div class="person">
+              <img class="avatar" [src]="app.logo || 'assets/avatar.png'" alt="" />
+              <div class="person-text">
+                <span class="name">{{ app.fullName }}</span>
+                <span class="email">{{ app.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ app.jobTitle }}</td>
+          <td>{{ app.appliedAt | date:'mediumDate' }}</td>
+          <td>
+            <span class="badge" [ngClass]="badgeClass(app.status)">
+              {{ label(app.status) }}
+            </span>
+          </td>
+          <td>
+            <select
+              class="status-select"
+              [ngModel]="app.status"
+              (ngModelChange)="onStatusChange(app, $event)"
+              [disabled]="app.status === Status.Withdrawn">
+              <option *ngFor="let s of filterStatuses" [ngValue]="s">{{ label(s) }}</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty -->
+  <div class="state" *ngIf="!loading && applications.length === 0">
+    <strong>No applications found</strong>
+    New applications will appear here as candidates apply.
+  </div>
+</div>
+
+<!-- Interview modal -->
+<div class="modal-backdrop" *ngIf="selectedApp" (click)="closeModal()">
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <h3>Schedule interview</h3>
+    <p class="subtitle">{{ selectedApp.fullName }} - {{ selectedApp.jobTitle }}</p>
+
+    <div class="field">
+      <label for="iv-date">Date and time</label>
+      <input id="iv-date" type="datetime-local" [(ngModel)]="interview.date" />
+    </div>
+
+    <div class="field">
+      <label for="iv-location">Location</label>
+      <input
+        id="iv-location"
+        [(ngModel)]="interview.location"
+        placeholder="Office address or meeting link" />
+    </div>
+
+    <div class="field">
+      <label for="iv-notes">Notes (optional)</label>
+      <textarea
+        id="iv-notes"
+        rows="3"
+        [(ngModel)]="interview.notes"
+        placeholder="Anything the candidate should know"></textarea>
+    </div>
+
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" (click)="closeModal()" [disabled]="saving">Cancel</button>
+      <button class="btn btn-primary" (click)="confirmInterview()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Schedule interview' }}
+      </button>
+    </div>
+  </div>
+</div>

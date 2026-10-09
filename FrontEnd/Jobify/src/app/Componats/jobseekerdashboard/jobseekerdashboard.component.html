@@ -6,47 +6,59 @@
       <h2>Dashboard</h2>
       <p>Welcome back! Here is what's happening with your job search.</p>
     </div>
-    <button class="dh-btn-primary">+ Search New Jobs</button>
   </div>
 
   <!-- Stats -->
-  <div class="stats-container">
-    <div class="stat-card" *ngFor="let card of topStats">
-      <span class="stat-title">{{ card.title }}</span>
+<div class="stats-grid">
+  <div class="stat-card" *ngFor="let card of topStats">
+
+    
+    <div class="stat-content">
       <span class="stat-value">{{ card.value }}</span>
+      <h3 class="stat-title">{{ card.title }}</h3>
     </div>
+   
   </div>
-
+</div>
   <!-- Recommended Jobs -->
-  <div class="section-header">
-    <h3>Recommended for You</h3>
-  </div>
+  <div class="rec-card">
+    <div class="rec-header">
+      <h3>Recommended Jobs</h3>
+      <button class="view-all">View all</button>
+    </div>
 
-  <div class="recommendedjobs">
-    <div *ngFor="let job of recommendedJobs" class="job-card">
+    <div class="jobs-grid">
+      <div *ngFor="let job of recommendedJobs" class="job-card">
 
-      <div class="job-header">
-        <div class="job-info">
-          <img [src]="job.logo || 'assets/default-user.png'" class="company-logo" />
-          <div>
-            <h4>{{ job.title }}</h4>
-            <p>{{ job.companyName }}</p>
+        <div class="job-top">
+          <div class="logo-box">
+            <img
+              [src]="job.logo || 'assets/default-user.png'"
+              class="company-logo"
+            />
+          </div>
+
+          <div class="job-main">
+            <h4 class="job-title">{{ job.title }}</h4>
+            <div class="meta">🏢 {{ job.companyName }}</div>
+            <div class="meta">📍 {{ job.location }}</div>
           </div>
         </div>
 
-      </div>
+        <div class="job-bottom">
+          <span class="salary">
+            {{ job.minSalary }} - {{ job.maxSalary }}
+          </span>
 
-      <div class="job-details">
-        <span>📍 {{ job.location }}</span>
-        <span>💼 {{ job.employmentTypeId }}</span>
-        <span>💰 {{ job.minSalary }} - {{ job.maxSalary }}</span>
-      </div>
+          <span
+            class="match-badge"
+            [ngClass]="{ 'high': job.matchScore >= 90 }"
+          >
+            ⚡ {{ job.matchScore }}% Match
+          </span>
+        </div>
 
-      <div class="job-footer">
-        <span class="match">{{ job.matchScore }}% Match</span>
-        <button class="apply-btn">Apply</button>
       </div>
-
     </div>
   </div>
 
@@ -58,7 +70,7 @@
         <h3>My Applications</h3>
         <p>Track your job applications</p>
       </div>
-      <button class="view-all-btn">View All →</button>
+      <button class="view-all-btn"(click)="myapplications()">View All →</button>
     </div>
 
     <div class="table-wrapper">
@@ -118,15 +130,21 @@
           </div>
         </div>
 
-        <button class="apply-btn" (click)="goToJobDetails(job.id)">
-          Apply →
-        </button>
+      <button class="apply-btn" (click)="goToJobDetails(job.id)">
+  <span class="btn-text">Apply Now</span>
+  <span class="btn-arrow">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+      <polyline points="12 5 19 12 12 19"></polyline>
+    </svg>
+  </span>
+</button>
 
       </div>
 
     </div>
 
-    <button class="view-all-btn" routerLink="/saved-jobs">
+    <button class="view-all-btn" routerLink="/Jobify/savedjobs">
       View All Saved Jobs
     </button>
 

@@ -1,121 +1,106 @@
-.card-container {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.app-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
-.card-container:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-  border-color: #2563eb;
-}
-
-/* Header & Logo Alignment */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.brand-section {
+.app-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
 }
 
-.logo-wrapper {
+.logo-box {
   width: 48px;
   height: 48px;
-  background: #f8fafc;
-  border-radius: 10px;
-  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #f1f5f9;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
-.company-logo {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+.fallback-text {
+  font-size: 20px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .job-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
   margin: 0;
-  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .company-name {
   font-size: 13px;
-  color: #64748b;
-  margin: 4px 0 0 0;
+  color: #6b7280;
+  margin: 0;
 }
 
-/* Status Badges */
-.status-indicator {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 20px;
+.app-meta {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
 }
 
-.status-indicator.pending { background: #fff7ed; color: #c2410c; }
-.status-indicator.accepted { background: #f0fdf4; color: #15803d; }
-.status-indicator.rejected { background: #fef2f2; color: #b91c1c; }
-
-.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-/* Body Info */
-.card-body {
+.meta-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.info-pill {
-  font-size: 12px;
-  background: #f1f5f9;
-  color: #475569;
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-
-/* Footer */
-.card-footer {
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid #f1f5f9;
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+
+  .icon {
+    font-size: 13px;
+    color: #9ca3af;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .text {
+    font-size: 13px;
+    color: #6b7280;
+  }
 }
 
-.applied-at { font-size: 12px; color: #94a3b8; }
-
-.details-btn {
-  background: #f8fafc;
-  color: #2563eb;
-  border: 1px solid #e2e8f0;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
+.status-wrapper {
+  display: flex;
 }
 
-.details-btn:hover { background: #2563eb; color: white; border-color: #2563eb; }
+.status-badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 6px;
+  text-transform: capitalize;
+
+  &.status-applied   { background: #EFF6FF; color: #1D4ED8; }
+  &.status-interview { background: #FFFBEB; color: #B45309; }
+  &.status-offer     { background: #F0FDF4; color: #15803D; }
+  &.status-rejected  { background: #FEF2F2; color: #B91C1C; }
+}

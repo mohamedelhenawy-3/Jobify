@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces.JobApplication;
 using Application.Interfaces.SavedJob;
 using Domain.Entities.LooksUp;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -46,7 +46,7 @@ namespace Jobify.Controllers
                                                .Count(a => a.JobSeekerId == jobSeekerId && a.Status == ApplicationStatus.Interviewed);
 
             var appliedJobs = await _jobapp.GetMyApplications();
-           var savedJobs = await _savedjobs.GetSavedJobsAsync();
+          
 
             return Ok(new
             {
@@ -54,7 +54,7 @@ namespace Jobify.Controllers
                 UnderReviewApplications = underReviewApplications,
                 InterviewApplications = interviewApplications,
                 AppliedJobs = appliedJobs,
-                SavedJobs = savedJobs
+              
             });
         }
 

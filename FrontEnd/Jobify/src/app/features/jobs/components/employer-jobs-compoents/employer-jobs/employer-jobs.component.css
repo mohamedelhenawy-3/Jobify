@@ -1,0 +1,13 @@
+.state { padding:24px; text-align:center; color:#6b7280; }
+.state.error { color:#dc2626; }
+.pager { display:flex; justify-content:center; align-items:center; gap:12px; margin-top:16px; font-size:14px; color:#6b7280; }
+.pager button { padding:8px 14px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; }
+.pager button:disabled { opacity:.5; cursor:not-allowed; }
+
+:host { display: block; }
+
+.employer-jobs {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;   /* 24px is the space under the navbar */
+}

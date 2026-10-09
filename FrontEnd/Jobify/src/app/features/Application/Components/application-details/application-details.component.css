@@ -1,0 +1,35 @@
+.page { max-width: 760px; margin: 0 auto; padding: 32px 20px 56px; color: #1d2433; }
+.back { display: inline-block; margin-bottom: 20px; color: #2f5bea; text-decoration: none; }
+.back:hover { text-decoration: underline; }
+
+.head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.head-text { flex: 1; min-width: 200px; }
+.head h1 { margin: 0 0 4px; font-size: 1.5rem; }
+.head p { margin: 0; color: #6b7385; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #e3e6ee; }
+
+.card { background: #fff; border: 1px solid #e3e6ee; border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+.card h2 { margin: 0 0 12px; font-size: 1.05rem; }
+dl { display: grid; grid-template-columns: 100px 1fr; gap: 8px 12px; margin: 0; }
+dt { color: #6b7385; }
+dd { margin: 0; }
+.letter { margin: 0; white-space: pre-wrap; line-height: 1.6; }
+
+.btn { display: inline-block; padding: 9px 16px; background: #2f5bea; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; }
+.btn:hover { background: #2447c4; }
+
+.badge { padding: 4px 12px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: #eceff5; color: #4a5368; }
+.status-applied { background: #e8eefc; color: #2447c4; }
+.status-underreview { background: #fdf3dc; color: #8a5a00; }
+.status-shortlisted { background: #efe7fb; color: #5b34a8; }
+.status-interviewscheduled { background: #dff4f6; color: #0d6670; }
+.status-interviewed { background: #d6f0f3; color: #0a5058; }
+.status-offered { background: #e3f4e1; color: #26701f; }
+.status-hired { background: #cdeccb; color: #1b5a16; }
+.status-rejected { background: #fbe4e6; color: #c62f3b; }
+.status-withdrawn { background: #eceff5; color: #6b7385; }
+
+.state { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 56px 20px; color: #6b7385; }
+.spinner { width: 28px; height: 28px; border: 3px solid #e3e6ee; border-top-color: #2f5bea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error { padding: 12px 14px; background: #fbe4e6; color: #c62f3b; border-radius: 8px; }

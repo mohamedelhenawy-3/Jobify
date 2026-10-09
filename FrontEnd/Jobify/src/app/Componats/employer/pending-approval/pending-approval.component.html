@@ -1,0 +1,81 @@
+<div class="pending-container">
+  <div class="pending-card">
+    <!-- Top Accent Line -->
+    <div class="card-accent"></div>
+
+    <div class="card-content">
+      <!-- Dynamic Status Badge -->
+      <div class="badge-wrapper">
+        <span class="status-badge" [ngClass]="{ 'badge-employee': !status?.hasCompany && status?.hasPendingJoinRequest }">
+          <i class="bi" [ngClass]="status?.hasCompany ? 'bi-clock-history' : 'bi-person-clock'"></i>
+          {{ status?.hasCompany ? 'Verification In Progress' : 'Awaiting Owner Authorization' }}
+        </span>
+      </div>
+
+      <!-- Animated Icon Header -->
+      <div class="icon-avatar">
+        <i class="bi" [ngClass]="status?.hasCompany ? 'bi-hourglass-split' : 'bi-building-gear'"></i>
+      </div>
+
+      <!-- Title -->
+      <h2 class="card-title">
+        {{ status?.hasCompany ? 'Company Verification Pending' : 'Join Request Submitted' }}
+      </h2>
+
+      <!-- Scenario 1: Company Owner Registration -->
+      <div *ngIf="status?.hasCompany" class="status-details">
+        <p class="description">
+          Your company registration for
+          <strong class="company-name">{{ status?.companyName }}</strong>
+          has been submitted successfully.
+        </p>
+
+        <div class="info-box">
+          <i class="bi bi-info-circle-fill info-icon"></i>
+          <p class="info-text">
+            Our platform administrators are currently verifying your business credentials. This process typically takes <strong>24–48 hours</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Scenario 2: Employee Join Request -->
+      <div *ngIf="!status?.hasCompany && status?.hasPendingJoinRequest" class="status-details">
+        <p class="description">
+          Your request to join
+          <strong class="company-name">{{ status?.companyName || 'the organization' }}</strong>
+          is awaiting manager authorization.
+        </p>
+
+        <div class="info-box">
+          <i class="bi bi-info-circle-fill info-icon"></i>
+          <p class="info-text">
+            An account owner or administrator needs to approve your request before you can access the company workspace.
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="action-group">
+        <button
+          class="btn-primary"
+          (click)="refreshStatus()"
+          [disabled]="isRefreshing">
+          <span *ngIf="isRefreshing" class="spinner"></span>
+          <i *ngIf="!isRefreshing" class="bi bi-arrow-repeat"></i>
+          <span>{{ isRefreshing ? 'Checking Status...' : 'Refresh Status' }}</span>
+        </button>
+
+        <button class="btn-ghost" (click)="logout()">
+          <i class="bi bi-box-arrow-left"></i>
+          <span>Sign out for now</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card Footer -->
+    <div class="card-footer">
+      <span>Need assistance? Reach out to our </span>
+      <a href="mailto:support@jobify.com" class="support-link">Support Team</a>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.industry;
 using Application.DTOs.JobPost;
+using Application.DTOs.JobPost.JobDTO;
 using Application.DTOs.Pagenation;
 using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
@@ -18,26 +19,32 @@ namespace Application.Interfaces.Job
 {
     public interface IJobService
     {
-        Task <SuccessResponse> CreateJob(CreateJob createjobdto);
+
+        //owner -employers
+        Task<IEnumerable<ReturnedJobDto>?> GetEmployerJobsAsync();
+        Task<PagedResult<EmployerJobCardDto>?> GetEmployerJobsAsync(EmployerJobsFilterDto filter);
+
+        Task<List<EmployerJobItemDto>> GetMyJobsAsync(); //based on employer admin-owner-recruter
+        Task<SuccessResponse> UpdateJob(UpdateJobDto dto, int id);
+        Task<SuccessResponse> CreateJob(CreateJobPostDto createjobdto);
+         Task<JobDetailsForJobseekerDto> GetJobDetailsForJobseeker(int jobId);
+        //Task<PagedResult<ReturnedJobDto>> SearchJobs(JobsFilterDto filter);
+        Task<PagedResult<JobCardDto>> GetActiveJobsAsync(JobsFilterDto filter);
+        //////////////
+
         Task<ReturnedJobDto> GetJobById(int id);
         Task<JobDto> GetJob(int id);
-        Task<IEnumerable<ReturnedJobDto>> AllJobsOfEmployer();
         Task<IEnumerable<JobDto>> AllJobs();
-        Task<SuccessResponse> UpdateJob(UpdateJobDto updatejob, int id);
+  
         Task<SuccessResponse> DeleteJob(int Id);
-        Task<IndustryDto> JobWithIndustry(int id);
-        Task<IEnumerable<IndustryDto>> Industries();
-       Task<PageDto<JobDto>> FilteredJobs(JobFilterDto jobfiltereddto, int pagesize = 10, int pagenumber = 1);
-
         Task<List<RecommendedJobsDto>> GetRecommendedJobs();
         ///
         Task<SuccessResponse> SaveAlert(string keyword);
         Task<List<JobPost>> FindNewJobs(SavedJobAlert alert);
 
-        Task<List<OpeningJobs>> AvalibleJobs();
         Task<List<SearchResponseDto>> Search(JobFilterDto jobfiltereddto);
         ////////////Apply Search Globaly/////////////
-        Task<List<SearchResponseDto>> SearchJobsAsync(GlobalSearchDto dto);
+        Task<List<SearchResDto>> SearchJobsAsync(GlobalSearchDto dto);
 
 
     }

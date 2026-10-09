@@ -9,19 +9,31 @@ import { JobSeekerApplication } from '../../Models/JobApplications/JobSeekerAppl
 import { UpdateStatus } from '../../Models/JobApplications/UpdateStatus';
 import { ApplicationFilter } from '../../Models/JobApplications/ApplicationsFilters/jobappfilters';
 import { MyApplicationDto } from '../../Models/JobApplications/ApplicationsFilters/MyApplicationDto';
-
+import { HiringPipelineDto, RecentApplicant } from '../../features/Owner-Profile/Models/OwnerProfile';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JobApplicationService {
 
-  private baseUrl = 'https://localhost:44309/api/JobApplication';
+  private baseUrl = 'https://localhost:7026/api/JobApplication';
   // change URL to your real API
 
   constructor(private http: HttpClient) {}
 
 
+
+
+
+
+  getPipeline(): Observable<HiringPipelineDto> {
+    return this.http.get<HiringPipelineDto>(`${this.baseUrl}/pipeline`);
+  }
+
+  getRecentApplicants(take = 5): Observable<RecentApplicant[]> {
+    const params = new HttpParams().set('take', take);
+    return this.http.get<RecentApplicant[]>(`${this.baseUrl}/recent-applicants`, { params });
+  }
 
   getEmployerApplications(): Observable<AppliedJobSeekerListItem[]> {
     return this.http.get<AppliedJobSeekerListItem []>(`${this.baseUrl}`);

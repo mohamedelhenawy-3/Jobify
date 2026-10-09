@@ -2,7 +2,7 @@
 using Domain.Entities;
 using Domain.Entities.Event;
 using Domain.Entities.LooksUp;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

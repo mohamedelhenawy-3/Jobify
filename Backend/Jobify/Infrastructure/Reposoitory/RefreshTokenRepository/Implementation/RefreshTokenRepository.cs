@@ -1,5 +1,5 @@
 ﻿using Domain.Entities;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Infrastructure.Reposoitory.RefreshTokenRepository.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;

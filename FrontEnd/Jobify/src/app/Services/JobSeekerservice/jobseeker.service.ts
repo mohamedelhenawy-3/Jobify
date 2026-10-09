@@ -9,7 +9,7 @@ import { UpdatePrivacyDto } from '../../Models/jobseeker/UpdatePrivacy';
 })
 export class JobseekerService {
 
-  private baseUrl = 'https://localhost:44309/api/JobSeeker';
+  private baseUrl = 'https://localhost:7026/api/JobSeeker';
 
   constructor(private http: HttpClient) {}
 
@@ -21,6 +21,6 @@ export class JobseekerService {
     return this.http.put(`${this.baseUrl}/me`, formData);
   }
   updateProfilePrivacy(dto: UpdatePrivacyDto) {
-  return this.http.put<{ message: string }>('https://localhost:44309/api/JobSeeker/privacy', dto);
+  return this.http.put<{ message: string }>('https://localhost:7026/api/JobSeeker/privacy', dto);
 }
 }
