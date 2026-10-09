@@ -14,8 +14,8 @@ namespace Application.DTOs.RecommendedJobbs
         public string CompanyName { get; set; } = null!; 
         public int MatchScore { get; set; }        
         public string Location { get; set; } = null!;   
-        public decimal MinSalary { get; set; }      
-        public decimal MaxSalary { get; set; }
+        public decimal? MinSalary { get; set; }      
+        public decimal? MaxSalary { get; set; }
         public int WorkModeId { get; set; }
         public int IndustryId { get; set; }
         public int EmploymentTypeId { get; set; }

@@ -1,0 +1,82 @@
+/* ---------- Design tokens (same as the profile pages) ---------- */
+:host {
+  --primary: #4f46e5;
+  --primary-soft: #eef2ff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f9fafb;
+  --card: #ffffff;
+  --danger: #dc2626;
+  --radius: 12px;
+
+  display: block;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ---------- Page: the top padding creates the space under the navbar ---------- */
+.jobs-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 16px 48px;
+}
+
+/* ---------- Title ---------- */
+.page-head { margin-bottom: 20px; }
+.page-head h1 { margin: 0; font-size: 26px; color: var(--text); }
+.page-head .muted { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+
+/* ---------- States ---------- */
+.state {
+  padding: 24px;
+  margin: 0 0 12px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.state.error { color: var(--danger); }
+
+/* ---------- Pager ---------- */
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.pager button {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.pager button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.pager button:disabled { opacity: .5; cursor: not-allowed; }
+.pager button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+app-jobs-filter {
+  display: block;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .jobs-page { padding-top: 24px; }
+  .page-head h1 { font-size: 22px; }
+}

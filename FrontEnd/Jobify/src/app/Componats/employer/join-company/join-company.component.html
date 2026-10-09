@@ -1,0 +1,83 @@
+<div class="join-container">
+  <div class="join-card">
+    <div class="card-accent"></div>
+
+    <div class="card-content">
+      <div class="header-section">
+        <div class="icon-avatar">
+          <i class="bi bi-building-add"></i>
+        </div>
+        <h2 class="card-title">Join Existing Company</h2>
+        <p class="card-subtitle">Search for your organization and request employee access</p>
+      </div>
+
+      <!-- Search Box -->
+      <div class="search-box">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="onSearchChange()" 
+          placeholder="Search by company name..."
+          class="search-input" />
+      </div>
+
+      <!-- Error Alert -->
+      <div *ngIf="errorMessage" class="error-alert">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <span>Searching companies...</span>
+      </div>
+
+      <!-- Company Results List -->
+      <div *ngIf="!isLoading" class="company-list">
+        <div 
+          *ngFor="let company of companies" 
+          class="company-item" 
+          [class.selected]="selectedCompanyId === company.companyId"
+          (click)="selectCompany(company.companyId)">
+          
+          <div class="company-info">
+            <div class="company-title-row">
+              <h4 class="company-name">{{ company.companyName }}</h4>
+              <span *ngIf="company.isVerified" class="badge-verified">
+                <i class="bi bi-patch-check-fill"></i> Verified
+              </span>
+            </div>
+            <span class="company-meta">{{ company.industry }} • {{ company.location }}</span>
+          </div>
+
+          <div class="radio-indicator">
+            <i class="bi" [ngClass]="selectedCompanyId === company.companyId ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+          </div>
+        </div>
+
+        <div *ngIf="companies.length === 0" class="empty-state">
+          <i class="bi bi-building-slash"></i>
+          <p>No companies found matching "{{ searchTerm }}"</p>
+        </div>
+      </div>
+
+      <!-- Submit Actions -->
+      <div class="action-group">
+        <button 
+          class="btn-primary" 
+          [disabled]="!selectedCompanyId || isSubmitting"
+          (click)="submitJoinRequest()">
+          <span *ngIf="isSubmitting" class="spinner-light"></span>
+          <span>{{ isSubmitting ? 'Sending Request...' : 'Request to Join' }}</span>
+        </button>
+
+        <a routerLink="/employer/onboarding" class="btn-ghost">
+          <i class="bi bi-arrow-left"></i>
+          Back to choices
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

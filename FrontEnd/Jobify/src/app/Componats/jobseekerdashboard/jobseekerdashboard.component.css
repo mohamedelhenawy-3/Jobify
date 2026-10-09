@@ -22,83 +22,252 @@
   cursor: pointer;
 }
 
-/* Stats */
-.stats-container {
+:root {
+  --primary-blue: #2563eb;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #f1f5f9;
+}
+
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  padding: 10px;
 }
 
 .stat-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  transition: 0.3s;
+  background: var(--bg-card);
+  background-color:  #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
 }
 
+/* 🌟 The Hover Effect */
 .stat-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 
+              0 10px 10px -5px rgba(37, 99, 235, 0.04);
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+/* Icon Box Styling */
+.icon-box {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary-blue);
+}
+
+/* Values & Titles */
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: block;
+  letter-spacing: -0.5px;
 }
 
 .stat-title {
-  font-size: 12px;
-  color: #888;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.stat-value {
-  font-size: 26px;
-  font-weight: bold;
+/* Trend Indicator */
+.stat-trend {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.stat-trend.up {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+/* Decorative Background Shape */
+.card-bg-shape {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: var(--primary-blue);
+  opacity: 0.03;
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 /* Recommended */
-.recommendedjobs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-  gap: 16px;
-  margin-bottom: 30px;
-}
-
-.job-card {
-  background: white;
+/* Container Card */
+.rec-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   padding: 16px;
-  border-radius: 12px;
-  transition: 0.3s;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
-.job-card:hover {
-  transform: translateY(-5px);
-}
-
-.job-header {
+/* Header */
+.rec-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-.job-info {
-  display: flex;
+.rec-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.view-all {
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+/* Grid */
+.jobs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.company-logo {
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
+/* Job Card */
+.job-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  transition: 0.2s;
+  cursor: pointer;
 }
 
-.job-details {
-  margin: 10px 0;
+.job-card:hover {
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.08);
+}
+
+/* Top Section */
+.job-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* Avatar */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Title */
+.job-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-title {
   font-size: 13px;
-  color: #666;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
 }
 
-.apply-btn {
-  background: #4f46e5;
-  color: white;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
+/* Meta */
+.meta {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
 }
 
+/* Bottom */
+.job-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Salary */
+.salary {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Match Badge */
+.match-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* LOGO BOX like React */
+.logo-box {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* IMAGE */
+.company-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+/* High Match */
+.match-badge.high {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
 /* Applications */
 .applications-card {
   background: white;
@@ -128,8 +297,8 @@
 }
 
 .company-cell img {
-  width: 30px;
-  height: 30px;
+  width: 70px;
+  height: 70px;
   border-radius: 6px;
 }
 
@@ -186,8 +355,8 @@
 }
 
 .saved-logo {
-  width: 40px;
-  height: 40px;
+  width: 70px;
+  height: 70px;
   border-radius: 8px;
 }
 
@@ -206,4 +375,75 @@
   background: transparent;
   color: #4f46e5;
   margin-top: 10px;
+}
+
+
+.apply-btn {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  
+  /* Styling */
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  white-space: nowrap;
+  
+  /* Shadow & Transition */
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 
+              0 2px 4px -2px rgba(37, 99, 235, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 🌟 Hover State */
+.apply-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
+}
+
+/* 🌟 Active (Click) State */
+.apply-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+/* 🏹 Arrow Animation Logic */
+.btn-arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.apply-btn:hover .btn-arrow {
+  transform: translateX(5px); /* Moves arrow slightly right on hover */
+}
+
+.apply-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.apply-btn:hover::after {
+  left: 100%;
 }

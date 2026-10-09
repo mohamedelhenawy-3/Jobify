@@ -13,6 +13,9 @@ import { JobService } from '../../Services/JobService/job.service';
   styleUrl: './jobseekerdashboard.component.css'
 })
 export class JobseekerdashboardComponent  implements OnInit{
+
+
+
   recommendedJobs: JobRecommendation[] = [];
    appliedJobs: any[] = [];
   savedJobs: any[] = [];
@@ -61,7 +64,20 @@ export class JobseekerdashboardComponent  implements OnInit{
   }
 }
   goToJobDetails(jobId: number) {
-  this.router.navigate(['/details', jobId]);
+  this.router.navigate(['/Jobify/details', jobId]);
+}
+getColor(job: any): string {
+  const colors = [
+    "#7c3aed", // purple
+    "#2563eb", // blue
+    "#16a34a", // green
+    "#dc2626"  // red
+  ];
+  return colors[job.companyName.charCodeAt(0) % colors.length];
+}
+
+myapplications() {
+this.router.navigate(['/Jobify/myapplications']);
 }
 
 }

@@ -10,8 +10,11 @@ namespace Application.Interfaces.Employer
 {
     public interface IEmployer
     {
-         Task<EmployerProfileResponseDto> MyProfile();
         Task<SuccessResponseDto> UpdateAsync(UpdateEmployerProfile model);
+
+
+        Task<EmployerProfileDto?> GetOwnerProfileAsync();
+        Task<bool> UpdateProfileAsync(UpdateEmployerProfile dto);
 
     }
 }

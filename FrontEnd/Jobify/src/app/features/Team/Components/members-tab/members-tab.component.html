@@ -1,0 +1,11 @@
+<app-members-filter (filterChange)="onFilter($event)" />
+
+<p *ngIf="loading">Loading...</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<ng-container *ngIf="result">
+<app-members-table [members]="result.items" [me]="me" (changed)="load()" />  <app-pager [page]="filter.pageNumber"
+             [totalPages]="result.totalPages"
+             [totalCount]="result.totalCount"
+             (pageChange)="onPage($event)" />
+</ng-container>

@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Comapny;
 using Application.DTOs.JobPost;
+using Application.DTOs.JobPost.JobDTO;
 using Application.DTOs.JobSeeker;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Application.SearchFeature.Dtos
 {
     public class GlobalSearchResponse
     {
-        public List<SearchResponseDto> Jobs { get; set; } = new();
+        public List<SearchResDto> Jobs { get; set; } = new();
         public List<UserSeachDto> Users { get; set; } = new();
         public List<SearchCompanyDto> Companies { get; set; } = new();
     }

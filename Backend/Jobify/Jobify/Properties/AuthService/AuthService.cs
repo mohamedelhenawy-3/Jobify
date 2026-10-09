@@ -4,7 +4,6 @@ using Application.Interfaces.Auth;
 using Application.Interfaces.Token;
 using Domain.Entities;
 using Domain.Identity;
-using Infrastructure.DBContext;
 using Infrastructure.Reposoitory.AuthRepository.Interface;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Identity;
@@ -80,7 +79,6 @@ namespace Infrastructure.Implementation.AuthService
                 UserName = dto.Email,
                 Email = dto.Email,
                 FullName = dto.FullName,
-                PhoneNumber = dto.PhoneNumber
             };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
@@ -104,24 +102,24 @@ namespace Infrastructure.Implementation.AuthService
                 var employer = new EmployerProfile
                 {
                     UserId = user.Id,
-                    Position = dto.Position!,
+                   
                 };
 
                 _context.EmployerProfiles.Add(employer);
                 await _context.SaveChangesAsync(); // employer.Id is now real
 
-                var company = new Company
-                {
-                    CompanyName = dto.CompanyName,
-                    CompanyWebsite = dto.CompanyWebsite,
-                    Industry = dto.Industry,
-                    Location = dto.CompanyLocation,
-                    EmployerProfileId = employer.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
+                //var company = new Company
+                //{
+                //    CompanyName = dto.CompanyName,
+                //    CompanyWebsite = dto.CompanyWebsite,
+                //    Industry = dto.Industry,
+                //    Location = dto.CompanyLocation,
+                //    EmployerProfileId = employer.Id,
+                //    CreatedAt = DateTime.UtcNow
+                //};
 
-                _context.Companies.Add(company);
-                await _context.SaveChangesAsync();
+                //_context.Companies.Add(company);
+                //await _context.SaveChangesAsync();
             }
             return new SuccessResponseDto
             {

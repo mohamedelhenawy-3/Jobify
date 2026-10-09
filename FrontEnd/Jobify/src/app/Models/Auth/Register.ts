@@ -1,13 +1,7 @@
 export interface Register {
   email: string;
   password: string;
+  confirmPassword:string;
   role: 'JobSeeker' | 'Employer';
-
-  // JobSeeker
   fullName?: string;
-  phoneNumber?: string;
-
-  // Employer
-  companyName?: string;
-  companyWebsite?: string;
 }

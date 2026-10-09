@@ -1,0 +1,155 @@
+
+<!-- 🔒 PRIVATE PROFILE -->
+<div *ngIf="!loading" class="private-profile">
+  🔒 This profile is private
+</div>
+
+<!-- ========================= -->
+<!-- 👤 JOB SEEKER PROFILE -->
+<!-- ========================= -->
+<div *ngIf="!loading && profile?.userRole === 'JobSeeker'" class="profile-page">
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <img class="profile-image" [src]="profile.profileImageUrl || 'assets/default-user.png'">
+
+    <div class="profile-info">
+      <h1>{{ profile.fullName }}</h1>
+      <h3>{{ profile.headline || 'Job Seeker' }}</h3>
+      <p class="location">📍 {{ profile.location }}</p>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="profile-content">
+
+    <!-- LEFT -->
+    <div>
+
+      <!-- ABOUT -->
+      <div class="card">
+        <h2>About</h2>
+        <p>{{ profile.bio || 'No bio added yet.' }}</p>
+      </div>
+
+      <!-- EXPERIENCE -->
+      <div class="card">
+        <h2>Experience</h2>
+
+        <div *ngIf="profile.experiences?.length; else noExp">
+          <div *ngFor="let exp of profile.experiences">
+            <h4>{{ exp.jobTitle }}</h4>
+            <span>{{ exp.companyName }}</span>
+            <span>{{ exp.startDate | date:'MMM yyyy' }} - {{ exp.endDate ? (exp.endDate | date:'MMM yyyy') : 'Present' }}</span>
+            <p>{{ exp.description }}</p>
+          </div>
+        </div>
+
+        <ng-template #noExp>
+          <p class="muted">No experience added</p>
+        </ng-template>
+      </div>
+
+      <!-- EDUCATION -->
+      <div class="card">
+        <h2>Education</h2>
+
+        <div *ngIf="profile.educations?.length; else noEdu">
+          <div *ngFor="let edu of profile.educations">
+            <h4>{{ edu.degree }}</h4>
+            <span>{{ edu.institution }}</span>
+            <span>{{ edu.startDate | date:'yyyy' }} - {{ edu.endDate | date:'yyyy' }}</span>
+          </div>
+        </div>
+
+        <ng-template #noEdu>
+          <p class="muted">No education added</p>
+        </ng-template>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="card" *ngIf="profile.skills?.length">
+        <h2>Skills</h2>
+        <div class="skills">
+          <span *ngFor="let s of profile.skills">{{ s.name }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+
+      <!-- SOCIAL -->
+      <div class="card">
+        <h2>Social</h2>
+
+        <a *ngIf="profile.githubUrl" [href]="profile.githubUrl" target="_blank" class="social-btn github">
+          GitHub
+        </a>
+
+        <a *ngIf="profile.linkedInUrl" [href]="profile.linkedInUrl" target="_blank" class="social-btn linkedin">
+          LinkedIn
+        </a>
+
+        <p *ngIf="!profile.githubUrl && !profile.linkedInUrl" class="muted">
+          No links
+        </p>
+      </div>
+
+      <!-- RESUME -->
+      <div class="card">
+        <h2>Resume</h2>
+        <a *ngIf="profile.resumeUrl" [href]="profile.resumeUrl" target="_blank" class="btn-full">
+          View Resume
+        </a>
+        <p *ngIf="!profile.resumeUrl" class="muted">No resume</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- 🏢 EMPLOYER PROFILE -->
+<!-- ========================= -->
+<div *ngIf="!loading && profile?.userRole === 'Employer'" class="container">
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <img class="profile-image" [src]="profile.profileImageUrl || 'assets/default-user.png'">
+
+    <div class="profile-info">
+      <h1>{{ profile.fullName }}</h1>
+      <h3>{{ profile.position || 'Employer' }}</h3>
+      <p class="location">📍 {{ profile.location }}</p>
+
+      <div class="meta">
+        <a *ngIf="profile.linkedInUrl" [href]="profile.linkedInUrl" target="_blank">LinkedIn</a>
+        <a *ngIf="profile.githubUrl" [href]="profile.githubUrl" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAL -->
+  <div class="card">
+    <h2>Personal Info</h2>
+    <p>Email: {{ profile.email }}</p>
+    <p>Phone: {{ profile.phoneNumber }}</p>
+    <p>Joined: {{ profile.createdAt | date }}</p>
+    <p>{{ profile.bio }}</p>
+  </div>
+
+  <!-- COMPANY -->
+  <div class="company-card" *ngIf="profile.company">
+    <h3>{{ profile.company.companyName }}</h3>
+    <p>{{ profile.company.description }}</p>
+
+    <p>📍 {{ profile.company.location }}</p>
+    <p>👥 {{ profile.company.companySize }}</p>
+
+    <button class="view-btn" (click)="viewCompanyJobs()">View Jobs</button>
+  </div>
+
+</div>

@@ -31,23 +31,8 @@ this.savedjobsservice.getSavedJobs().subscribe({
 
   }, error: () => this.loading = false
 })  }
-getEmploymentType(id: number): string {
-  switch (id) {
-    case 1: return 'Full-time';
-    case 2: return 'Part-time';
-    case 3: return 'Contract';
-    default: return 'Unknown';
-  }
-}
 
-getWorkMode(id: number): string {
-  switch (id) {
-    case 1: return 'Onsite';
-    case 2: return 'Remote';
-    case 3: return 'Hybrid';
-    default: return 'Unknown';
-  }
-}
+
 
 getStatusText(id: number): string {
   switch (id) {
@@ -60,14 +45,7 @@ getStatusText(id: number): string {
   }
 }
 
-getStatusClass(id: number): string {
-  switch (id) {
-    case 1: return 'applied';
-    case 4: return 'hired';
-    case 5: return 'rejected';
-    default: return '';
-  }
-}
+
 unsavedJob(id:number){
   this.savedjobsservice.unsaveJob(id).subscribe(()=>{
     next:{

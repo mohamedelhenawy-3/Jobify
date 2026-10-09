@@ -33,7 +33,7 @@ export interface GlobalSearchResponse {
 })
 export class SearchsystemService {
 
-  private baseUrl = 'https://localhost:44309/api/Search'; // ⚠️ change if needed
+  private baseUrl = 'https://localhost:7026/api/Search'; // ⚠️ change if needed
 
   constructor(private http: HttpClient) {}
     search(dto: GlobalSearchDto): Observable<GlobalSearchResponse> {

@@ -3,7 +3,7 @@ using Application.Interfaces.Job;
 using Application.Interfaces.JobSeeker;
 using Application.SearchFeature.Dtos;
 using Application.SearchFeature.Interface;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace Infrastructure.Implementation.SearchService
         private readonly IJobSeekerService _seekerservice;
         private readonly ICompanyService _companysrvice;
 
-        public SearchService(AppDBContext db, IJobService js, IJobSeekerService sj,ICompanyService cs)
+        public SearchService(AppDBContext db, IJobService js, IJobSeekerService sj, ICompanyService cs)
         {
             _db = db;
             _companysrvice = cs;
@@ -29,33 +29,39 @@ namespace Infrastructure.Implementation.SearchService
         }
         public async Task<GlobalSearchResponse> GlobalSearchAsync(GlobalSearchDto dto)
         {
-           var response = new GlobalSearchResponse();
-           bool onlyKeyword =!string.IsNullOrEmpty(dto.Keyword) && dto.IndustryIds == null && dto.WorkModeIds == null &&
-           dto.EmploymentTypeIds == null &&
-           dto.CompanySize == null &&
-           dto.Industry == null &&
-           dto.PostedWithinDays == null;
+            var response = new GlobalSearchResponse();
+            var type = (dto.Type ?? "all").Trim().ToLower();
 
-            if (dto.Type == "all" || string.IsNullOrEmpty(dto.Type))
+            if (type == "all" || type == "")
             {
-                response.Jobs = await _jobService.SearchJobsAsync(dto);
-                response.Users = await _seekerservice.SearchUsersAsync(dto);
-                response.Companies = await _companysrvice.SearchCompaniesAsync(dto);
+                bool jobFilters = !string.IsNullOrWhiteSpace(dto.EmploymentType)
+                               || !string.IsNullOrWhiteSpace(dto.ExperienceLevel)
+                               || dto.PostedWithinDays.HasValue;
+
+                bool companyFilters = !string.IsNullOrWhiteSpace(dto.Industry)
+                                   || !string.IsNullOrWhiteSpace(dto.CompanySize);
+
+                bool includeJobs = !companyFilters || jobFilters;
+                bool includeCompanies = !jobFilters || companyFilters;
+                bool includeUsers = !jobFilters && !companyFilters;
+
+                if (includeJobs) response.Jobs = await _jobService.SearchJobsAsync(dto);
+                if (includeCompanies) response.Companies = await _companysrvice.SearchCompaniesAsync(dto);
+                if (includeUsers) response.Users = await _seekerservice.SearchUsersAsync(dto);
 
                 return response;
             }
-            switch (dto.Type)
+
+            switch (type)
             {
                 case "job":
                     response.Jobs = await _jobService.SearchJobsAsync(dto);
                     break;
-
-                case "user":
-                    response.Users = await _seekerservice.SearchUsersAsync(dto);
-                    break;
-
                 case "company":
                     response.Companies = await _companysrvice.SearchCompaniesAsync(dto);
+                    break;
+                case "user":
+                    response.Users = await _seekerservice.SearchUsersAsync(dto);
                     break;
             }
 

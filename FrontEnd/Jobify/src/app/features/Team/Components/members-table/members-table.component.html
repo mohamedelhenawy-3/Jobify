@@ -1,0 +1,163 @@
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Member</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Jobs</th>
+        <th>Joined</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of members">
+        <td>
+          <div class="person">
+            <div class="avatar">{{ initials(m.fullName) }}</div>
+            <div>
+              <strong>{{ m.fullName }}</strong>
+              <span class="you" *ngIf="m.isMe">You</span>
+              <small>{{ m.email }}</small>
+            </div>
+          </div>
+        </td>
+        <td><span class="role r{{ roleId(m.role) }}">{{ roleName(m.role) }}</span></td>
+        <td><span class="status" [class.off]="!m.isActive">{{ m.isActive ? 'Active' : 'Inactive' }}</span></td>
+        <td>{{ m.jobsPosted }}</td>
+        <td>{{ m.joinedAt | date: 'mediumDate' }}</td>
+
+        <td class="actions">
+          <ng-container *ngIf="canManage(m)">
+            <button class="dots" type="button" (click)="toggleMenu($event, m.id)">⋯</button>
+            <ul class="menu" *ngIf="menuOpenId === m.id">
+              <li *ngFor="let a of actionsFor(m)"
+                  [class.danger]="a.danger"
+                  (click)="choose(m, a.key)">{{ a.label }}</li>
+            </ul>
+          </ng-container>
+        </td>
+      </tr>
+
+      <tr *ngIf="members.length === 0">
+        <td colspan="6" class="empty">No members found.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="backdrop" *ngIf="target && mode" (click)="!saving && close()">
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+
+    <ng-container *ngIf="target as m">
+
+      <!-- CHANGE ROLE -->
+      <form *ngIf="mode === 'role'" (ngSubmit)="saveRole(m)">
+        <div class="modal-head">
+          <div class="avatar">{{ initials(m.fullName) }}</div>
+          <div>
+            <h3>Change role</h3>
+            <small>{{ m.fullName }} · currently {{ roleName(m.role) }}</small>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <label class="option" *ngFor="let r of assignableRoles"
+                 [class.selected]="selectedRole === r">
+            <input type="radio" name="role" [checked]="selectedRole === r"
+                   (change)="selectedRole = r" />
+            <span>{{ r }}</span>
+          </label>
+          <p class="hint">Permissions will reset to the defaults of the new role.</p>
+          <p class="error" *ngIf="error">{{ error }}</p>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
+          <button type="submit" class="primary"
+                  [disabled]="saving || selectedRole === roleName(m.role)">
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- EDIT PERMISSIONS -->
+      <form *ngIf="mode === 'permissions'" (ngSubmit)="savePermissions(m)">
+        <div class="modal-head">
+          <div class="avatar">{{ initials(m.fullName) }}</div>
+          <div>
+            <h3>Edit permissions</h3>
+            <small>{{ m.fullName }} · {{ roleName(m.role) }}</small>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <label class="option" *ngFor="let p of allPermissions"
+                 [class.disabled]="!canToggle(p.key)"
+                 [class.selected]="draft.has(p.key)">
+            <input type="checkbox" [checked]="draft.has(p.key)"
+                   [disabled]="!canToggle(p.key)" (change)="togglePerm(p.key)" />
+            <span>{{ p.label }}</span>
+          </label>
+          <p class="hint">You can only grant permissions that you have yourself.</p>
+          <p class="error" *ngIf="error">{{ error }}</p>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
+          <button type="submit" class="primary" [disabled]="saving">
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- REMOVE -->
+      <form *ngIf="mode === 'remove'" (ngSubmit)="doRemove(m)">
+        <div class="modal-head">
+          <div class="avatar danger">!</div>
+          <div>
+            <h3>Remove member</h3>
+            <small>{{ m.fullName }}</small>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <p>{{ m.fullName }} will lose access to the company immediately.</p>
+          <p class="error" *ngIf="error">{{ error }}</p>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
+          <button type="submit" class="danger-btn" [disabled]="saving">
+            {{ saving ? 'Removing…' : 'Remove' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- TRANSFER OWNERSHIP -->
+      <form *ngIf="mode === 'transfer'" (ngSubmit)="doTransfer(m)">
+        <div class="modal-head">
+          <div class="avatar danger">!</div>
+          <div>
+            <h3>Transfer ownership</h3>
+            <small>{{ m.fullName }}</small>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <p>{{ m.fullName }} will become the Owner and you will become an Admin.</p>
+          <p class="error" *ngIf="error">{{ error }}</p>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
+          <button type="submit" class="danger-btn" [disabled]="saving">
+            {{ saving ? 'Transferring…' : 'Transfer' }}
+          </button>
+        </div>
+      </form>
+
+    </ng-container>
+  </div>
+</div>

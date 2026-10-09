@@ -17,10 +17,18 @@ export class JobseekerapplicationsComponent {
 @Input() data!: MyApplicationDto;
   constructor(private applicationService: JobApplicationService) {}
 
+  // getStatusClass(status: string): string {
+  //   return status.toLowerCase().replace(/\s+/g, '');
+  // }
+
   getStatusClass(status: string): string {
-    return status.toLowerCase().replace(/\s+/g, '');
+    const map: Record<string, string> = {
+      'Applied':   'status-applied',
+      'Interview': 'status-interview',
+      'Offer':     'status-offer',
+      'Rejected':  'status-rejected',
+    };
+    return map[status] ?? 'status-applied';
   }
-
-
 
 }

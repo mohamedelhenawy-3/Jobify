@@ -16,7 +16,7 @@ namespace Domain.Entities
 
         public int JobId { get; set; }
         public JobPost Job { get; set; }
-
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

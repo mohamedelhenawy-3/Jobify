@@ -1,61 +1,53 @@
 import { Routes } from '@angular/router';
 import { LandingPageComponent } from './Componats/landing-page/landing-page.component';
-import { EmployeregisterComponent } from './Componats/auth/employer/employeregister/employeregister.component';
-import { JobseekerregisterComponent } from './Componats/auth/jobseeker/jobseekerregister/jobseekerregister.component';
 import { LoginComponent } from './Componats/auth/login/login.component';
 import { RegisterComponent } from './Componats/auth/register/register.component';
 import { HomeComponent } from './Componats/home/home.component';
-import { JobListPageComponentComponent } from './Componats/JobComponents/job-list-page-component/job-list-page-component.component';
-import { JobspagesComponent } from './Componats/JobComponents/jobspages/jobspages.component';
-import { CreatejobComponent } from './Componats/createjob/createjob.component';
-import { ManagejobsComponent } from './Componats/managejobs/managejobs.component';
-import { JobdetailsComponent } from './Componats/jobdetails/jobdetails.component';
-import { SeekerprofileComponent } from './Componats/JoobSeeker/seekerprofile/seekerprofile.component';
-import { UpdateJobComponent } from './Componats/update-job/update-job.component';
-import { ApplicationsComponent } from './Componats/applications/applications.component';
-import { ApplicationDetailsComponent } from './Componats/application-details/application-details.component';
-import { CreatejobapplicationComponent } from './Componats/createjobapplication/createjobapplication.component';
+
 import { SideBarComponent } from './Componats/side-bar/side-bar.component';
 import { MainLayoutComponent } from './Componats/main-layout/main-layout.component';
-import { JobseekerapplicationsComponent } from './Componats/jobseekerapplications/jobseekerapplications.component';
 import { SavedjobsComponent } from './Componats/savedjobs/savedjobs.component';
 import { JobseekerdashboardComponent } from './Componats/jobseekerdashboard/jobseekerdashboard.component';
 import { EmployerdashboardComponent } from './Componats/employerdashboard/employerdashboard.component';
-import { EmployerprofileComponent } from './Componats/EmployerProfile/employerprofile/employerprofile.component';
-import { CompanyProfileComponent } from './Componats/Company/company-profile/company-profile.component';
-import { JobsearchComponent } from './Componats/jobsearch/jobsearch.component';
-import { JobbarfilterComponent } from './Componats/Job-Dashboard/jobbarfilter/jobbarfilter.component';
-import { JobdashboardComponent } from './Componats/Job-Dashboard/jobdashboard/jobdashboard.component';
-import { SearchsystemService } from './Services/SearchSystem/searchsystem.service';
-import { DashboardComponent } from './Componats/SearchSystem/dashboard/dashboard.component';
-import { ApplicationsShellComponent } from './Componats/ApplicationsDashBoard/applications-shell/applications-shell.component';
+import { UserProfileComponent } from './Componats/user-profile/user-profile.component';
+import { OnboardingComponent } from './Componats/employer/onboarding/onboarding.component';
+import { CreatecompanyComponent } from './Componats/employer/createcompany/createcompany.component';
+import { SearchcompanyComponent } from './Componats/employer/searchcompany/searchcompany.component';
+import { PendingApprovalComponent } from './Componats/employer/pending-approval/pending-approval.component';
+import { companyOnboardingGuard } from './Componats/auth/Guard/company-onboarding-guard.guard';
+import { JoinCompanyComponent } from './Componats/employer/join-company/join-company.component';
+import { JOBS_ROUTES } from './features/jobs/jobs.routes';
+import path from 'path/win32';
+import { OwnerProfileComponent } from './features/Owner-Profile/owner-profile/owner-profile.component';
+import { COMPANY_ROUTES } from './features/Company/company.routes';
+import { Search_ROUTES } from './features/SearchSystem/search.routes';
+import { APPLICATIONS_ROUTES } from './features/Application/applications.routes';
+import { TeamLayoutComponent } from './features/Team/Components/team-layout/team-layout.component';
+import { Team_ROUTES } from './features/Team/team.routes';
+import { SeekerProfile_ROUTES } from './features/SeekerProfile/seeker.route';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
     
       { path: 'Jobify',
       component: MainLayoutComponent,
-     children: [
-        { path: 'applications', component: ApplicationsComponent },
-        {path: 'jobsearch', component: JobsearchComponent },
-        {path:'seeker',component:SeekerprofileComponent},
+      children: [
+         ...JOBS_ROUTES,
+         ...COMPANY_ROUTES,
+         ...Search_ROUTES,
+         ...APPLICATIONS_ROUTES,
+        ...Team_ROUTES,
+        ...SeekerProfile_ROUTES,
+
         { path: 'home', component: HomeComponent },
-        { path: 'findjob', component: JobspagesComponent },
-        { path: 'createjob', component: CreatejobComponent },
-        { path: 'managejobs', component: ManagejobsComponent },
-        {path:'jobapplications',component:ApplicationsShellComponent},
-        {path: 'ApplicationDetails/:id', component: ApplicationDetailsComponent },
-        {path:'updateJob/:id',component:UpdateJobComponent},
-        {path:'details/:id',component:JobdetailsComponent},
-        { path: 'apply/:id', component: CreatejobapplicationComponent },
-        { path: 'myapplications', component:ApplicationsShellComponent  },
         { path: 'savedjobs', component: SavedjobsComponent },
         { path: 'jobseekerdashboard', component: JobseekerdashboardComponent },
-        { path: 'employerdashboard', component: EmployerdashboardComponent },
-        { path: 'employerprofile', component: EmployerprofileComponent },
-        { path: 'mycompany',component :CompanyProfileComponent},
-        { path: 'Searchsystem',component :DashboardComponent},
-        { path: 'jobbashoard',component :JobdashboardComponent}
+        { path: 'employerdashboard',canActivate: [companyOnboardingGuard], component: EmployerdashboardComponent },
+        {
+          path: 'employer/profile',
+          component: OwnerProfileComponent,
+        },
+        { path: 'user-profile/:id',component :UserProfileComponent}
 
 
 
@@ -64,9 +56,15 @@ export const routes: Routes = [
      },
     {path:'sidebar',component:SideBarComponent}, 
     { path: 'register', component: RegisterComponent },
-    { path: 'login', component: LoginComponent },
+     { path: 'login', component: LoginComponent },
 
 
+
+     { path: 'employer/onboarding', component: OnboardingComponent },
+     { path: 'employer/pending-approval', component: PendingApprovalComponent },
+     { path: 'employer/createcompany', component: CreatecompanyComponent },
+     { path: 'employer/searchcompany', component: SearchcompanyComponent },
+       { path: 'employer/JoinCompany', component: JoinCompanyComponent },
     // {path:'updateJob/:id',component:UpdateJobComponent},
 
     // {path:'jobapplications',component:ApplicationsComponent},

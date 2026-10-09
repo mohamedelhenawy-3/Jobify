@@ -110,7 +110,7 @@ export class AuthserviceService {
 
   register(data: Register): Observable<any> {
     return this.httpclient.post(
-      `https://localhost:44309/api/Auth/register`,
+      `https://localhost:7026/api/Auth/register`,
       data,
       { responseType: 'text' }
     );
@@ -121,7 +121,7 @@ export class AuthserviceService {
 
     return this.httpclient
       .post<loginresponse>(
-        `https://localhost:44309/api/Auth/login`,
+        `https://localhost:7026/api/Auth/login`,
         { ...data, deviceId }
       )
       .pipe(
@@ -133,7 +133,7 @@ export class AuthserviceService {
 
   refreshToken(): Observable<loginresponse> {
     return this.httpclient.post<loginresponse>(
-      `https://localhost:44309/api/Auth/refresh`,
+      `https://localhost:7026/api/Auth/refresh`,
       {
         refreshToken: this.getRefreshToken(),
         deviceId: this.deviceservice.getdeviceId()
@@ -148,7 +148,7 @@ export class AuthserviceService {
     if (refreshToken) {
       this.httpclient
         .post(
-          `https://localhost:44309/api/Auth/logout`,
+          `https://localhost:7026/api/Auth/logout`,
           { refreshToken, deviceId }
         )
         .subscribe({

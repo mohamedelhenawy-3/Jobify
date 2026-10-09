@@ -1,0 +1,10 @@
+<div class="team-page">
+  <h2>Team</h2>
+  <p class="sub">Manage members, roles and access</p>
+
+  <nav class="tabs">
+    <a *ngFor="let t of tabs" [routerLink]="t.link" routerLinkActive="active">{{ t.label }}</a>
+  </nav>
+
+  <router-outlet />
+</div>

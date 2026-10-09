@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class EmployerdashboarderviceService {
 
  
-  private apiUrl = 'https://localhost:44309/api/EmployerDashboard'; // Replace with your API base URL
+  private apiUrl = 'https://localhost:7026/api/EmployerDashboard'; // Replace with your API base URL
 
   constructor(private http: HttpClient) { }
 

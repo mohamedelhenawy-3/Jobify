@@ -1,10 +1,6 @@
-﻿using Domain.Entities.LooksUp;
-using Domain.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Entities.LooksUp.JobEnum;
 
 namespace Domain.Entities
 {
@@ -12,37 +8,36 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
 
-        // Add this
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+
+        // e.g., FullTime, PartTime, Remote, Contract, Internship
+        public JobType JobType { get; set; } = JobType.FullTime;
+
+        // e.g., EntryLevel, MidLevel, Senior, Lead
+        public ExperienceLevel ExperienceLevel { get; set; } = ExperienceLevel.MidLevel;
+
+  
+        public decimal? SalaryMin { get; set; }
+        public decimal? SalaryMax { get; set; }
+        public string Currency { get; set; } = "USD";
+
+        public string Requirements { get; set; } = string.Empty;
+        public string Responsibilities { get; set; } = string.Empty;
+
+ 
+        public bool IsActive { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime ExpirationDate { get; set; } = DateTime.UtcNow.AddDays(30);
+
+  
         public int CompanyId { get; set; }
-        public Company Company { get; set; }
+        public Company Company { get; set; } = null!;
 
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string Location { get; set; }
-        public string Responsibilities { get; set; }
-        public string EducationOrExperience { get; set; }
-        public string Requirements { get; set; }
-
-
-        public decimal MinSalary { get; set; }
-        public decimal MaxSalary { get; set; }
-
-        public int IndustryId { get; set; }
-        public JobIndustry Industry { get; set; }
-
-        public int EmploymentTypeId { get; set; }
-        public EmploymentType EmploymentType { get; set; }
-
-        public int StatusId { get; set; }
-        public JobStatus Status { get; set; }
-
-        public string CreatedByUserId { get; set; }
-        public AppUser CreatedByUser { get; set; }
-        public int WorkModeId { get; set; } = 1;
-        public bool isActive { get; set; } = true;
-        public WorkMode WorkMode { get; set; } = null!;
-        public DateTime CreatedAt { get; set; }
-
-        public ICollection<JobApplication> Applications { get; set; }
+        public int PostedByEmployerId { get; set; }
+        public EmployerProfile PostedByEmployer { get; set; } = null!;
+        public ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
     }
 }

@@ -38,21 +38,21 @@
             <label>Password</label>
             <input type="password" formControlName="password" placeholder="Min. 8 characters" />
           </div>
+            <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" formControlName="confirmPassword" placeholder="Min. 8 characters" />
+          </div>
 
-          <div class="input-group animate-fade" *ngIf="userType === 'JobSeeker'">
+          <div class="input-group animate-fade" *ngIf="userType === 'JobSeeker'" >
             <label>Full Name</label>
             <input type="text" formControlName="fullName" placeholder="John Doe" />
           </div>
 
           <div class="employer-extra animate-fade" *ngIf="userType === 'Employer'">
             <div class="input-group">
-              <label>Company Name</label>
-              <input type="text" formControlName="companyName" placeholder="Tech Solutions Inc." />
-            </div>
-             <div class="input-group">
-          <label>Company Website</label>
-          <input type="text" formControlName="companyWebsite" placeholder="https://company.com" />
-        </div>
+                 <label>Full Name</label>
+            <input type="text" formControlName="fullName" placeholder="John Doe" />
+           </div>
           </div>
         </div>
 

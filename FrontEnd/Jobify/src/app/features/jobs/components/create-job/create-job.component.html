@@ -1,0 +1,119 @@
+<div class="page-content">
+  <div class="job-form-container">
+
+    <h2 class="form-title">Post a Job</h2>
+
+    <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="job-form" novalidate>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title">Job Title</label>
+        <input id="title" formControlName="title" placeholder="e.g., Frontend Developer"
+               [class.invalid]="f['title'].touched && f['title'].invalid" />
+        <small class="error-text" *ngIf="f['title'].touched && f['title'].invalid">
+          Job title is required.
+        </small>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Job Description</label>
+        <textarea id="description" formControlName="description" rows="5"
+                  placeholder="Describe the role"
+                  [class.invalid]="f['description'].touched && f['description'].invalid"></textarea>
+        <small class="error-text" *ngIf="f['description'].touched && f['description'].invalid">
+          Description is required.
+        </small>
+      </div>
+
+      <!-- Requirements -->
+      <div class="form-group">
+        <label for="requirements">Requirements</label>
+        <textarea id="requirements" formControlName="requirements" rows="5"
+                  placeholder="Skills, education, years of experience..."
+                  [class.invalid]="f['requirements'].touched && f['requirements'].invalid"></textarea>
+        <small class="error-text" *ngIf="f['requirements'].touched && f['requirements'].invalid">
+          Requirements are required.
+        </small>
+      </div>
+
+      <!-- Responsibilities -->
+      <div class="form-group">
+        <label for="responsibilities">Responsibilities</label>
+        <textarea id="responsibilities" formControlName="responsibilities" rows="5"
+                  placeholder="Day-to-day tasks and duties..."
+                  [class.invalid]="f['responsibilities'].touched && f['responsibilities'].invalid"></textarea>
+        <small class="error-text" *ngIf="f['responsibilities'].touched && f['responsibilities'].invalid">
+          Responsibilities are required.
+        </small>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input id="location" formControlName="location" placeholder="e.g., Cairo, Egypt"
+               [class.invalid]="f['location'].touched && f['location'].invalid" />
+        <small class="error-text" *ngIf="f['location'].touched && f['location'].invalid">
+          Location is required.
+        </small>
+      </div>
+
+      <!-- Salary row -->
+      <div class="form-row cols-3">
+        <div class="form-group">
+          <label for="minSalary">Min Salary</label>
+          <input type="number" id="minSalary" formControlName="minSalary" placeholder="e.g., 2000" />
+        </div>
+        <div class="form-group">
+          <label for="maxSalary">Max Salary</label>
+          <input type="number" id="maxSalary" formControlName="maxSalary" placeholder="e.g., 18000" />
+        </div>
+        <div class="form-group">
+          <label for="currency">Currency</label>
+          <input id="currency" formControlName="currency" maxlength="3" placeholder="USD"
+                 class="uppercase" />
+        </div>
+      </div>
+
+      <!-- Dropdown row -->
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label for="jobType">Job Type</label>
+          <select id="jobType" formControlName="jobType">
+            <option *ngFor="let t of jobTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="experienceLevel">Experience Level</label>
+          <select id="experienceLevel" formControlName="experienceLevel">
+            <option *ngFor="let l of experienceLevels" [value]="l">{{ l }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Expiration + Active -->
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label for="expirationDate">Expiration Date <span class="optional">(optional)</span></label>
+          <input type="datetime-local" id="expirationDate" formControlName="expirationDate" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <label class="switch">
+            <input type="checkbox" formControlName="isActive" />
+            <span class="slider"></span>
+            <span class="switch-text">Active</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="loading">
+        {{ loading ? 'Saving...' : 'Post Job' }}
+      </button>
+
+    </form>
+  </div>
+</div>

@@ -5,73 +5,77 @@ import { Observable } from 'rxjs';
 import { JobResponse } from '../../Models/Job/jobres';
 import { createjob } from '../../Models/Job/createjob';
 import { Job } from '../../Models/Job/job';
-import { jobdetails } from '../../Models/Job/dteailsjob';
+import { jobdetails } from '../../Models/Job/detailsjob';
 import { JobRecommendation } from '../../Models/Job/recommendedjob';
 import { OpeningJobs } from '../../Models/Job/openjobsmodel';
 import { SearchJob } from '../../Models/Job/search';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class JobService {
-private apiUrl = 'https://localhost:44309/api/Job';
+private apiUrl = 'https://localhost:7026/api/Job';
 
    constructor(private HttpClient:HttpClient) { }
 
 
 
   GetAllIndustriesWithJobCount():Observable<industrieswithjobcount[]>{
-    return this.HttpClient.get<industrieswithjobcount[]>(`https://localhost:44309/api/Job/GetAllIndustriesWithJobCount`)
+    return this.HttpClient.get<industrieswithjobcount[]>(`https://localhost:7026/api/Job/GetAllIndustriesWithJobCount`)
   }
   getopeningjobs():Observable<OpeningJobs[]>{
-    return this.HttpClient.get<OpeningJobs[]>(`https://localhost:44309/api/Job/OpeningJobs`)
+    return this.HttpClient.get<OpeningJobs[]>(`https://localhost:7026/api/Job/OpeningJobs`)
 
   }
 
 
 
- 
+   EmployerJobs():Observable<jobdetails[]>{
+    return this.HttpClient.get<jobdetails[]>(`https://localhost:7026/api/Job/my-jobs`)
+  }
+    JobsForCompanyOwner():Observable<jobdetails[]>{
+    return this.HttpClient.get<jobdetails[]>(`https://localhost:7026/api/Job/CompanyJobs`)
+  }
+
+
+
+
+
 
   
-    getJobs(page: any, pageSize: number, filters: any): Observable<JobResponse> {
+    getJobs(page: any, pageSize: number): Observable<JobResponse> {
     let params = new HttpParams()
       .set('page', page)
       .set('pageSize', pageSize);
 
-    if (filters?.industries?.length) {
-      params = params.set('IndustryIds', filters.industries.join(',')); // comma-separated
-    }
-
-    if (filters?.types?.length) {
-      params = params.set('EmploymentTypeIds', filters.types.join(','));
-    }
-
-    if (filters?.modes?.length) {
-      params = params.set('WorkModeIds', filters.modes.join(','));
-    }
-
     return this.HttpClient.get<JobResponse>(`${this.apiUrl}/search`, { params });
   }
+
+
+
+
   createJob(job: createjob): Observable<any> {
     return this.HttpClient.post(`${this.apiUrl}/CreateJob`, job);
   }
-    EmployerJobs():Observable<jobdetails[]>{
-    return this.HttpClient.get<jobdetails[]>(`https://localhost:44309/api/Job/my-jobs`)
-  }
+  
   getJobDetails(id: number) {
-  return this.HttpClient.get<jobdetails>(`https://localhost:44309/api/Job/${id}`);
-}
-getJob(id:number){
-    return this.HttpClient.get<Job>(`https://localhost:44309/api/Job/myjob/${id}`);
+  return this.HttpClient.get<jobdetails>(`https://localhost:7026/api/Job/${id}`);
+  }
 
+
+
+getJobDetailsForJobseeker(jobId: number): Observable<any> {
+  return this.HttpClient.get<any>(`https://localhost:7026/api/Job/${jobId}/jobseeker-details`);
 }
+
 updateJob(id: number, data: any): Observable<any> {
-  return this.HttpClient.put(`https://localhost:44309/api/Job/${id}`, data);
+  return this.HttpClient.put(`https://localhost:7026/api/Job/${id}`, data);
 }
 
 
   getRecommendedJobs(): Observable<JobRecommendation[]> {
-    return this.HttpClient.get<JobRecommendation[]>(`https://localhost:44309/api/Job/recommended`);
+    return this.HttpClient.get<JobRecommendation[]>(`https://localhost:7026/api/Job/recommended`);
   }
 
 
@@ -80,7 +84,7 @@ updateJob(id: number, data: any): Observable<any> {
 
 search(filter: any) {
   return this.HttpClient.post<any[]>(
-    `https://localhost:44309/api/Job/filter`,
+    `https://localhost:7026/api/Job/filter`,
     filter
   );
 }
@@ -89,6 +93,10 @@ saveJobAlert(keyword: string): Observable<any> {
   return this.HttpClient.post(`${this.apiUrl}/SaveAlert`, JSON.stringify(keyword), {
     headers: { 'Content-Type': 'application/json' }
   });
+}
+  getJob(id:number){
+    return this.HttpClient.get<Job>(`https://localhost:7026/api/Job/myjob/${id}`);
+
 }
 
 }

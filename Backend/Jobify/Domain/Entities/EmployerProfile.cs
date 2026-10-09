@@ -1,4 +1,5 @@
-﻿using Domain.Identity;
+﻿using Domain.Entities.LooksUp.EmployerPermisions;
+using Domain.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,17 @@ namespace Domain.Entities
         public AppUser User { get; set; }
         public string? Bio { get; set; }
         public string? Position { get; set; }
-      
-        public ProfileImage? ProfileImage { get; set; }
+        public bool IsPublic { get; set; } = true;
+        public EmployerCompanyRole? Role { get; set; }
+        public List<string> Permissions { get; set; } = new();
+
+        public bool IsActive { get; set; } = true;
+        public DateTime? JoinedCompanyAt { get; set; }
+
+        public int? CompanyId { get; set; }
         public Company? Company { get; set; }
+
+        public ProfileImage? ProfileImage { get; set; }
 
       
         

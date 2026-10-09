@@ -1,0 +1,98 @@
+
+/* GENERAL */
+.profile-page, .container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* HEADER */
+.profile-header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* CONTENT GRID */
+.profile-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* CARD */
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+/* TEXT */
+h2 { margin-bottom: 10px; }
+.muted { color: gray; }
+
+/* SKILLS */
+.skills span {
+  background: #e0f2fe;
+  padding: 6px 10px;
+  margin: 5px;
+  display: inline-block;
+  border-radius: 8px;
+}
+
+/* BUTTON */
+.btn-full {
+  display: block;
+  text-align: center;
+  background: #2563eb;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* SOCIAL */
+.social-btn {
+  display: block;
+  margin-bottom: 10px;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  color: white;
+}
+
+.github { background: #333; }
+.linkedin { background: #0a66c2; }
+
+/* COMPANY */
+.company-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* PRIVATE */
+.private-profile {
+  text-align: center;
+  margin-top: 50px;
+  color: red;
+  font-weight: bold;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .profile-content {
+    grid-template-columns: 1fr;
+  }
+}

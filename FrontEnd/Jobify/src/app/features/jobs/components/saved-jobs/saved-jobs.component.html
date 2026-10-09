@@ -1,0 +1,81 @@
+<div class="head">
+  <div>
+    <h2>Saved jobs</h2>
+    <p class="sub">Jobs you bookmarked to look at later.</p>
+  </div>
+  <span class="counter" *ngIf="result">{{ result.totalCount }} saved</span>
+</div>
+
+<p class="loading" *ngIf="loading">Loading...</p>
+<p class="error" *ngIf="error">{{ error }}</p>
+
+<ng-container *ngIf="result">
+  <div class="list">
+
+    <div class="job" *ngFor="let j of result.items">
+      <img *ngIf="j.logo; else noLogo" class="logo img" [src]="j.logo" [alt]="j.title" />
+      <ng-template #noLogo>
+        <div class="logo">{{ initials(j.title) }}</div>
+      </ng-template>
+
+      <div class="info">
+        <a class="title" [routerLink]="['/jobs', j.id]">{{ j.title }}</a>
+        <div class="chips">
+          <span class="chip" *ngIf="j.location"><i class="fas fa-map-marker-alt"></i> {{ j.location }}</span>
+          <span class="chip"><i class="fas fa-briefcase"></i> {{ j.jobType }}</span>
+          <span class="chip"><i class="fas fa-layer-group"></i> {{ j.experienceLevel }}</span>
+        </div>
+        <small class="date">Saved {{ j.savedAt | date: 'mediumDate' }}</small>
+      </div>
+
+      <a class="view" [routerLink]="['/jobs', j.id]">View job</a>
+
+      <button type="button" class="bookmark" aria-label="Remove from saved jobs"
+              title="Remove from saved jobs" (click)="askRemove(j)">
+        <i class="fas fa-bookmark"></i>
+      </button>
+    </div>
+
+    <!-- empty state -->
+    <div class="empty" *ngIf="!loading && result.items.length === 0">
+      <i class="far fa-bookmark"></i>
+      <h3>No saved jobs yet</h3>
+      <p>Tap the bookmark on any job to keep it here.</p>
+      <a routerLink="/Jobify/jobs" class="primary-link">Browse jobs</a>
+    </div>
+  </div>
+
+  <app-pager *ngIf="result.totalCount > 0"
+             [page]="pageNumber"
+             [totalPages]="result.totalCount"
+             [totalCount]="result.totalCount"
+             (pageChange)="onPage($event)" />
+</ng-container>
+
+<!-- toast -->
+<div class="toast" *ngIf="toast">{{ toast }}</div>
+
+<!-- remove confirm modal -->
+<div class="backdrop" *ngIf="target" (click)="close()">
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <div class="warn"><i class="fas fa-bookmark"></i></div>
+      <div>
+        <h3>Remove saved job</h3>
+        <small>{{ target.title }}</small>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <p>This job will be removed from your saved list. You can save it again from the job page.</p>
+      <p class="error" *ngIf="modalError">{{ modalError }}</p>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" (click)="close()" [disabled]="removing">Cancel</button>
+      <button type="button" class="danger-btn" (click)="confirmRemove()" [disabled]="removing">
+        {{ removing ? 'Removing…' : 'Remove' }}
+      </button>
+    </div>
+  </div>
+</div>

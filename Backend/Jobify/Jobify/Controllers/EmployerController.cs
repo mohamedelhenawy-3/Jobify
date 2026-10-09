@@ -23,17 +23,25 @@ namespace Jobify.Controllers
             _profileService = profileService;
         }
     
-        [HttpGet]
-        public async Task<IActionResult> GetProfile()
+        //[HttpGet]
+        //public async Task<IActionResult> GetProfile()
+        //{
+        //    var profile = await _profileService.MyProfile();
+
+        //    if (profile == null)
+        //        return NotFound(new { message = "Company profile not found" });
+
+        //    return Ok(profile);
+        //}
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfileAsync()
         {
-            var profile = await _profileService.MyProfile();
-
-            if (profile == null)
-                return NotFound(new { message = "Company profile not found" });
-
-            return Ok(profile);
+            var profile = await _profileService.GetOwnerProfileAsync();
+            return profile == null ? Forbid() : Ok(profile);
         }
-        [HttpPut]
+
+        [HttpPut("profile")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateProfile([FromForm] UpdateEmployerProfile model)
         {
             var result = await _profileService.UpdateAsync(model);

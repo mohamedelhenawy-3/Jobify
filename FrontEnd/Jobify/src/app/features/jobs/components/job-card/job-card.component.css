@@ -1,0 +1,43 @@
+.card {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 16px; margin-bottom: 10px;
+  border: 1px solid #e5e7eb; border-radius: 10px; background: #fff;
+  transition: border-color .15s, background .15s;
+}
+.card:hover { border-color: #4f46e5; background: #eef2ff; }
+
+.card-link {
+  display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;
+  text-decoration: none; color: inherit;
+}
+
+.logo { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.logo.placeholder { display: grid; place-items: center; background: #eef2ff; color: #4f46e5; font-weight: 700; }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.main small, .side small { color: #6b7280; font-size: 12px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip { padding: 3px 10px; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 12px; }
+
+.side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.status { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #f1f5f9; color: #6b7280; }
+.status.active  { background: #dcfce7; color: #15803d; }
+.status.expired { background: #fef3c7; color: #b45309; }
+.status.closed  { background: #fee2e2; color: #b91c1c; }
+
+/* Buttons (from the old design) */
+.actions { display: flex; gap: 8px; margin-top: 6px; }
+.btn-primary, .btn-secondary {
+  padding: 8px 14px; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease; text-align: center; outline: none;
+}
+.btn-primary { background-color: #2563eb; color: #fff; border: 1px solid #2563eb; }
+.btn-primary:hover { background-color: #1d4ed8; border-color: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+.btn-secondary { background-color: #fff; color: #1e293b; border: 1px solid #cbd5e1; }
+.btn-secondary:hover { background-color: #f8fafc; border-color: #2563eb; color: #2563eb; }
+
+@media (max-width: 600px) {
+  .card { flex-wrap: wrap; }
+  .side { align-items: flex-start; }
+}
