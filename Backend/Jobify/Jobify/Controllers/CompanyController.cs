@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Comapny;
 using Application.DTOs.Comapny.RefactorCompany;
+using Application.DTOs.Comapny.RefactorCompany.RecordDto;
 using Application.Interfaces.Company;
 using Application.Interfaces.PublicCompany;
 using Microsoft.AspNetCore.Authorization;
@@ -66,7 +67,14 @@ namespace Jobify.Controllers
             var result = await _companyService.PrivateCompany();
             return Ok(result);
         }
- 
+        [HttpGet("top-hiring")]
+        [ProducesResponseType(typeof(IReadOnlyList<TopHiringCompanyDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<TopHiringCompanyDto>>> GetTopHiring(
+              [FromQuery] int count = 8, CancellationToken ct = default)
+        {
+            var companies = await _companyService.GetTopHiringCompaniesAsync(count, ct);
+            return Ok(companies);
+        }
 
     }
 }

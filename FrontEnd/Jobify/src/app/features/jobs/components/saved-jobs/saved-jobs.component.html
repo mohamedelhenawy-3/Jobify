@@ -19,7 +19,7 @@
       </ng-template>
 
       <div class="info">
-        <a class="title" [routerLink]="['/jobs', j.id]">{{ j.title }}</a>
+        <a class="title" [routerLink]="['/Jobify/jobs', j.id]">{{ j.title }}</a>
         <div class="chips">
           <span class="chip" *ngIf="j.location"><i class="fas fa-map-marker-alt"></i> {{ j.location }}</span>
           <span class="chip"><i class="fas fa-briefcase"></i> {{ j.jobType }}</span>
@@ -28,7 +28,7 @@
         <small class="date">Saved {{ j.savedAt | date: 'mediumDate' }}</small>
       </div>
 
-      <a class="view" [routerLink]="['/jobs', j.id]">View job</a>
+      <a class="view" [routerLink]="['/Jobify/jobs', j.id]">View job</a>
 
       <button type="button" class="bookmark" aria-label="Remove from saved jobs"
               title="Remove from saved jobs" (click)="askRemove(j)">

@@ -80,13 +80,20 @@ namespace Jobify.Controllers
             await _memberService.ChangeRoleAsync(id, dto);
             return NoContent();
         }
-        [HttpDelete("{employerId}")]
-        public async Task<IActionResult> Remove(int employerId)
-          => Ok(await _memberService.RemoveMemberAsync(employerId));
+        [HttpDelete("members/{memberId:int}")]
+        public async Task<IActionResult> RemoveMember(int memberId, [FromBody] RemoveMemberDto? dto = null)
+        {
+            var result = await _memberService.RemoveMemberAsync(memberId, dto);
+            return Ok(result);
+        }
 
-        [HttpPost("leave")]
-        public async Task<IActionResult> Leave()
-            => Ok(await _memberService.LeaveCompanyAsync());
+        [HttpPost("members/leave")]
+        public async Task<IActionResult> LeaveCompany([FromBody] RemoveMemberDto? dto = null)
+        {
+            var result = await _memberService.LeaveCompanyAsync(dto);
+            return Ok(result);
+        }
+
 
         [HttpPost("transfer-ownership/{newOwnerEmployerId}")]
         public async Task<IActionResult> Transfer(int newOwnerEmployerId)
@@ -105,5 +112,24 @@ namespace Jobify.Controllers
         public async Task<ActionResult<SuccessResponseDto>> Permissions(int id, UpdatePermissionsDto dto)
             => Ok(await _memberService.UpdatePermissionsAsync(id, dto));
 
+
+
+        [HttpGet("activity")]
+        public async Task<ActionResult<PagedResult<ActivityDto>>> Activity([FromQuery] ActivityFilterDto f)
+    => Ok(await _memberService.GetActivityAsync(f));
+
+
+
+        /// <summary>Activities where I am the actor or the target.</summary>
+        [HttpGet("activity/me")]
+        public async Task<IActionResult> GetMyActivity([FromQuery] ActivityFilterDto filter) =>
+            Ok(await _memberService.GetMyActivityAsync(filter));
+
+        [HttpGet("companyactivity")]
+        public async Task<IActionResult> GetCompanyActivity([FromQuery] ActivityFilterDto filter) =>
+            Ok(await _memberService.GetCompanyActivityAsync(filter));
     }
+
+
 }
+

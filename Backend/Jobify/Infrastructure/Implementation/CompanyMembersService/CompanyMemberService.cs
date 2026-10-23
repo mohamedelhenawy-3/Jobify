@@ -4,9 +4,11 @@ using Application.DTOs.CompanyMembers;
 using Application.DTOs.JobPost.JobDTO;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.CompanyMembers;
+using Application.Interfaces.Logger;
 using Application.Interfaces.Permisions;
 using Application.Interfaces.User;
 using Domain.Entities;
+using Domain.Entities.Comp;
 using Domain.Entities.LooksUp.EmployerPermisions;
 using Infrastructure.CurrentUserService;
 using Infrastructure.Implementation.AuthService;
@@ -28,10 +30,13 @@ namespace Infrastructure.Implementation.CompanyMembersService
         private readonly IEmployerPermissionService _permissionService;
         private CloudinaryService _cloudinaryService;
 
+        private readonly IActivityLogger _activity;
+
 
         public CompanyMemberService(
             AppDBContext context,
             ICurrentUser currentUser,
+            IActivityLogger activitu,
             IEmployerPermissionService permissionService,
               CloudinaryService cloudinaryService)
         {
@@ -39,6 +44,30 @@ namespace Infrastructure.Implementation.CompanyMembersService
             _currentUser = currentUser;
             _permissionService = permissionService;
             _cloudinaryService = cloudinaryService;
+            _activity = activitu;
+        }
+        private async Task<string> NameOfAsync(int employerId) => await _context.EmployerProfiles
+        .Where(e => e.Id == employerId)
+        .Select(e => e.User.FullName)
+        .FirstOrDefaultAsync() ?? "Unknown";
+
+        private async Task LogAsync(int companyId, EmployerProfile actor, EmployerProfile? target,
+                            ActivityType type, Func<string, string?, string> message)
+        {
+            var actorName = await NameOfAsync(actor.Id);
+            var targetName = target == null ? null : await NameOfAsync(target.Id);
+
+            _context.CompanyActivities.Add(new CompanyActivity
+            {
+                CompanyId = companyId,
+                Type = type,
+                ActorEmployerId = actor.Id,
+                ActorName = actorName,
+                TargetEmployerId = target?.Id,
+                TargetName = targetName,
+                Message = message(actorName, targetName),
+                CreatedAt = DateTime.UtcNow
+            });
         }
         private async Task<EmployerProfile> GetActorAsync() => await _permissionService.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.ManageEmployerRoles) ?? throw new UnauthorizedAccessException("You don't have access to manage the team.");
         private async Task<EmployerProfile> GetTargetAsync(EmployerProfile actor, int id)
@@ -91,91 +120,104 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
             target.Role = dto.NewRole;
             target.Permissions = dto.NewRole.DefaultPermissions()
-                                 .Where(p => CanGrant(actor, p))      // never give more than the actor has
+                                 .Where(p => CanGrant(actor, p))      
                                    .ToList();
-
+            await _activity.LogAsync(actor.CompanyId!.Value, actor, target, ActivityType.RoleChanged,(a, t) => $"{a} changed {t}'s role from {target.Role} to {dto.NewRole}.");
             await _context.SaveChangesAsync();
 
             return new SuccessResponseDto { Message = $"Role changed to {dto.NewRole}." };
         }
 
 
-        public async Task<SuccessResponseDto> RemoveMemberAsync(int targetEmployerId)
+        public async Task<SuccessResponseDto> RemoveMemberAsync(int targetEmployerId, RemoveMemberDto dto)
         {
-            var acting = await _context.EmployerProfiles
-               .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
-            if (acting?.CompanyId == null)
-                return new SuccessResponseDto { Message = "Employer profile not found." };
+            var actor = await GetActorAsync();                     
+            var target = await GetTargetAsync(actor, targetEmployerId); 
 
 
-            var target = await _context.EmployerProfiles.FindAsync(targetEmployerId);
-            if (target == null || target.CompanyId != acting.CompanyId)
-                return new SuccessResponseDto { Message = "Employer not found in your company." };
+            var newPosterId = dto.ReassignToEmployerId ?? actor.Id;
+          
 
 
-            if (!_permissionService.HasPermission(acting, EmployerPermissions.ManageEmployerRoles))
-                return new SuccessResponseDto { Message = "You do not have permission to remove members." };
+            var newPoster = await _context.EmployerProfiles.FirstOrDefaultAsync(e =>
+                    e.Id == newPosterId &&
+                    e.Id != target.Id &&
+                    e.CompanyId == actor.CompanyId &&
+                    e.IsActive&&e.HasAccess)
+                ?? throw new InvalidOperationException("Choose a valid active member to take over the jobs.");
+
+            await using var tx = await _context.Database.BeginTransactionAsync();
+
+            var companyId = actor.CompanyId!.Value;
+            var newPosterName = await NameOfAsync(newPosterId);
+            await _context.JobPosts
+                .Where(j => j.CompanyId == companyId && j.PostedByEmployerId == target.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(j => j.PostedByEmployerId, newPoster.Id));
+
+            await _activity.LogAsync(companyId, actor, target, ActivityType.MemberRemoved,
+                (a, t) => $"{a} removed {t} from the company. Their jobs were reassigned to {newPosterName}.");
 
 
-            if (target.Id == acting.Id)
-                return new SuccessResponseDto { Message = "Use leave company instead." };
+            await tx.CommitAsync();
 
-            if (target.Role == EmployerCompanyRole.Owner)
-                return new SuccessResponseDto { Message = "The Owner cannot be removed. Transfer ownership first." };
-
-            if (target.Role == EmployerCompanyRole.Admin && acting.Role != EmployerCompanyRole.Owner)
-                return new SuccessResponseDto
-                {
-                    Message = "Only the Owner can remove Admins."
-                };
-
-            Unlink(target);
-            await _context.SaveChangesAsync();
-            return new SuccessResponseDto { Message = "Member removed from the company." };
-
-
-
-
+            return new SuccessResponseDto { Message = "Member removed and their jobs were reassigned." };
         }
+        
 
-        public async Task<SuccessResponseDto> LeaveCompanyAsync()
+        public async Task<SuccessResponseDto> LeaveCompanyAsync(RemoveMemberDto dto)
         {
-            var me = await _context.EmployerProfiles
-                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
-            if (me?.CompanyId == null)
-                return new SuccessResponseDto { Message = "You are not in a company." };
-
+            var me = await _context.EmployerProfiles.FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId)
+                ?? throw new KeyNotFoundException("Profile not found.");
+            if (me.CompanyId == null) throw new InvalidOperationException("You are not in a company.");
             if (me.Role == EmployerCompanyRole.Owner)
-                return new SuccessResponseDto { Message = "The Owner cannot leave. Transfer ownership first." };
+                throw new InvalidOperationException("The Owner cannot leave. Transfer ownership first.");
 
+            var newPoster = await _context.EmployerProfiles.FirstOrDefaultAsync(e =>
+                    e.Id == dto.ReassignToEmployerId && e.Id != me.Id &&
+                    e.CompanyId == me.CompanyId && e.IsActive && e.HasAccess)
+                ?? await _context.EmployerProfiles.FirstAsync(e =>
+                    e.CompanyId == me.CompanyId && e.Role == EmployerCompanyRole.Owner);
+
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            await _context.JobPosts
+                .Where(j => j.CompanyId == me.CompanyId && j.PostedByEmployerId == me.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(j => j.PostedByEmployerId, newPoster.Id));
+            var companyId = me.CompanyId!.Value;
+
+            await _activity.LogAsync(companyId, me, null, ActivityType.MemberLeft,
+                (a, _) => $"{a} left the company.");
             Unlink(me);
             await _context.SaveChangesAsync();
+            await tx.CommitAsync();
+
             return new SuccessResponseDto { Message = "You left the company." };
         }
         public async Task<SuccessResponseDto> TransferOwnershipAsync(int newOwnerEmployerId)
         {
-            var acting = await _context.EmployerProfiles
-                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
+            var acting = await _context.EmployerProfiles.FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
             if (acting?.CompanyId == null || acting.Role != EmployerCompanyRole.Owner)
-                return new SuccessResponseDto { Message = "Only the Owner can transfer ownership." };
+                throw new UnauthorizedAccessException("Only the Owner can transfer ownership.");
 
-            var target = await _context.EmployerProfiles.FindAsync(newOwnerEmployerId);
-            if (target == null || target.CompanyId != acting.CompanyId || !target.IsActive)
-                return new SuccessResponseDto { Message = "Employer not found in your company." };
+            var target = await _context.EmployerProfiles.FirstOrDefaultAsync(e =>
+                    e.Id == newOwnerEmployerId && e.CompanyId == acting.CompanyId && e.IsActive && e.HasAccess)
+                ?? throw new KeyNotFoundException("Member not found in your company.");
 
             if (target.Id == acting.Id)
-                return new SuccessResponseDto { Message = "You are already the Owner." };
+                throw new InvalidOperationException("You are already the Owner.");
 
-            // one SaveChanges = one transaction, so there is never a moment with zero or two Owners
             target.Role = EmployerCompanyRole.Owner;
             target.Permissions = EmployerCompanyRole.Owner.DefaultPermissions();
             acting.Role = EmployerCompanyRole.Admin;
             acting.Permissions = EmployerCompanyRole.Admin.DefaultPermissions();
-            await _context.SaveChangesAsync();
+
+            await _activity.LogAsync(acting.CompanyId!.Value, acting, target, ActivityType.OwnershipTransferred,
+               (a, t) => $"{a} transferred ownership to {t}. {a} is now an Admin.");
+
+
+            await _context.SaveChangesAsync();   // one transaction: never zero or two Owners
 
             return new SuccessResponseDto { Message = "Ownership transferred. You are now an Admin." };
         }
-
 
 
 
@@ -215,8 +257,8 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
         public async Task<CompanyProfileDto> GetMyCompanyAsync()
         {
-            var me = await _context.EmployerProfiles.Include(X => X.User)
-                    .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
+            var me = await _context.EmployerProfiles.Include(x => x.User)
+                 .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId && e.IsActive);
 
             if (me?.CompanyId == null)
                 return null;
@@ -250,7 +292,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
         public async Task<CompanyProfileDto> UpdateMyCompanyAsync(UpdateCompanyDto dto)
         {
             var employerProfile = await _context.EmployerProfiles
-                .FirstOrDefaultAsync(x => x.UserId == _currentUser.UserId);
+                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId && e.IsActive && e.HasAccess) ;
 
             if (employerProfile == null || employerProfile.CompanyId == null)
                 throw new KeyNotFoundException("You do not belong to a company.");
@@ -276,6 +318,8 @@ namespace Infrastructure.Implementation.CompanyMembersService
             company.Industry = dto.Industry;
             company.CompanySize = dto.CompanySize;
             company.Founded = dto.Founded;
+            await _activity.LogAsync(company.Id, employerProfile, null, ActivityType.CompanyUpdated,
+    (a, _) => $"{a} updated the company profile.");
 
             // Logo
             if (dto.Logo != null)
@@ -283,10 +327,13 @@ namespace Infrastructure.Implementation.CompanyMembersService
                 if (!dto.Logo.ContentType.StartsWith("image/") || dto.Logo.Length > 2 * 1024 * 1024)
                     throw new ArgumentException("Logo must be an image under 2 MB.");
 
+
                 // 1. upload the new one first
                 var (url, publicId) = await _cloudinaryService.UploadImageAsync(dto.Logo);
 
                 var oldPublicId = company.Logo?.PublicId;
+                await _activity.LogAsync(company.Id, employerProfile, null, ActivityType.CompanyLogoChanged,
+     (a, _) => $"{a} changed the company logo.");
 
                 // 2. save it on the company
                 if (company.Logo == null)
@@ -297,6 +344,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
                         PublicId = publicId,
                         CreatedAt = DateTime.UtcNow
                     };
+
                 }
                 else
                 {
@@ -315,7 +363,8 @@ namespace Infrastructure.Implementation.CompanyMembersService
             {
                 await _context.SaveChangesAsync();
             }
-
+            await LogAsync(company.Id, employerProfile, null, ActivityType.CompanyUpdated,
+                            (a, _) => $"{a} updated the company profile.");
             return await GetMyCompanyAsync();
         }
 
@@ -371,6 +420,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
             if (f.IsActive.HasValue) q = q.Where(e => e.IsActive == f.IsActive);
 
 
+
             if (!string.IsNullOrWhiteSpace(f.Search))
             {
                 var s = f.Search.Trim().ToLower();
@@ -402,6 +452,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
                 {
                     Id = e.Id,
                     FullName = e.User.FullName,
+                    HasAccessed=e.HasAccess,
                     Email = e.User.Email,
                     Role = e.Role.Value,
                     IsActive = e.IsActive,
@@ -429,8 +480,9 @@ namespace Infrastructure.Implementation.CompanyMembersService
             var actor = await GetActorAsync();
             var target = await GetTargetAsync(actor, memberId);
 
-            target.IsActive = dto.IsActive;
-
+            target.HasAccess = dto.HasAccessed;
+            await LogAsync(actor.CompanyId!.Value, actor, target, ActivityType.AccessChanged,
+            (a, t) => dto.HasAccessed? $"{a} restored {t}'s access to the company.": $"{a} denied {t}'s access to the company.");
             await _context.SaveChangesAsync();
 
 
@@ -441,13 +493,17 @@ namespace Infrastructure.Implementation.CompanyMembersService
         {
             var me = await _context.EmployerProfiles
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId && e.CompanyId != null && e.IsActive)
+                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId && e.CompanyId != null)
                 ?? throw new UnauthorizedAccessException("You are not in a company.");
+
+            var canUse = me.IsActive && me.HasAccess;
 
             return new MyTeamRoleDto
             {
                 Role = me.Role ?? EmployerCompanyRole.Employer,
-                Permissions = me.Permissions.ToList()
+                Permissions = canUse ? me.Permissions.ToList() : new List<string>(),
+                IsActive = me.IsActive,
+                HasAccess = me.HasAccess
             };
         }
         public async Task<SuccessResponseDto> UpdatePermissionsAsync(int memberId, UpdatePermissionsDto dto)
@@ -461,13 +517,113 @@ namespace Infrastructure.Implementation.CompanyMembersService
                 throw new InvalidOperationException("Unknown permission.");
 
             var added = requested.Except(target.Permissions).ToList();
+            var removed = target.Permissions.Except(requested).ToList();
             if (added.Any(p => !CanGrant(actor, p)))
                 throw new UnauthorizedAccessException("You can't grant permissions you don't have.");
 
             target.Permissions = requested;
+            await _activity.LogAsync(actor.CompanyId!.Value, actor, target, ActivityType.PermissionsChanged, (a, t) =>
+            {
+                var parts = new List<string>();
+                if (added.Any()) parts.Add($"added {string.Join(", ", added)}");
+                if (removed.Any()) parts.Add($"removed {string.Join(", ", removed)}");
+                return parts.Count == 0
+                    ? $"{a} saved {t}'s permissions with no changes."
+                    : $"{a} updated {t}'s permissions: {string.Join("; ", parts)}.";
+            });
             await _context.SaveChangesAsync();
 
             return new SuccessResponseDto { Message = "Permissions updated." };
+        }
+
+        public async Task<PagedResult<ActivityDto>> GetMyActivityAsync(ActivityFilterDto f)
+        {
+            var me = await _permissionService.GetCurrentEmployerAsync()
+                ?? throw new UnauthorizedAccessException("You are not in a company.");
+            if (me.CompanyId == null) throw new InvalidOperationException("You are not in a company.");
+
+            var q = _context.CompanyActivities.AsNoTracking()
+                .Where(a => a.CompanyId == me.CompanyId &&
+                            (a.ActorEmployerId == me.Id || a.TargetEmployerId == me.Id));
+
+            return await PageAsync(q, f);
+        }
+
+        public async Task<PagedResult<ActivityDto>> GetCompanyActivityAsync(ActivityFilterDto f)
+        {
+            var actor = await GetActorAsync();   // Owner/Admin with ManageEmployerRoles
+
+            var q = _context.CompanyActivities.AsNoTracking()
+                .Where(a => a.CompanyId == actor.CompanyId &&
+                            !ActivityCategories.Personal.Contains(a.Type));   // hide personal items
+
+            if (f.ActorEmployerId != null) q = q.Where(a => a.ActorEmployerId == f.ActorEmployerId);
+
+            return await PageAsync(q, f);
+        }
+
+        private async Task<PagedResult<ActivityDto>> PageAsync(IQueryable<CompanyActivity> q, ActivityFilterDto f)
+        {
+            if (!string.IsNullOrWhiteSpace(f.Type) && Enum.TryParse<ActivityType>(f.Type, true, out var type))
+                q = q.Where(a => a.Type == type);
+
+            if (!string.IsNullOrWhiteSpace(f.Category) &&
+                ActivityCategories.Map.TryGetValue(f.Category, out var types))
+                q = q.Where(a => types.Contains(a.Type));
+
+            if (f.From != null) q = q.Where(a => a.CreatedAt >= f.From);
+            if (f.To != null) q = q.Where(a => a.CreatedAt < f.To.Value.Date.AddDays(1));
+            if (!string.IsNullOrWhiteSpace(f.Search))
+            {
+                var s = f.Search.Trim().ToLower();
+                q = q.Where(a => a.Message.ToLower().Contains(s));
+            }
+
+            var pageSize = Math.Clamp(f.PageSize, 1, 50);
+            var page = Math.Max(f.PageNumber, 1);
+            var total = await q.CountAsync();
+
+            var rows = await q.OrderByDescending(a => a.CreatedAt).ThenByDescending(a => a.Id)
+                .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<ActivityDto>
+            {
+                Items = rows.Select(a => new ActivityDto
+                {
+                    Id = a.Id,
+                    Type = a.Type.ToString(),
+                    Category = ActivityCategories.Of(a.Type),
+                    Message = a.Message,
+                    ActorEmployerId = a.ActorEmployerId,
+                    ActorName = a.ActorName,
+                    TargetName = a.TargetName,
+                    RefId = a.RefId,
+                    CreatedAt = a.CreatedAt
+                }).ToList(),
+                TotalCount = total,
+                PageNumber = page,
+                PageSize = pageSize
+            };
+        }
+
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        public Task<PagedResult<ActivityDto>> GetActivityAsync(ActivityFilterDto f)
+        {
+            throw new NotImplementedException();
         }
     }
 }

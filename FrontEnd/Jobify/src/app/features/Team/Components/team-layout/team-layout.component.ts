@@ -12,6 +12,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 export class TeamLayoutComponent {
   tabs = [
     { label: 'Members', link: 'members' },
-    { label: 'Join requests', link: 'join-requests' }
+    { label: 'Join requests', link: 'join-requests' },
   ];
 }

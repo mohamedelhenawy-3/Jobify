@@ -46,5 +46,7 @@ namespace Jobify.Controllers
             var result = await _tokenservice.Logout(dto.RefreshToken, dto.DeviceId);
             return Ok(result);
         }
+    
+
     }
 }

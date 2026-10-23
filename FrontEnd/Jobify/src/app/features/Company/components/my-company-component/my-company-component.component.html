@@ -60,63 +60,65 @@
       </div>
 
     </div>
-   @if (!editing) {
-  <div class="actions-grid">
-    @if (can('PostJobs')) {
-      <a class="action" routerLink="/Jobify/Jobcreate">
-        <i class="fas fa-briefcase"></i><span>Post a job</span>
-      </a>
-    }
-    @if (can('ManageApplicants')) {
-      <a class="action" routerLink="/Jobify/employer-applications">
-        <i class="fas fa-users"></i><span>Applicants</span>
-      </a>
-    }
-    @if (can('ViewAnalytics')) {
-      <a class="action" routerLink="/Jobify/analytics">
-        <i class="fas fa-chart-line"></i><span>Analytics</span>
-      </a>
-    }
-    @if (can('ManageEmployerRoles')) {
-      <a class="action" routerLink="/Jobify/team/members">
-        <i class="fas fa-user-gear"></i><span>Manage team</span>
-      </a>
-    }
-    @if (can('ApproveJoinRequests')) {
-      <a class="action" routerLink="/Jobify/team/join-requests">
-        <i class="fas fa-user-plus"></i><span>Join requests</span>
-      </a>
-    }
-    
-  </div>
-}
-@if (snapshot && !editing) {
-  <section class="snapshot">
-    <div class="snap-card">
-      <div class="snap-icon"><i class="fas fa-briefcase"></i></div>
-      <strong>{{ snapshot.openJobs }}</strong>
-      <span>Open jobs</span>
-    </div>
 
-    <div class="snap-card">
-      <div class="snap-icon"><i class="fas fa-user-plus"></i></div>
-      <strong>{{ snapshot.newApplicantsThisWeek }}</strong>
-      <span>New applicants this week</span>
-    </div>
+    @if (!editing) {
+      <div class="actions-grid">
+        @if (can('PostJobs')) {
+          <a class="action" routerLink="/Jobify/Jobcreate">
+            <i class="fas fa-briefcase"></i><span>Post a job</span>
+          </a>
+        }
+        @if (can('ManageApplicants')) {
+          <a class="action" routerLink="/Jobify/employer-applications">
+            <i class="fas fa-users"></i><span>Applicants</span>
+          </a>
+        }
+        @if (can('ViewAnalytics')) {
+          <a class="action" routerLink="/Jobify/analytics">
+            <i class="fas fa-chart-line"></i><span>Analytics</span>
+          </a>
+        }
+        @if (can('ManageEmployerRoles')) {
+          <a class="action" routerLink="/Jobify/team/members">
+            <i class="fas fa-user-gear"></i><span>Manage team</span>
+          </a>
+        }
+        @if (can('ApproveJoinRequests')) {
+          <a class="action" routerLink="/Jobify/team/join-requests">
+            <i class="fas fa-user-plus"></i><span>Join requests</span>
+          </a>
+        }
+      </div>
+    }
 
-    <div class="snap-card">
-      <div class="snap-icon"><i class="fas fa-calendar-check"></i></div>
-      <strong>{{ snapshot.interviewsScheduled }}</strong>
-      <span>Interviews scheduled</span>
-    </div>
+    @if (snapshot && !editing) {
+      <section class="snapshot">
+        <div class="snap-card">
+          <div class="snap-icon"><i class="fas fa-briefcase"></i></div>
+          <strong>{{ snapshot.openJobs }}</strong>
+          <span>Open jobs</span>
+        </div>
 
-    <div class="snap-card">
-      <div class="snap-icon"><i class="fas fa-handshake"></i></div>
-      <strong>{{ snapshot.hiresThisMonth }}</strong>
-      <span>Hires this month</span>
-    </div>
-  </section>
-}
+        <div class="snap-card">
+          <div class="snap-icon"><i class="fas fa-user-plus"></i></div>
+          <strong>{{ snapshot.newApplicantsThisWeek }}</strong>
+          <span>New applicants this week</span>
+        </div>
+
+        <div class="snap-card">
+          <div class="snap-icon"><i class="fas fa-calendar-check"></i></div>
+          <strong>{{ snapshot.interviewsScheduled }}</strong>
+          <span>Interviews scheduled</span>
+        </div>
+
+        <div class="snap-card">
+          <div class="snap-icon"><i class="fas fa-handshake"></i></div>
+          <strong>{{ snapshot.hiresThisMonth }}</strong>
+          <span>Hires this month</span>
+        </div>
+      </section>
+    }
+
     @if (message) {
       <div class="alert success"><i class="fas fa-circle-check"></i> {{ message }}</div>
     }
@@ -170,7 +172,8 @@
           </div>
         </aside>
       </div>
-            <!-- ================= TABS SECTION (last section) ================= -->
+
+      <!-- ================= TABS SECTION (last section) ================= -->
       <section class="tabs-section">
 
         <nav class="tabs" role="tablist">
@@ -219,8 +222,6 @@
             }
           }
 
-          <!-- Verification (owner and admin) -->
-          
           <!-- Your access (everyone) -->
           <section class="card">
             <div class="card-head">
@@ -261,20 +262,14 @@
             @if (members && members.length === 0 && !membersLoading) {
               <p class="empty-note">No team members yet.</p>
             }
-@if (membersTotal > previewSize) {
-  <a class="see-more" routerLink="/Jobify/team">
-    See more ({{ membersTotal - previewSize }} more)
-    <i class="fas fa-arrow-right"></i>
-  </a>
-}
 
             @for (m of members; track m.employerId) {
               <div class="member">
-@if (m.logo) {
-  <img [src]="m.logo" [alt]="m.fullName" class="member-avatar" />
-} @else {
-  <div class="member-avatar">{{ m.fullName.charAt(0) }}</div>
-}
+                @if (m.logo) {
+                  <img [src]="m.logo" [alt]="m.fullName" class="member-avatar" />
+                } @else {
+                  <div class="member-avatar">{{ m.fullName.charAt(0) }}</div>
+                }
                 <div class="member-info">
                   <strong>{{ m.fullName }}</strong>
                   @if (m.email) { <small>{{ m.email }}</small> }
@@ -294,6 +289,91 @@
               <a class="see-all" routerLink="/Jobify/team">
                 See all {{ membersTotal }} members <i class="fas fa-arrow-right"></i>
               </a>
+            }
+          </section>
+        }
+
+        <!-- ---------- ACTIVITY TAB (company-wide, Owner/Admin) ---------- -->
+        @if (activeTab === 'activity' && canViewCompanyActivity) {
+          <section class="card">
+            <div class="card-head">
+              <h2><i class="fas fa-clock-rotate-left"></i> Company activity</h2>
+              @if (activity) {
+                <span class="act-total">{{ activityTotal }} total</span>
+              }
+            </div>
+
+            <div class="act-filters">
+              <input type="search" class="act-input act-search" placeholder="Search activity"
+                     aria-label="Search activity"
+                     [ngModel]="activityFilter.search"
+                     (ngModelChange)="onActivitySearch($event)" />
+
+              <select class="act-input" aria-label="Category"
+                      [(ngModel)]="activityFilter.category"
+                      (ngModelChange)="applyActivityFilters()">
+                <option value="">All categories</option>
+                @for (c of activityCategories; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+
+              <label class="act-date">From
+                <input type="date" class="act-input"
+                       [(ngModel)]="activityFilter.from" (ngModelChange)="applyActivityFilters()" />
+              </label>
+              <label class="act-date">To
+                <input type="date" class="act-input"
+                       [(ngModel)]="activityFilter.to" (ngModelChange)="applyActivityFilters()" />
+              </label>
+
+              @if (hasActivityFilters) {
+                <button type="button" class="btn" (click)="clearActivityFilters()">Clear filters</button>
+              }
+            </div>
+
+            @if (activityLoading && !activity) { <p class="empty-note">Loading activity...</p> }
+            @if (activityError) {
+              <p class="empty-note error-text">
+                {{ activityError }}
+                <button type="button" class="link-btn" (click)="loadActivity()">Retry</button>
+              </p>
+            }
+            @if (activity && activity.length === 0 && !activityError) {
+              <p class="empty-note">
+                {{ hasActivityFilters ? 'No activity matches these filters.' : 'No company activity yet. It shows up here as your team works.' }}
+              </p>
+            }
+
+            @if (activity && activity.length > 0) {
+              <ul class="act-list" [class.loading]="activityLoading">
+                @for (a of activity; track a.id) {
+                  <li class="act-item">
+                    <span class="act-avatar" aria-hidden="true">{{ initials(a.actorName) }}</span>
+                    <div class="act-body">
+                      <p>{{ a.message }}</p>
+                      <small>
+                        <span class="act-cat">{{ a.category }}</span>
+                        <time [attr.datetime]="a.createdAt" [title]="toDate(a.createdAt) | date: 'medium'">
+                          {{ timeAgo(a.createdAt) }}
+                        </time>
+                      </small>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (activityTotal > activityFilter.pageSize) {
+              <div class="act-pager">
+                <button type="button" class="btn"
+                        [disabled]="activityFilter.pageNumber <= 1"
+                        (click)="goToActivityPage(activityFilter.pageNumber - 1)">Previous</button>
+                <span class="act-total">Page {{ activityFilter.pageNumber }} of {{ activityPages }}</span>
+                <button type="button" class="btn"
+                        [disabled]="activityFilter.pageNumber >= activityPages"
+                        (click)="goToActivityPage(activityFilter.pageNumber + 1)">Next</button>
+              </div>
             }
           </section>
         }
@@ -373,6 +453,5 @@
       </form>
     }
   }
-     
-  
+
 </div>

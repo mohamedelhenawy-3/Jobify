@@ -41,6 +41,9 @@ namespace Application.DTOs.JobSeeker.JobSeekers
         public List<EducationDto> Educations { get; set; } = new();
         public List<string> Skills { get; set; } = new();
 
+        public List<LanguageDto> Languages { get; set; } = new();
+        public List<ProjectDto> Projects { get; set; } = new();
+        public List<CertificateDto> Certificates { get; set; } = new();
         public int Strength { get; set; }
         public List<string> Missing { get; set; } = new();
     }

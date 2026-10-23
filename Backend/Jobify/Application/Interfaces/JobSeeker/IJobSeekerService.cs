@@ -22,6 +22,17 @@ namespace Application.Interfaces.JobSeeker
         Task<ProfileDto> SaveEducationAsync(int? id, EducationDto dto);
         Task<ProfileDto> DeleteEducationAsync(int id);
         Task<ProfileDto> SaveSkillsAsync(UpdateSkillsDto dto);
+
+        Task<ProfileDto> SaveLanguageAsync(int? id, LanguageDto dto);
+        Task<ProfileDto> DeleteLanguageAsync(int id);
+        Task<ProfileDto> SaveCertificateAsync(int? id, CertificateDto dto);
+        Task<ProfileDto> DeleteCertificateAsync(int id);
+        Task<ProfileDto> AddProjectImagesAsync(int projectId, List<IFormFile> files);
+        Task<ProfileDto> DeleteProjectImageAsync(int projectId, int imageId);
+        Task<ProfileDto> SetProjectCoverAsync(int projectId, int imageId);
+        Task<ProfileDto> SaveProjectAsync(int? id, ProjectDto dto);
+        Task<ProfileDto> DeleteProjectAsync(int id);
+
         Task<ProfileDto> SavePreferencesAsync(UpdatePreferencesDto dto);
         Task<ProfileDto> UpdateProfileImge(UpdateProfileImage dto);
         Task<SuccessResponse> UploadCv(UploadMyResume resumedto);

@@ -11,6 +11,7 @@ namespace Application.DTOs.Employer
         public string FullName { get; set; } = default!;
   
         public string? Bio { get; set; }
+        public string? position { get; set; }
         public string Email { get; set; } = default!;
         public string? Phone { get; set; }
         public string? Location { get; set; }

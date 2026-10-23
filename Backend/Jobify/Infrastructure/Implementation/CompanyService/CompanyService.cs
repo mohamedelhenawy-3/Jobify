@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Comapny;
 using Application.DTOs.Comapny.RefactorCompany;
+using Application.DTOs.Comapny.RefactorCompany.RecordDto;
 using Application.DTOs.JobSeeker;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Company;
@@ -7,11 +8,13 @@ using Application.SearchFeature.Dtos;
 using Domain.Entities;
 using Domain.Entities.LooksUp;
 using Domain.Entities.LooksUp.EmployerPermisions;
+using Domain.Entities.LooksUp.JobEnum;
 using Infrastructure.CurrentUserService;
 using Infrastructure.Implementation.AuthService;
 using Infrastructure.Implementation.CLoudinary;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,12 +31,18 @@ namespace Infrastructure.Implementation.CompanyService
         private ICurrentUser _user;
         private AppDBContext _db;
         private CloudinaryService _cloudinaryService;
+
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+        private readonly IMemoryCache _cache;
         public CompanyService(
+             IMemoryCache cache,
           AppDBContext db,
           CloudinaryService cloudinaryService,
           ICurrentUser user)
         {
             _db = db;
+            _cache = cache;
+
             _cloudinaryService = cloudinaryService;
             _user = user;
         }
@@ -360,6 +369,39 @@ namespace Infrastructure.Implementation.CompanyService
             };
 
         }
+
+        public async Task<IReadOnlyList<TopHiringCompanyDto>> GetTopHiringCompaniesAsync(int count = 8, CancellationToken ct = default)
+        {
+            count = Math.Clamp(count, 1, 24);
+
+            var cacheKey = $"top_hiring_companies_{count}";
+            if (_cache.TryGetValue(cacheKey, out IReadOnlyList<TopHiringCompanyDto>? cached) && cached is not null)
+                return cached;
+
+            var companies = await _db.Companies.Include(X=>X.Logo)
+                .AsNoTracking()
+                .Where(c => c.JobPosts.Any(j => j.IsActive))
+                .Select(c => new
+                {
+                    Company = c,
+                    OpenJobs = c.JobPosts.Count(j => j.IsActive)
+                })
+                .OrderByDescending(x => x.OpenJobs)
+                .ThenBy(x => x.Company.CompanyName)
+                .Take(count)
+                .Select(x => new TopHiringCompanyDto(
+                    x.Company.Id,
+                    x.Company.CompanyName,
+                    x.Company.Logo.ImageUrl,
+                    x.Company.Industry,
+                    x.Company.Location,
+                    x.OpenJobs))
+                .ToListAsync(ct);
+
+            _cache.Set(cacheKey, companies, CacheDuration);
+            return companies;
+        }
+    
     }
 }
 

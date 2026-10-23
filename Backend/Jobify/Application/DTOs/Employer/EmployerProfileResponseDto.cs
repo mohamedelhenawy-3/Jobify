@@ -13,7 +13,8 @@ namespace Application.DTOs.Employer
         public string Email { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Location { get; set; }
-        public string? LinkedInUrl { get; set; }
+        public string? linkedIn
+        { get; set; }
 
         public string? Position { get; set; }       
         public string? Bio { get; set; }            

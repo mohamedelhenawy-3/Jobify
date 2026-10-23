@@ -1,79 +1,89 @@
-<div class="tabs">
-  <button type="button" *ngFor="let s of statuses"
-          [class.active]="filter.status === s" (click)="setStatus(s)">
-    {{ s }}
-  </button>
-</div>
+<p *ngIf="meLoading">Loading...</p>
 
-<p class="loading" *ngIf="loading">Loading...</p>
-<p class="error" *ngIf="error">{{ error }}</p>
+<app-access-blocked *ngIf="!meLoading && me && !canUse" [me]="me" (left)="onLeft()" />
 
-<ng-container *ngIf="result">
-  <div class="list">
+<p class="error" *ngIf="!meLoading && !me && error">{{ error }}</p>
 
-    <div class="req" *ngFor="let r of result.items">
+<ng-container *ngIf="!meLoading && canUse">
 
-      <!-- avatar: logo if present, initials as fallback -->
-      <img *ngIf="r.logo; else noLogo" class="avatar img" [src]="r.logo" [alt]="r.fullName" />
-      <ng-template #noLogo>
-        <div class="avatar">{{ initials(r.fullName) }}</div>
-      </ng-template>
-
-      <div class="info">
-        <strong>{{ r.fullName }}</strong>
-        <small>{{ r.email }}</small>
-        <small class="date">Requested {{ r.createdAt | date: 'mediumDate' }}</small>
-      </div>
-
-      <div class="btns" *ngIf="r.status === 'Pending'; else done">
-        <button type="button" class="reject" (click)="open(r, false)">Reject</button>
-        <button type="button" class="primary" (click)="open(r, true)">Approve</button>
-      </div>
-      <ng-template #done>
-        <span class="badge {{ r.status }}">{{ r.status }}</span>
-      </ng-template>
-    </div>
-
-    <p class="empty" *ngIf="!loading && result.items.length === 0">
-      No {{ filter.status.toLowerCase() }} requests.
-    </p>
+  <div class="tabs">
+    <button type="button" *ngFor="let s of statuses"
+            [class.active]="filter.status === s" (click)="setStatus(s)">
+      {{ s }}
+    </button>
   </div>
 
-  <app-pager [page]="filter.pageNumber"
-             [totalPages]="result.totalPages"
-             [totalCount]="result.totalCount"
-             (pageChange)="onPage($event)" />
-</ng-container>
+  <p class="loading" *ngIf="loading">Loading...</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
 
-<!-- confirm modal -->
-<div class="backdrop" *ngIf="target" (click)="close()">
-  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <div class="modal-head">
-      <img *ngIf="target.logo; else modalInitials" class="avatar img" [src]="target.logo" [alt]="target.fullName" />
-      <ng-template #modalInitials>
-        <div class="avatar" [class.danger]="!approving">{{ initials(target.fullName) }}</div>
-      </ng-template>
-      <div>
-        <h3>{{ approving ? 'Approve request' : 'Reject request' }}</h3>
-        <small>{{ target.fullName }} · {{ target.email }}</small>
+  <ng-container *ngIf="result">
+    <div class="list">
+
+      <div class="req" *ngFor="let r of result.items">
+
+        <!-- avatar: logo if present, initials as fallback -->
+        <img *ngIf="r.logo; else noLogo" class="avatar img" [src]="r.logo" [alt]="r.fullName" />
+        <ng-template #noLogo>
+          <div class="avatar">{{ initials(r.fullName) }}</div>
+        </ng-template>
+
+        <div class="info">
+          <strong>{{ r.fullName }}</strong>
+          <small>{{ r.email }}</small>
+          <small class="date">Requested {{ r.createdAt | date: 'mediumDate' }}</small>
+        </div>
+
+        <div class="btns" *ngIf="r.status === 'Pending'; else done">
+          <button type="button" class="reject" (click)="open(r, false)">Reject</button>
+          <button type="button" class="primary" (click)="open(r, true)">Approve</button>
+        </div>
+        <ng-template #done>
+          <span class="badge {{ r.status }}">{{ r.status }}</span>
+        </ng-template>
       </div>
-    </div>
 
-    <div class="modal-body">
-      <p *ngIf="approving">
-        {{ target.fullName }} will join the company as <strong>Employer</strong> with the default Employer permissions.
-        You can change the role afterwards from the Members tab.
+      <p class="empty" *ngIf="!loading && result.items.length === 0">
+        No {{ filter.status.toLowerCase() }} requests.
       </p>
-      <p *ngIf="!approving">{{ target.fullName }} will not be added to the company.</p>
-      <p class="error" *ngIf="modalError">{{ modalError }}</p>
     </div>
 
-    <div class="modal-foot">
-      <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
-      <button type="button" [class.primary]="approving" [class.danger-btn]="!approving"
-              [disabled]="saving" (click)="confirm()">
-        {{ saving ? 'Saving…' : (approving ? 'Approve' : 'Reject') }}
-      </button>
+    <app-pager [page]="filter.pageNumber"
+               [totalPages]="result.totalPages"
+               [totalCount]="result.totalCount"
+               (pageChange)="onPage($event)" />
+  </ng-container>
+
+  <!-- confirm modal -->
+  <div class="backdrop" *ngIf="target" (click)="close()">
+    <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <img *ngIf="target.logo; else modalInitials" class="avatar img" [src]="target.logo" [alt]="target.fullName" />
+        <ng-template #modalInitials>
+          <div class="avatar" [class.danger]="!approving">{{ initials(target.fullName) }}</div>
+        </ng-template>
+        <div>
+          <h3>{{ approving ? 'Approve request' : 'Reject request' }}</h3>
+          <small>{{ target.fullName }} · {{ target.email }}</small>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <p *ngIf="approving">
+          {{ target.fullName }} will join the company as <strong>Employer</strong> with the default Employer permissions.
+          You can change the role afterwards from the Members tab.
+        </p>
+        <p *ngIf="!approving">{{ target.fullName }} will not be added to the company.</p>
+        <p class="error" *ngIf="modalError">{{ modalError }}</p>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
+        <button type="button" [class.primary]="approving" [class.danger-btn]="!approving"
+                [disabled]="saving" (click)="confirm()">
+          {{ saving ? 'Saving…' : (approving ? 'Approve' : 'Reject') }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+
+</ng-container>

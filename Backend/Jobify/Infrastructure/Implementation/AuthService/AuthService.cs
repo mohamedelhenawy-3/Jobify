@@ -4,9 +4,12 @@ using Application.Interfaces.Auth;
 using Application.Interfaces.Token;
 using Domain.Entities;
 using Domain.Identity;
+using Infrastructure.CurrentUserService;
+using Infrastructure.Implementation.CompanyMembersService.CurrentUserService;
 using Infrastructure.Reposoitory.AuthRepository.Interface;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -26,6 +29,7 @@ namespace Infrastructure.Implementation.AuthService
         private readonly IEmployeer _employerRepo;
         private readonly IAuthRepository _authrepo;
         private readonly ITokenService _jwtService;
+        private readonly ICurrentUser _currentUserService;
 
 
 
@@ -36,7 +40,8 @@ namespace Infrastructure.Implementation.AuthService
             , IJobSeeker jobSeekerRepo, IEmployeer employerRepo,
             IAuthRepository authrepo,
             ITokenService jwtService,
-            IConfiguration config)
+            IConfiguration config,
+            ICurrentUser Currentuser)
         {
             _jobSeekerRepo = jobSeekerRepo;
             _employerRepo = employerRepo;
@@ -46,7 +51,10 @@ namespace Infrastructure.Implementation.AuthService
             _config = config;
             _authrepo = authrepo;
             _jwtService = jwtService;
+            _currentUserService = Currentuser;
         }
+
+   
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
         {

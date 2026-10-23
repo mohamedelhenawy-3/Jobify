@@ -89,7 +89,19 @@ export interface PagedResult<T> {
   pageNumber: number;
   pageSize: number;
 }
-
+export interface JobMatch {
+  id: number;
+  title: string;
+  companyName?: string;
+  location?: string;
+  jobType?: string;
+  experienceLevel?: string;
+  minSalary?: number;
+  maxSalary?: number;
+  logo?: string;
+  createdAt: string;
+  matchPercent: number;
+}
 
 export interface JobAlert {
    id: number;

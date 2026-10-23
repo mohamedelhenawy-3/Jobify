@@ -2,11 +2,14 @@
 using Application.DTOs.Auth.AuthResponse;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Token;
+using Application.Interfaces.User;
 using Domain.Entities;
 using Domain.Identity;
+using Infrastructure.CurrentUserService;
 using Infrastructure.Reposoitory.AuthRepository.Interface;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -26,6 +29,8 @@ namespace Infrastructure.Implementation.AuthService
         private readonly IEmployeer _employerRepo;
         private readonly IAuthRepository _authrepo;
         private readonly ITokenService _jwtService;
+        private readonly ICurrentUser _currentUserService;
+
 
 
 
@@ -36,7 +41,7 @@ namespace Infrastructure.Implementation.AuthService
             , IJobSeeker jobSeekerRepo, IEmployeer employerRepo,
             IAuthRepository authrepo,
             ITokenService jwtService,
-            IConfiguration config)
+            IConfiguration config, ICurrentUser Currentuser)
         {
             _jobSeekerRepo = jobSeekerRepo;
             _employerRepo = employerRepo;
@@ -46,6 +51,24 @@ namespace Infrastructure.Implementation.AuthService
             _config = config;
             _authrepo = authrepo;
             _jwtService = jwtService;
+            _currentUserService = Currentuser;
+
+        }
+
+        public async Task<UserSummaryDto?> GetMySummaryAsync()
+        {
+            var userId = _currentUserService.UserId;
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            return await _context.EmployerProfiles
+                .AsNoTracking()
+                .Where(e => e.UserId == userId)
+                .Select(e => new UserSummaryDto
+                {
+                    FullName = e.User.FullName,
+                    PhotoUrl = e.ProfileImage != null ? e.ProfileImage.ImageUrl : null
+                })
+                .FirstOrDefaultAsync();
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
@@ -108,18 +131,6 @@ namespace Infrastructure.Implementation.AuthService
                 _context.EmployerProfiles.Add(employer);
                 await _context.SaveChangesAsync(); // employer.Id is now real
 
-                //var company = new Company
-                //{
-                //    CompanyName = dto.CompanyName,
-                //    CompanyWebsite = dto.CompanyWebsite,
-                //    Industry = dto.Industry,
-                //    Location = dto.CompanyLocation,
-                //    EmployerProfileId = employer.Id,
-                //    CreatedAt = DateTime.UtcNow
-                //};
-
-                //_context.Companies.Add(company);
-                //await _context.SaveChangesAsync();
             }
             return new SuccessResponseDto
             {
@@ -128,11 +139,11 @@ namespace Infrastructure.Implementation.AuthService
 
 
         }
+    
 
-      
     }
 
-     
-    
+
+
 }
 

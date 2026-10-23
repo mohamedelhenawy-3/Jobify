@@ -27,6 +27,7 @@ export interface TeamMember {
   jobsPosted: number;
   joinedAt: string | null;
   isMe: boolean;
+  hasAccessed:boolean;
 }
 
 export interface PagedResult<T> {
@@ -56,7 +57,6 @@ export const ROLE_RANK: Record<RoleName, number> = {
   Owner: 3, Admin: 2, Recruiter: 1, Employer: 1     // same ranks as the backend
 };
 
-// NEW: rank from any role value (number or text)
 export function roleRank(role: number | string): number {
   return ROLE_RANK[roleName(role)] ?? 0;
 }
@@ -74,8 +74,19 @@ export const ALL_PERMISSIONS = [
 
 export interface ActionResult { message: string; }
 
-// NEW: response of GET /team/me
 export interface MyTeamRole {
   role: number | string;
   permissions: string[];
+  isActive: boolean;    
+  hasAccess   :boolean;
+}
+
+
+export interface ActivityItem {
+  id: number;
+  type: string;
+  message: string;
+  actorName: string;
+  targetName?: string | null;
+  createdAt: string;
 }

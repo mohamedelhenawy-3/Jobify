@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.industry;
 using Application.DTOs.JobPost;
 using Application.DTOs.JobPost.JobDTO;
+using Application.DTOs.JobPost.JobDTO.RecordsDTO;
 using Application.DTOs.Pagenation;
 using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
@@ -23,14 +24,18 @@ namespace Application.Interfaces.Job
         //owner -employers
         Task<IEnumerable<ReturnedJobDto>?> GetEmployerJobsAsync();
         Task<PagedResult<EmployerJobCardDto>?> GetEmployerJobsAsync(EmployerJobsFilterDto filter);
-
-        Task<List<EmployerJobItemDto>> GetMyJobsAsync(); //based on employer admin-owner-recruter
+        Task<List<EmployerJobItemDto>> GetMyJobsAsync();
         Task<SuccessResponse> UpdateJob(UpdateJobDto dto, int id);
         Task<SuccessResponse> CreateJob(CreateJobPostDto createjobdto);
          Task<JobDetailsForJobseekerDto> GetJobDetailsForJobseeker(int jobId);
-        //Task<PagedResult<ReturnedJobDto>> SearchJobs(JobsFilterDto filter);
         Task<PagedResult<JobCardDto>> GetActiveJobsAsync(JobsFilterDto filter);
-        //////////////
+        Task<RecordPagedResult<RecommendedJobDto>?> RecommendAsync( int page, int size, CancellationToken ct);
+         Task<IReadOnlyList<LatestJobDto>> GetLatestJobsAsync(int count = 6, CancellationToken ct = default);
+
+
+
+
+
 
         Task<ReturnedJobDto> GetJobById(int id);
         Task<JobDto> GetJob(int id);

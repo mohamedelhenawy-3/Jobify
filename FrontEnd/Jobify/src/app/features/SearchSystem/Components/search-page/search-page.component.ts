@@ -135,6 +135,7 @@ export class SearchPageComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.results = res;
+          console.log(res);
           this.loading = false;
         },
         error: () => {

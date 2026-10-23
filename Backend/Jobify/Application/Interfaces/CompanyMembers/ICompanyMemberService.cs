@@ -19,12 +19,16 @@ namespace Application.Interfaces.CompanyMembers
         Task<MyTeamRoleDto> GetMyRoleAsync();
         Task<SuccessResponseDto> UpdatePermissionsAsync(int memberId, UpdatePermissionsDto dto);
 
-
+        Task<PagedResult<ActivityDto>> GetActivityAsync(ActivityFilterDto f);
         Task<PagedResult<TeamMemberDto>> GetMembers(TeamFilterDto f);
          Task SetActive(int memberId, SetActiveDto dto);
         Task<SuccessResponseDto> ChangeRoleAsync(int memberId, ChangeMemberRoleDto dto);
-        Task<SuccessResponseDto> RemoveMemberAsync(int targetEmployerId);
-        Task<SuccessResponseDto> LeaveCompanyAsync();
+        Task<SuccessResponseDto> RemoveMemberAsync(int targetEmployerId, RemoveMemberDto dto);
+        Task<SuccessResponseDto> LeaveCompanyAsync(RemoveMemberDto dto);
         Task<SuccessResponseDto> TransferOwnershipAsync(int newOwnerEmployerId);
+
+
+        Task<PagedResult<ActivityDto>> GetMyActivityAsync(ActivityFilterDto f);
+        Task<PagedResult<ActivityDto>> GetCompanyActivityAsync(ActivityFilterDto f);
     }
 }

@@ -1,4 +1,6 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs.JobSeeker.JobSeekers;
+using Domain.Entities;
+using Domain.Entities.Comp;
 using Domain.Entities.LooksUp;
 using Domain.Entities.LooksUp.JobEnum;
 using Domain.Identity;
@@ -19,37 +21,33 @@ namespace Infrastructure.Implementation.AuthService
         {
 
         }
+
         public DbSet<CompanyJoinRequest> CompanyJoinRequests { get; set; }
         public DbSet<Interview> Interviews { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        // =========================
-        // Identity & Users
-        // =========================
+
         public DbSet<AppUser> AppUsers { get; set; }
 
-        // =========================
-        // Profiles
-        // =========================
         public DbSet<JobSeeker> JobSeekers { get; set; }
         public DbSet<EmployerProfile> EmployerProfiles { get; set; }
         public DbSet<ProfileImage> ProfileImages { get; set; }
         public DbSet<Pdf> Pdfs { get; set; }
         public DbSet<SavedJobAlert> SavedJobAlerts { get; set; }
-        // =========================
-        // Jobs & Applications
-        // =========================
+
         public DbSet<JobPost> JobPosts { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<JobApplicationNote> JobApplicationNotes { get; set; }
         public DbSet<JobIndustry> JobIndustries { get; set; }
-        //public DbSet<JobStatus> JobStatuse{ get; set; }
+        public DbSet<SeekerLanguage> Languages { get; set; }
+        public DbSet<SeekerCertificate> Certificates { get; set; } 
+        public DbSet<SeekerProject> Projects { get; set; } 
         public DbSet<WorkMode> WorkModes { get; set; }
         public DbSet<EmploymentType> EmploymentTypes { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Education> Educations { get; set; }
-
+        public DbSet<CompanyActivity> CompanyActivities { get; set; }
         public DbSet<Experience> Experiences { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -85,13 +83,50 @@ namespace Infrastructure.Implementation.AuthService
                       .HasForeignKey<EmployerProfile>(ep => ep.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
-   
-             
-        
-        /* =========================
-           JobSeeker
-        ========================== */
-        builder.Entity<JobSeeker>(entity =>
+            builder.Entity<CompanyActivity>(b =>
+            {
+                b.Property(x => x.Type).HasConversion<string>().HasMaxLength(40);
+                b.Property(x => x.ActorName).HasMaxLength(150);
+                b.Property(x => x.TargetName).HasMaxLength(150);
+                b.Property(x => x.Message).HasMaxLength(500);
+                b.HasIndex(a => new { a.CompanyId, a.CreatedAt });
+                b.HasIndex(a => new { a.ActorEmployerId, a.CreatedAt });
+                b.HasIndex(a => new { a.TargetEmployerId, a.CreatedAt });
+                b.HasIndex(x => new { x.CompanyId, x.CreatedAt });
+            });
+            builder.Entity<SeekerLanguage>()
+             .HasOne<JobSeeker>().WithMany(j => j.Languages)
+             .HasForeignKey(x => x.JobSeekerProfileId).OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<SeekerCertificate>()
+                .HasOne<JobSeeker>().WithMany(j => j.Certificates)
+                .HasForeignKey(x => x.JobSeekerProfileId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<SeekerProject>(entity =>
+            {
+                entity.ToTable("SeekerProjects");
+
+                entity.Property(x => x.Title).IsRequired().HasMaxLength(150);
+                entity.Property(x => x.Description).HasMaxLength(2000);
+                entity.Property(x => x.Url).HasMaxLength(500);
+                entity.Property(x => x.Technologies).HasMaxLength(500);
+                entity.Property(x => x.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasIndex(x => x.JobSeekerProfileId);
+
+                entity.HasOne<JobSeeker>()
+                      .WithMany(j => j.Projects)
+                      .HasForeignKey(x => x.JobSeekerProfileId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(x => x.Images)
+                      .WithOne(i => i.SeekerProject)
+                      .HasForeignKey(i => i.SeekerProjectId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+            /* =========================
+               JobSeeker
+            ========================== */
+            builder.Entity<JobSeeker>(entity =>
             {
                 entity.ToTable("JobSeekers");
 
@@ -168,34 +203,28 @@ namespace Infrastructure.Implementation.AuthService
             builder.Entity<ProfileImage>(entity =>
             {
                 entity.ToTable("ProfileImages");
-
                 entity.HasKey(pi => pi.Id);
 
-                entity.Property(pi => pi.ImageUrl)
-                      .IsRequired()
-                      .HasMaxLength(500);
+                entity.Property(pi => pi.ImageUrl).IsRequired().HasMaxLength(500);
+                entity.Property(pi => pi.PublicId).HasMaxLength(300);
+                entity.Property(pi => pi.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
 
-                entity.Property(pi => pi.PublicId)
-                      .HasMaxLength(300);
+                entity.HasIndex(pi => new { pi.SeekerProjectId, pi.DisplayOrder });
 
-                entity.Property(pi => pi.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                entity.HasOne(pi => pi.JobSeeker)
+                      .WithOne(js => js.ProfileImage)
+                      .HasForeignKey<ProfileImage>(pi => pi.JobSeekerId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
-            
-                    entity.HasOne(pi => pi.JobSeeker)
-                          .WithOne(js => js.ProfileImage)
-                          .HasForeignKey<ProfileImage>(pi => pi.JobSeekerId)
-                          .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(pi => pi.EmployerProfile)
+                      .WithOne(ep => ep.ProfileImage)
+                      .HasForeignKey<ProfileImage>(pi => pi.EmployerProfileId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
-                    entity.HasOne(pi => pi.EmployerProfile)
-                          .WithOne(ep => ep.ProfileImage)
-                          .HasForeignKey<ProfileImage>(pi => pi.EmployerProfileId)
-                          .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(p => p.Company)
-         .WithOne(c => c.Logo)
-         .HasForeignKey<ProfileImage>(p => p.CompanyId)
-         .OnDelete(DeleteBehavior.Cascade);
-
+                entity.HasOne(pi => pi.Company)
+                      .WithOne(c => c.Logo)
+                      .HasForeignKey<ProfileImage>(pi => pi.CompanyId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Company>(entity =>

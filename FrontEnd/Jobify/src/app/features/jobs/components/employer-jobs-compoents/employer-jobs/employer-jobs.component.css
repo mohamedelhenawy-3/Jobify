@@ -7,7 +7,6 @@
 :host { display: block; }
 
 .employer-jobs {
-  max-width: 1000px;
   margin: 0 auto;
   padding: 24px 16px 48px;   /* 24px is the space under the navbar */
 }

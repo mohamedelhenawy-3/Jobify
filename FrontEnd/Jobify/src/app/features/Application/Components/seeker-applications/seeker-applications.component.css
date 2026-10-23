@@ -13,7 +13,7 @@
 
   display: block;
   min-height: 100vh;
-  padding: 40px 24px 64px;
+  padding: 10px 20px;
   background: var(--bg);
   color: var(--ink);
   font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
@@ -22,7 +22,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-.page { max-width: 1000px; margin: 0 auto; }
+.page {  margin: 0 auto; }
 
 .page-header { margin-bottom: 24px; }
 .page-header h1 {

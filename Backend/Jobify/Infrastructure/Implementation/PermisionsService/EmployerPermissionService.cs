@@ -62,7 +62,9 @@ namespace Infrastructure.Implementation.PermisionsService
                 return new SuccessResponseDto { Message = "Unknown permission." };
 
             var acting = await _context.EmployerProfiles
-                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
+                  .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId
+                           && e.CompanyId != null
+                           && e.IsActive);
             if (acting is null)
                 return new SuccessResponseDto { Message = "Employer profile not found." };
 
@@ -88,7 +90,9 @@ namespace Infrastructure.Implementation.PermisionsService
         public async Task<SuccessResponseDto> RevokeAsync( int targetEmployerId, string permission)
         {
             var acting = await _context.EmployerProfiles
-                         .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
+                           .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId
+                           && e.CompanyId != null
+                           && e.IsActive);
             if (acting is null)
                 return new SuccessResponseDto { Message = "Employer profile not found." };
 
@@ -120,7 +124,9 @@ namespace Infrastructure.Implementation.PermisionsService
                         .Include(x => x.ProfileImage)
                         .Include(e => e.Company)
                             .ThenInclude(c => c!.Logo)
-                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
+                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId
+                           && e.CompanyId != null
+                           && e.IsActive && e.HasAccess);
 
             if (employer?.CompanyId == null || !HasPermission(employer, permission))
                 return null;
@@ -135,7 +141,9 @@ namespace Infrastructure.Implementation.PermisionsService
                         .Include(x=>x.ProfileImage)
                         .Include(e => e.Company)
                             .ThenInclude(c => c!.Logo)
-                        .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId);
+                          .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId
+                           && e.CompanyId != null
+                           && e.IsActive);
 
             return employer?.CompanyId == null ? null : employer;
         }

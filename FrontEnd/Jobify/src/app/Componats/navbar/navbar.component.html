@@ -1,78 +1,100 @@
 <nav class="navbar">
+
   <!-- Logo -->
-  <div class="brand">
+  <a class="brand" routerLink="/Jobify/home">
     <img src="assets/Logo/Jobify.png" alt="Jobify Logo" class="logo" />
-    <!-- <span class="brand-name">Jobify</span> -->
-     <strong>Jobify</strong>
-  </div>
+    <strong>Jobify</strong>
+  </a>
 
-  <!-- Menu -->
-  <!-- <ul class="menu">
-    <li class="item"><a routerLink="/Jobify/home">Home</a></li>
-     <li class="item"><a routerLink="/Jobify/findjob">Find Job</a></li>
+  <!-- Job links with click dropdowns (logged in only) -->
+  <ul class="nav-links" [class.mobile-open]="mobileOpen" *ngIf="navItems$ | async as groups">
+    <li *ngFor="let g of groups" class="nav-item" routerLinkActive="active">
 
+      <a *ngIf="!g.children" [routerLink]="g.route">{{ g.label }}</a>
 
-  </ul> -->
-    <!-- SEARCH BAR -->
-<div class="search-container"  #searchBox>
+      <ng-container *ngIf="g.children">
+        <button type="button" class="drop-btn"
+                [class.open]="openMenu === g.label"
+                (click)="toggle(g.label, $event)">
+          {{ g.label }} <i class="fas fa-chevron-down"></i>
+        </button>
 
-  <div class="search-bar" [class.focused]="isFocused">
-
-    <!-- Icon -->
-    <span class="icon">🔍</span>
-
-  <input
-  type="text"
-  [(ngModel)]="keyword"
-  name="keyword"
-  placeholder="Search jobs, companies..."
-  (input)="onInputChange()"
-  (focus)="onFocus()"
-  (blur)="onBlur()"
-  (keyup.enter)="onSearch()"
-/>
-
-    <!-- Location -->
-    <div class="location">
-      📍 Anywhere
-    </div>
-
-  </div>
-
-  <!-- 🔥 Suggestions -->
-  <div class="suggestions" *ngIf="showSuggestions && filteredSuggestions.length">
-
-    <div 
-      *ngFor="let item of filteredSuggestions"
-      class="suggestion-item"
-      (mousedown)="selectSuggestion(item)"
-    >
-      🔍 {{ item }}
-    </div>
-
-  </div>
-
-</div>
-  <!-- Right Side Icons -->
-    <ul class="right-actions">
-        <!-- Logged in -->
-      <ng-container *ngIf="isLoggedIn">
-      <img
-    src="assets/LandImag/computer-worker.png"
-    class="card-icon"
-    alt="Employer"
-  />
-    
-
-        <li><a class="logout-link" (click)="logout()">Logout</a></li>
+        <ul class="drop-menu" *ngIf="openMenu === g.label" (click)="$event.stopPropagation()">
+          <li *ngFor="let c of g.children">
+            <a [routerLink]="c.route" routerLinkActive="active-item">
+              <i [class]="c.icon"></i> {{ c.label }}
+            </a>
+          </li>
+        </ul>
       </ng-container>
 
-      <!-- Not logged in -->
-      <ng-container *ngIf="!isLoggedIn">
-        <li><a routerLink="/login">Login</a></li>
-        <li><a routerLink="/register">Register</a></li>
-      </ng-container>
+    </li>
+  </ul>
 
-    </ul>
-  
+  <!-- Search -->
+  <div class="search-container" #searchBox>
+    <div class="search-bar" [class.focused]="isFocused">
+      <span class="icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="keyword"
+        name="keyword"
+        placeholder="Search jobs, companies..."
+        (input)="onInputChange()"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        (keyup.enter)="onSearch()"
+      />
+    </div>
+
+    <div class="suggestions" *ngIf="showSuggestions && filteredSuggestions.length">
+      <div *ngFor="let item of filteredSuggestions"
+           class="suggestion-item"
+           (mousedown)="selectSuggestion(item)">
+        🔍 {{ item }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side: profile + logout -->
+  <ul class="right-actions">
+
+    <ng-container *ngIf="isLoggedIn">
+      <li>
+        <a class="nav-user" [routerLink]="profileRoute" title="Open my profile">
+
+          <ng-container *ngIf="user$ | async as u; else fallbackUser">
+            <img *ngIf="u.photoUrl && !imgFailed; else initialsAvatar"
+                 class="nav-avatar"
+                 [src]="u.photoUrl"
+                 [alt]="u.fullName"
+                 (error)="imgFailed = true" />
+            <ng-template #initialsAvatar>
+              <span class="nav-avatar nav-avatar--initials">{{ initials(u.fullName) }}</span>
+            </ng-template>
+            <span class="nav-greeting">Hi, {{ firstName(u.fullName) }}</span>
+          </ng-container>
+
+          <ng-template #fallbackUser>
+            <span class="nav-avatar nav-avatar--initials"><i class="fas fa-user"></i></span>
+            <span class="nav-greeting">Profile</span>
+          </ng-template>
+
+        </a>
+      </li>
+      <li><a class="logout-link" (click)="logout()">Logout</a></li>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoggedIn">
+      <li><a routerLink="/login">Login</a></li>
+      <li><a routerLink="/register">Register</a></li>
+    </ng-container>
+
+  </ul>
+
+  <!-- Hamburger (small screens) -->
+  <button type="button" class="hamburger" *ngIf="isLoggedIn" (click)="toggleMobile($event)" aria-label="Menu">
+    <i class="fas" [ngClass]="mobileOpen ? 'fa-times' : 'fa-bars'"></i>
+  </button>
+
 </nav>

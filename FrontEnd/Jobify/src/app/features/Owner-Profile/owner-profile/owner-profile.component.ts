@@ -1,17 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { forkJoin, Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 
 import { OwnerProfileService } from '../Services/owner-profile.service';
-import { EmployerJob, EmployerProfileDto, RecentApplicant, UpdateProfileForm } from '../Models/OwnerProfile';
+import {
+  EmployerJob,
+  EmployerProfileDto,
+  HiringPipelineDto,
+  RecentApplicant,
+  UpdateProfileForm
+} from '../Models/OwnerProfile';
+import { ActivityDto, ActivityFilter } from '../../Activity/avrvity';
 import { JobService } from '../../jobs/Service/job.service';
-import { HiringPipelineDto } from '../Models/OwnerProfile'; // or wherever HiringPipelineDto lives
 import { JobApplicationService } from '../../../Services/JobApplication/jopapplicationservice.service';
+import { TeamService } from '../../Team/Services/team.service';
 
-type ProfileTab = 'overview' | 'jobs' | 'team' | 'permissions';
+type ProfileTab = 'overview' | 'jobs' | 'activity' | 'permissions';
 type JobFilter = 'all' | 'active' | 'closed';
 
 interface PipelineRow {
@@ -28,11 +35,12 @@ interface PipelineRow {
   templateUrl: './owner-profile.component.html',
   styleUrl: './owner-profile.component.css'
 })
-export class OwnerProfileComponent implements OnInit {
+export class OwnerProfileComponent implements OnInit, OnDestroy {
   profile: EmployerProfileDto | null = null;
   loading = true;
   error: string | null = null;
 
+  // edit profile
   showEditProfile = false;
   savingProfile = false;
   saveError: string | null = null;
@@ -55,6 +63,21 @@ export class OwnerProfileComponent implements OnInit {
   recentApplicants: RecentApplicant[] = [];
   hiringLoading = false;
 
+  // activity
+  activity: ActivityDto[] | null = null;
+  activityLoading = false;
+  activityError: string | null = null;
+  activityTotal = 0;
+  activityFilter: ActivityFilter = {
+    search: '', category: '', from: '', to: '', pageNumber: 1, pageSize: 15
+  };
+  // keys must match ActivityCategories.Map on the server
+  readonly activityCategories = ['Members', 'Jobs', 'Applicants', 'Company'];
+
+  private activityReq = 0;
+  private search$ = new Subject<string>();
+  private searchSub?: Subscription;
+
   readonly permissionCatalog = [
     { key: 'PostJobs',             label: 'Post jobs',               desc: 'Create and publish job listings.',            icon: 'fa-briefcase' },
     { key: 'ManageApplicants',     label: 'Manage applicants',       desc: 'Review applications and update their status.', icon: 'fa-users' },
@@ -69,32 +92,43 @@ export class OwnerProfileComponent implements OnInit {
   constructor(
     private profileService: OwnerProfileService,
     private jobService: JobService,
-    private applications: JobApplicationService
+    private applications: JobApplicationService,
+    private teamservice: TeamService
   ) {}
 
   ngOnInit(): void {
     this.loadProfile();
+
+    this.searchSub = this.search$
+      .pipe(debounceTime(350), distinctUntilChanged())
+      .subscribe(s => {
+        this.activityFilter.search = s;
+        this.activityFilter.pageNumber = 1;
+        this.loadActivity();
+      });
   }
 
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+  }
+
+  // ---------- Tabs ----------
   get tabs(): { value: ProfileTab; label: string; count?: number }[] {
     return [
       { value: 'overview', label: 'Overview' },
-      {
-        value: 'jobs',
-        label: this.isOwnerOrAdmin ? 'Company jobs' : 'My jobs',
-        count: this.profile?.jobsPostedCount
-      },
-      // { value: 'team', label: 'Team' },   // enable when Team is ready
-      { value: 'permissions', label: 'Permissions', count: this.profile?.permissions.length }
+      // { value: 'jobs', label: this.isOwnerOrAdmin ? 'Company jobs' : 'My jobs', count: this.profile?.jobsPostedCount },
+      { value: 'permissions', label: 'Permissions', count: this.profile?.permissions.length },
+      { value: 'activity', label: 'Activity' }
     ];
   }
 
   setTab(tab: ProfileTab): void {
     this.activeTab = tab;
     if (tab === 'jobs' && this.jobs === null) this.loadJobs();
-    // if (tab === 'team' && this.members === null) this.loadMembers();
+    if (tab === 'activity' && this.activity === null) this.loadActivity();
   }
 
+  // ---------- Jobs ----------
   private loadJobs(): void {
     this.jobsLoading = true;
     this.jobsError = null;
@@ -111,6 +145,7 @@ export class OwnerProfileComponent implements OnInit {
     return all;
   }
 
+  // ---------- Permissions ----------
   get grantedCount(): number {
     return this.permissionCatalog.filter(p => this.hasPermission(p.key)).length;
   }
@@ -123,11 +158,13 @@ export class OwnerProfileComponent implements OnInit {
     return this.profile?.role === 'Owner' || this.profile?.role === 'Admin';
   }
 
+  // ---------- Profile ----------
   private loadProfile(): void {
     this.loading = true;
     this.profileService.getOwnerProfile().subscribe({
       next: (data) => {
         this.profile = data;
+        console.log("my profiledata",data);
         this.loading = false;
         if (this.hasPermission('ManageApplicants') && !this.pipeline) this.loadHiring();
       },
@@ -157,7 +194,6 @@ export class OwnerProfileComponent implements OnInit {
   }
 
   private buildPipelineRows(p: HiringPipelineDto): void {
-    // `new` equals `applied` on the backend, so only `applied` is shown and summed.
     const defs = [
       { label: 'Applied',             count: p.applied,            cls: 'applied' },
       { label: 'Under review',        count: p.underReview,        cls: 'underreview' },
@@ -177,8 +213,71 @@ export class OwnerProfileComponent implements OnInit {
     }));
   }
 
+  // ---------- Activity ----------
+  loadActivity(): void {
+    const req = ++this.activityReq; // ignore out-of-order responses
+    this.activityLoading = true;
+    this.activityError = null;
+
+    this.teamservice.getMyActivity(this.activityFilter).subscribe({
+      next: (r) => {
+        if (req !== this.activityReq) return;
+        this.activity = r.items;
+        this.activityTotal = r.totalCount;
+        this.activityLoading = false;
+      },
+      error: (err) => {
+        if (req !== this.activityReq) return;
+        this.activityError = err.status === 401 || err.status === 403
+          ? 'You are not in a company.'
+          : 'Could not load activity.';
+        this.activityLoading = false;
+      }
+    });
+  }
+
+  onActivitySearch(value: string): void {
+    this.search$.next(value);
+  }
+
+  applyActivityFilters(): void {
+    this.activityFilter.pageNumber = 1;
+    this.loadActivity();
+  }
+
+  clearActivityFilters(): void {
+    this.activityFilter = { ...this.activityFilter, search: '', category: '', from: '', to: '', pageNumber: 1 };
+    this.loadActivity();
+  }
+
+  get hasActivityFilters(): boolean {
+    const f = this.activityFilter;
+    return !!(f.search || f.category || f.from || f.to);
+  }
+
+  get activityPages(): number {
+    return Math.max(1, Math.ceil(this.activityTotal / this.activityFilter.pageSize));
+  }
+
+  goToActivityPage(page: number): void {
+    if (page < 1 || page > this.activityPages) return;
+    this.activityFilter.pageNumber = page;
+    this.loadActivity();
+  }
+
+  initials(name: string): string {
+    return name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('') || '?';
+  }
+
+  // ---------- Dates ----------
+  // EF Core returns DateTime with Kind=Unspecified, so the JSON has no "Z" and the browser
+  // reads the UTC value as local time. Treat values without a zone as UTC.
+  toDate(iso: string): Date {
+    return new Date(/([zZ]|[+-]\d\d:?\d\d)$/.test(iso) ? iso : iso + 'Z');
+  }
+
   timeAgo(date: string): string {
-    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    const seconds = Math.floor((Date.now() - this.toDate(date).getTime()) / 1000);
     const units: [number, string][] = [
       [31536000, 'y'], [2592000, 'mo'], [604800, 'w'], [86400, 'd'], [3600, 'h'], [60, 'm']
     ];
@@ -198,13 +297,20 @@ export class OwnerProfileComponent implements OnInit {
       fullName: p.fullName,
       phoneNumber: p.phone ?? '',
       location: p.location ?? '',
-      position: p.headline ?? '',
+      position: p.position ?? p.headline ?? '',
       bio: p.bio ?? '',
+      linkedIn: p.linkedIn ?? '',            // NEW
+
     };
     this.selectedImage = null;
     this.imagePreview = null;
     this.saveError = null;
     this.showEditProfile = true;
+  }
+    linkedInHref(url: string | null | undefined): string | null {
+    const u = url?.trim();
+    if (!u) return null;
+    return /^https?:\/\//i.test(u) ? u : `https://${u}`;
   }
 
   closeEditProfile(): void {
@@ -247,6 +353,11 @@ export class OwnerProfileComponent implements OnInit {
     this.savingProfile = true;
     this.saveError = null;
 
+    const li = this.profileForm.linkedIn?.trim();
+if (li && !/linkedin\.com\//i.test(li)) {
+  this.saveError = 'Enter a valid LinkedIn profile URL.';
+  return;
+}
     this.profileService.updateProfile(this.profileForm, this.selectedImage).subscribe({
       next: () => {
         this.savingProfile = false;

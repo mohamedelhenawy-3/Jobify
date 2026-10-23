@@ -121,7 +121,7 @@
     <section class="result-section" *ngIf="r.users.length">
       <h2 class="section-title">People ({{ r.users.length }})</h2>
 
-      <div class="card" *ngFor="let user of r.users">
+      <div class="card" *ngFor="let user of r.users" [routerLink]="['/Jobify/public-profiles', user.id]">
         <img
           [src]="user.profileImageUrl || user.profileImage || '/assets/images/avatar-placeholder.png'"
           class="card-avatar"
@@ -139,7 +139,7 @@
     <section class="result-section" *ngIf="r.companies.length">
       <h2 class="section-title">Companies ({{ r.companies.length }})</h2>
 
-      <div class="card" *ngFor="let company of r.companies">
+      <div class="card" *ngFor="let company of r.companies" [routerLink]="['/Jobify/public-Profiles-Comapny', company.id]">
         <img *ngIf="company.logo" [src]="company.logo" class="card-logo" alt="" />
         <div class="card-body">
           <h3 class="card-title">{{ company.companyName }}</h3>

@@ -20,6 +20,9 @@ namespace Domain.Entities
         public List<string> Permissions { get; set; } = new();
 
         public bool IsActive { get; set; } = true;
+        public bool HasAccess { get; set; } = true;
+
+
         public DateTime? JoinedCompanyAt { get; set; }
 
         public int? CompanyId { get; set; }

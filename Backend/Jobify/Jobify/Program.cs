@@ -3,16 +3,20 @@ using Application.Handlers;
 using Application.Interfaces.Admin;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Company;
+using Application.Interfaces.CompanyMembers;
 using Application.Interfaces.Email;
 using Application.Interfaces.Employer;
 using Application.Interfaces.Job;
 using Application.Interfaces.JobApplication;
 using Application.Interfaces.JobsAlert;
 using Application.Interfaces.JobSeeker;
+using Application.Interfaces.Logger;
 using Application.Interfaces.OnBoarding;
 using Application.Interfaces.Permisions;
 using Application.Interfaces.PublicCompany;
+using Application.Interfaces.PublicProfile;
 using Application.Interfaces.SavedJob;
+using Application.Interfaces.Stats;
 using Application.Interfaces.Token;
 using Application.Interfaces.User;
 using Application.SearchFeature.Interface;
@@ -32,11 +36,14 @@ using Infrastructure.Implementation.EmployerService;
 using Infrastructure.Implementation.FileUploadService;
 using Infrastructure.Implementation.JobApplicationSrevice;
 using Infrastructure.Implementation.JobService;
+using Infrastructure.Implementation.Logger;
 using Infrastructure.Implementation.OnBoardingService;
 using Infrastructure.Implementation.PermisionsService;
 using Infrastructure.Implementation.PublicCompanyService;
+using Infrastructure.Implementation.PublicProfiles;
 using Infrastructure.Implementation.SavedJobService;
 using Infrastructure.Implementation.SearchService;
+using Infrastructure.Implementation.StatsService;
 using Infrastructure.Implementation.TokenServices;
 using Infrastructure.Implementation.UserServices;
 using Infrastructure.Reposoitory.AuthRepository;
@@ -100,8 +107,11 @@ builder.Services.Configure<FormOptions>(options =>
 });
 
 // Register Dependencies
-builder.Services.AddControllers()
-    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddScoped<IPublicProfileService, PublicProfileService>();
+builder.Services.AddScoped<IStatsService, StatsService>();
+builder.Services.AddScoped<ISimilarJobsService, SimilarJobsService>();
+builder.Services.AddScoped<IActivityLogger, ActivityLogger>();
 builder.Services.AddScoped<ICurrentUser,CurrentUserService>();
 builder.Services.AddScoped<IJobSeeker, JobSeekerRepository>();
 builder.Services.AddScoped<IOnboardingService, OnboardingService>();
@@ -131,7 +141,7 @@ builder.Services.AddScoped<IEmployerPermissionService, EmployerPermissionService
 builder.Services.AddScoped<ICompanyMemberService, CompanyMemberService>();
 builder.Services.AddScoped<IPublicCompanyService, PublicCompanyService>();
 builder.Services.AddScoped<IAlertJobs, AlertJobsService>();
-
+builder.Services.AddMemoryCache();
 
 builder.Services.Configure<SupabaseSettings>(
     builder.Configuration.GetSection("Supabase"));

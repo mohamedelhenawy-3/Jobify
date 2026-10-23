@@ -25,6 +25,7 @@ import { APPLICATIONS_ROUTES } from './features/Application/applications.routes'
 import { TeamLayoutComponent } from './features/Team/Components/team-layout/team-layout.component';
 import { Team_ROUTES } from './features/Team/team.routes';
 import { SeekerProfile_ROUTES } from './features/SeekerProfile/seeker.route';
+import { PUBLICPROFILES_ROUTES } from './features/PublicProfiles/publicprofiles.routes';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -38,6 +39,7 @@ export const routes: Routes = [
          ...APPLICATIONS_ROUTES,
         ...Team_ROUTES,
         ...SeekerProfile_ROUTES,
+        ...PUBLICPROFILES_ROUTES,
 
         { path: 'home', component: HomeComponent },
         { path: 'savedjobs', component: SavedjobsComponent },

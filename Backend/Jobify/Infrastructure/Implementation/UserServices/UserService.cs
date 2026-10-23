@@ -1,11 +1,14 @@
-﻿using Application.DTOs.Comapny;
+﻿using Application.DTOs.Auth.AuthResponse;
+using Application.DTOs.Comapny;
 using Application.DTOs.Education;
 using Application.DTOs.Experience;
 using Application.DTOs.Skills;
 using Application.DTOs.User;
 using Application.Interfaces.User;
+using Infrastructure.CurrentUserService;
 using Infrastructure.Implementation.AuthService;
 using Infrastructure.Implementation.CLoudinary;
+using Infrastructure.Implementation.CompanyMembersService.CurrentUserService;
 using Infrastructure.Implementation.FileUploadService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -25,12 +28,14 @@ namespace Infrastructure.Implementation.UserServices
         private readonly IHttpContextAccessor _httpaccessor;
         private readonly CloudinaryService _cloudinaryService;
         private readonly SupabaseService _supabaseservice;
+        private ICurrentUser _currentuser;
 
         public UserService(
               AppDBContext context,
               CloudinaryService cloudinaryService,
               IHttpContextAccessor httpContextAccessor,
-               SupabaseService supabaseservice
+               SupabaseService supabaseservice,
+               ICurrentUser c
 
               )
         {
@@ -38,7 +43,30 @@ namespace Infrastructure.Implementation.UserServices
             _cloudinaryService = cloudinaryService;
             _httpaccessor = httpContextAccessor;
             _supabaseservice = supabaseservice;
+            _currentuser = c;
         }
+
+        public async Task<UserSummaryDto?> GetMySummaryAsync()
+        {
+            var userId = _currentuser.UserId;
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            return await _db.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Select(u => new UserSummaryDto
+                {
+                    FullName = u.FullName,
+                    PhotoUrl =
+                        u.EmployerProfile != null && u.EmployerProfile.ProfileImage != null
+                            ? u.EmployerProfile.ProfileImage.ImageUrl
+                        : u.JobSeeker != null && u.JobSeeker.ProfileImage != null
+                            ? u.JobSeeker.ProfileImage.ImageUrl
+                        : null
+                })
+                .FirstOrDefaultAsync();
+        }
+
 
         public Task<GetUserProfile?> GetUserProfileAsync(string userId)
         {

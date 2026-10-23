@@ -1,21 +1,20 @@
 /* =========================================
    1. LAYOUT & MATCHING LOGIN THEME
    ========================================= */
-.main-wrapper {
+/* .main-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 20px;
   font-family: 'Inter', sans-serif;
-}
+} */
 
 .registration-container {
   display: flex;
-  width: 950px;
-  height: 600px; /* Slightly taller than login for extra fields */
+  height: 100vh; /* Slightly taller than login for extra fields */
   background: #ffffff;
-  border-radius: 28px;
+
   overflow: hidden;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
 }

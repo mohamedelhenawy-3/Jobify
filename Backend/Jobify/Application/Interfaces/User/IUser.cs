@@ -1,4 +1,5 @@
-﻿using Application.DTOs.User;
+﻿using Application.DTOs.Auth.AuthResponse;
+using Application.DTOs.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Application.Interfaces.User
     public interface IUser
     {
         Task<GetUserProfile?> GetUserProfileAsync(string userId);
+
+        Task<UserSummaryDto?> GetMySummaryAsync();
 
     }
 }

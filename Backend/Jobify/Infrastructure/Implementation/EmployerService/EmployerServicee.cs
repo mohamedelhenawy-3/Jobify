@@ -59,14 +59,12 @@ namespace Infrastructure.Implementation.EmployerService
 
             if (canSeeCompanyWide)
             {
-                // Owner/Admin/anyone with analytics: company-wide numbers
                 jobsPostedCount = await _context.JobPosts.CountAsync(j => j.CompanyId == employer.CompanyId);
                 activeJobsCount = await _context.JobPosts.CountAsync(j => j.CompanyId == employer.CompanyId && j.IsActive);
                 totalApplicants = await _context.JobApplications.CountAsync(a => a.JobPost!.CompanyId == employer.CompanyId);
             }
             else
             {
-                // Recruiter/Employer without analytics: only their own numbers
                 jobsPostedCount = await _context.JobPosts.CountAsync(j => j.PostedByEmployerId == employer.Id);
                 activeJobsCount = await _context.JobPosts.CountAsync(j => j.PostedByEmployerId == employer.Id && j.IsActive);
                 totalApplicants = await _context.JobApplications.CountAsync(a => a.JobPost!.PostedByEmployerId == employer.Id);
@@ -76,6 +74,7 @@ namespace Infrastructure.Implementation.EmployerService
             {
                 FullName = employer.User.FullName,
                 LinkedIn =employer.User.LinkedInUrl,
+                position=employer.Position,
                 Bio = employer.Bio,
                 Email = employer.User.Email,
                 Phone = employer.User.PhoneNumber,
@@ -123,8 +122,8 @@ namespace Infrastructure.Implementation.EmployerService
             if (!string.IsNullOrWhiteSpace(model.Position))
                 profile.Position = model.Position ?? profile.Position;
 
-            if (!string.IsNullOrWhiteSpace(model.LinkedInUrl))
-                user.LinkedInUrl = model.LinkedInUrl;
+            if (!string.IsNullOrWhiteSpace(model.LinkedIn))
+                user.LinkedInUrl = model.LinkedIn;
             if (!string.IsNullOrWhiteSpace(model.Bio))
                 profile.Bio = model.Bio ?? profile.Bio;
 

@@ -47,7 +47,6 @@ export class SideBarComponent implements OnInit {
     if (this.userRole === 'JobSeeker') {
       this.sidebarItems = [
         { label: 'home', route: '/Jobify/home', icon: 'fas fa-home' },
-        { label: 'Dashboard', route: '/Jobify/jobseekerdashboard', icon: 'fas fa-home' },
         { label: 'Find Jobs', route: '/Jobify/jobs', icon: 'fas fa-search' },
         { label: 'My Applications', route: '/Jobify/seeker-applications', icon: 'fas fa-clipboard-list' },
         { label: 'Saved Jobs', route: '/Jobify/SavedJobs', icon: 'fas fa-bookmark' },
@@ -59,6 +58,7 @@ export class SideBarComponent implements OnInit {
     } else if (this.userRole === 'Employer') {
       this.sidebarItems = [
         { label: 'Dashboard', route: '/Jobify/employerdashboard', icon: 'fas fa-home' },
+        { label: 'Find Jobs', route: '/Jobify/jobs', icon: 'fas fa-search' },
         { label: 'My Jobs', route: '/Jobify/employerjobs', icon: 'fas fa-briefcase' },
         { label: 'Company Profile', route: '/Jobify/mycompany', icon: 'fas fa-building' },
         { label: 'Profile', route: '/Jobify/employer/profile', icon: 'fas fa-building' }

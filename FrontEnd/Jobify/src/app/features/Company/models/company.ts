@@ -33,6 +33,7 @@ export interface CompanyMember {
   role: string;
   permissions?: string[];
   isActive: boolean;
+
   joinedCompanyAt?: string | null;
 }
 
@@ -40,3 +41,4 @@ export interface CompanyMembersPreview {
   total: number;
   items: CompanyMember[];
 }
+

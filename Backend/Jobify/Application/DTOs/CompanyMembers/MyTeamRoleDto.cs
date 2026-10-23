@@ -11,5 +11,8 @@ namespace Application.DTOs.CompanyMembers
     {
         public EmployerCompanyRole Role { get; set; }
         public List<string> Permissions { get; set; } = new();
+        public bool IsActive { get; set; }
+        public bool HasAccess { get; set; }
+
     }
 }

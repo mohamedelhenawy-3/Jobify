@@ -23,6 +23,13 @@ namespace Jobify.Controllers
             var result = await _userservice.GetUserProfileAsync(id);
             return Ok(result);
         }
+        [HttpGet("me/summary")]
+        public async Task<IActionResult> GetMySummary()
+        {
+            var summary = await _userservice.GetMySummaryAsync();
+            return summary == null ? NotFound() : Ok(summary);
+        }
+
 
     }
 }

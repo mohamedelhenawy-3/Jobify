@@ -2,13 +2,16 @@
 using Application.DTOs.industry;
 using Application.DTOs.JobPost;
 using Application.DTOs.JobPost.JobDTO;
+using Application.DTOs.JobPost.JobDTO.RecordsDTO;
 using Application.DTOs.Pagenation;
 using Application.DTOs.RecommendedJobbs;
 using Application.DTOs.SuccefullOp;
 using Application.Interfaces.Job;
+using Application.Interfaces.Logger;
 using Application.Interfaces.Permisions;
 using Application.SearchFeature.Dtos;
 using Domain.Entities;
+using Domain.Entities.Comp;
 using Domain.Entities.LooksUp;
 using Domain.Entities.LooksUp.EmployerPermisions;
 using Domain.Entities.LooksUp.JobEnum;
@@ -16,10 +19,12 @@ using Infrastructure.CurrentUserService;
 using Infrastructure.Implementation.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http.Results;
 
@@ -30,12 +35,23 @@ namespace Infrastructure.Implementation.JobService
         private readonly AppDBContext _db;
         private readonly IHttpContextAccessor _httpaccessor;
         private readonly IEmployerPermissionService _Ipermision;
+        private readonly IActivityLogger _activity;
 
-        public JobService(AppDBContext db, IHttpContextAccessor http, IEmployerPermissionService Ipermision)
+        private readonly ICurrentUser _currentuser;
+
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
+        private readonly IMemoryCache _cache;
+
+        public JobService(AppDBContext db, IMemoryCache cache,
+            ICurrentUser currentuser ,IHttpContextAccessor http, IEmployerPermissionService Ipermision, IActivityLogger activity)
         {
             _db = db;
             _httpaccessor = http;
             _Ipermision = Ipermision;
+             _activity=activity;
+            _currentuser = currentuser;
+            _cache = cache;
+
         }
 
         private string? GetCurrentUserId()
@@ -43,26 +59,25 @@ namespace Infrastructure.Implementation.JobService
             var user = _httpaccessor.HttpContext?.User;
             return user?.FindFirstValue(ClaimTypes.NameIdentifier);
         }
-        public async
-            Task<List<EmployerJobItemDto>> GetMyJobsAsync()
+
+        // ───────────────────────── EMPLOYER: MY JOBS ─────────────────────────
+        public async Task<List<EmployerJobItemDto>> GetMyJobsAsync()
         {
             var userId = GetCurrentUserId();
             var me = await _db.EmployerProfiles
-               .Include(e => e.User) // Explicitly load User navigation property if FullName lives on User
-               .FirstOrDefaultAsync(x => x.UserId == userId);
-        
-
-            if (me == null)
+                     .AsNoTracking()
+                     .FirstOrDefaultAsync(x => x.UserId == userId && x.IsActive);
+            if (me == null || me.CompanyId == null)
                 return new List<EmployerJobItemDto>();
 
-            var query = _db.JobPosts.AsNoTracking();
+            var query = _db.JobPosts
+                .AsNoTracking()
+                .Where(j => j.CompanyId == me.CompanyId);
 
-            bool seesWholeCompany = me.CompanyId != null &&
-                (me.Role == EmployerCompanyRole.Owner || me.Role == EmployerCompanyRole.Admin);
+            bool seesWholeCompany = me.Role == EmployerCompanyRole.Owner || me.Role == EmployerCompanyRole.Admin;
 
-            query = seesWholeCompany
-                ? query.Where(j => j.CompanyId == me.CompanyId)
-                : query.Where(j => j.PostedByEmployerId == me.Id);
+            if (!seesWholeCompany)
+                query = query.Where(j => j.PostedByEmployerId == me.Id);
 
             var jobs = await query
                 .OrderByDescending(j => j.CreatedAt)
@@ -77,16 +92,19 @@ namespace Infrastructure.Implementation.JobService
                     CreatedAt = j.CreatedAt,
                     IsActive = j.IsActive,
                     ApplicantsCount = j.JobApplications.Count(),
-                    PostedBy = seesWholeCompany ? j.PostedByEmployer.User.FullName : null
+                    PostedBy = seesWholeCompany && j.PostedByEmployer != null && j.PostedByEmployer.User != null
+                        ? j.PostedByEmployer.User.FullName
+                        : null
                 })
                 .ToListAsync();
 
             return jobs;
         }
+
         public async Task<IEnumerable<ReturnedJobDto>?> GetEmployerJobsAsync()
         {
             var employer = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs);
-            if (employer == null)
+            if (employer == null || employer.CompanyId == null)
                 return null;
 
             var canSeeAllCompanyJobs = _Ipermision.HasPermission(employer, EmployerPermissions.ManageEmployerRoles);
@@ -141,8 +159,8 @@ namespace Infrastructure.Implementation.JobService
                 Status = j.IsActive ? "Active" : "Closed",
                 CreatedAt = j.CreatedAt,
                 PostedAge = CalculateAgeText(j.CreatedAt, now),
-                Requirements=j.Requirements,
-                Responsibilities=j.Responsibilities,
+                Requirements = j.Requirements,
+                Responsibilities = j.Responsibilities,
                 CompanyName = j.CompanyName,
                 CompanyAge = CalculateAgeText(j.CompanyCreatedAt, now),
                 TotalApplications = j.ApplicationsCount,
@@ -151,78 +169,7 @@ namespace Infrastructure.Implementation.JobService
                 IsOwnerView = canSeeAllCompanyJobs
             }).ToList();
         }
-    
-        //public async Task<PagedResult<ReturnedJobDto>> SearchJobs(JobsFilterDto filter)
-        //{
-        //    var query = _db.JobPosts
-        //            .Include(j => j.Company)
-        //                .ThenInclude(c => c.Logo)
-        //            .Where(j => j.IsActive)
-        //            .AsQueryable();
 
-        //    if (!string.IsNullOrWhiteSpace(filter.Keyword))
-        //        query = query.Where(j => j.Title.Contains(filter.Keyword)
-        //                               || j.Description.Contains(filter.Keyword));
-
-        //    if (!string.IsNullOrWhiteSpace(filter.Location))
-        //        query = query.Where(j => j.Location.Contains(filter.Location));
-
-        //    // Parse string -> enum BEFORE the query, then compare enum == enum
-        //    if (!string.IsNullOrWhiteSpace(filter.EmploymentType)
-        //        && Enum.TryParse<JobType>(filter.EmploymentType, out var jobType))
-        //    {
-        //        query = query.Where(j => j.JobType == jobType);
-        //    }
-
-        //    if (!string.IsNullOrWhiteSpace(filter.ExperienceLevel)
-        //        && Enum.TryParse<ExperienceLevel>(filter.ExperienceLevel, out var expLevel))
-        //    {
-        //        query = query.Where(j => j.ExperienceLevel == expLevel);
-        //    }
-
-        //    if (filter.MinSalary.HasValue)
-        //        query = query.Where(j => j.SalaryMax == null || j.SalaryMax >= filter.MinSalary);
-
-        //    if (filter.MaxSalary.HasValue)
-        //        query = query.Where(j => j.SalaryMin == null || j.SalaryMin <= filter.MaxSalary);
-
-        //    query = filter.SortBy switch
-        //    {
-        //        "salary_desc" => query.OrderByDescending(j => j.SalaryMax),
-        //        "salary_asc" => query.OrderBy(j => j.SalaryMin),
-        //        _ => query.OrderByDescending(j => j.CreatedAt)
-        //    };
-
-        //    var totalCount = await query.CountAsync();
-
-        //    var jobs = await query
-        //        .Skip((filter.PageNumber - 1) * filter.PageSize)
-        //        .Take(filter.PageSize)
-        //        .Select(j => new ReturnedJobDto
-        //        {
-        //            Id = j.Id,
-        //            Logo = j.Company.Logo != null ? j.Company.Logo.ImageUrl : null,
-        //            Title = j.Title,
-        //            Description = j.Description,
-        //            Location = j.Location,
-        //            MinSalary = j.SalaryMin,
-        //            MaxSalary = j.SalaryMax,
-        //            EmploymentType = j.JobType.ToString(),      // ✅ fine here — this is a projection, not a filter
-        //            ExprianceLevel = j.ExperienceLevel.ToString(), // ✅ fine here too
-        //            Status = j.IsActive ? "Active" : "Inactive",
-        //            CreatedAt = j.CreatedAt,
-        //            CompanyName = j.Company.CompanyName
-        //        })
-        //        .ToListAsync();
-
-        //    return new PagedResult<ReturnedJobDto>
-        //    {
-        //        Items = jobs,
-        //        TotalCount = totalCount,
-        //        PageNumber = filter.PageNumber,
-        //        PageSize = filter.PageSize
-        //    };
-        //}
         public async Task<SuccessResponse> CreateJob(CreateJobPostDto createjobdto)
         {
             var user = GetCurrentUserId();
@@ -238,8 +185,6 @@ namespace Infrastructure.Implementation.JobService
             var company = await _db.Companies.FindAsync(employerProfile.CompanyId);
             if (company == null || !company.IsVerified)
                 return new SuccessResponse { Message = "Your company must be verified to post jobs." };
-
-
 
             var jobPost = new JobPost
             {
@@ -263,6 +208,9 @@ namespace Infrastructure.Implementation.JobService
             _db.JobPosts.Add(jobPost);
             await _db.SaveChangesAsync();
 
+            await _activity.LogAsync(jobPost.CompanyId, employerProfile, null, ActivityType.JobCreated,
+             (a, _) => $"{a} posted the job \"{jobPost.Title}\".", refId: jobPost.Id);
+
             return new SuccessResponse
             {
                 Message = "Job Added successfully."
@@ -271,17 +219,19 @@ namespace Infrastructure.Implementation.JobService
 
         public async Task<SuccessResponse> DeleteJob(int id)
         {
-            var employerProfile = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs);
-            if (employerProfile == null)
-                throw new Exception("Employer not Have Access");
+            var employerProfile = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs)
+                ?? throw new UnauthorizedAccessException("Employer does not have access.");
 
+            // company check is part of the query
             var job = await _db.JobPosts
-                    .FirstOrDefaultAsync(j => j.Id == id && j.CompanyId == employerProfile.CompanyId);
+                    .FirstOrDefaultAsync(j => j.Id == id && j.CompanyId == employerProfile.CompanyId)
+                    ?? throw new KeyNotFoundException("Job post not found.");
 
             if (!CanManageJob(employerProfile, job))
-                throw new Exception("Only the job creator or a recruiter-Admin can delete this job.");
-
-
+                throw new UnauthorizedAccessException("Only the job creator or a recruiter/admin can delete this job.");
+            var title = job.Title;
+            await _activity.LogAsync(job.CompanyId, employerProfile, null, ActivityType.JobDeleted,
+                (a, _) => $"{a} deleted the job \"{title}\".");
             _db.JobPosts.Remove(job);
             await _db.SaveChangesAsync();
 
@@ -290,20 +240,15 @@ namespace Infrastructure.Implementation.JobService
 
         public async Task<SuccessResponse> UpdateJob(UpdateJobDto dto, int id)
         {
-            var employer = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs);
-            if (employer == null)
-                throw new Exception("Employer not Have Access");
-
-
+            var employer = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs)
+                ?? throw new UnauthorizedAccessException("Employer does not have access.");
 
             var job = await _db.JobPosts
-                   .FirstOrDefaultAsync(j => j.Id == id && j.CompanyId == employer.CompanyId);
-
-            if (job == null)
-                throw new KeyNotFoundException("Job post not found.");
+                   .FirstOrDefaultAsync(j => j.Id == id && j.CompanyId == employer.CompanyId)
+                   ?? throw new KeyNotFoundException("Job post not found.");
 
             if (!CanManageJob(employer, job))
-                throw new Exception("Only the job creator or a recruiter can edit this job.");
+                throw new UnauthorizedAccessException("Only the job creator or a recruiter/admin can edit this job.");
 
             if (!string.IsNullOrWhiteSpace(dto.Title))
                 job.Title = dto.Title;
@@ -317,7 +262,6 @@ namespace Infrastructure.Implementation.JobService
                 job.Responsibilities = dto.Responsibilities;
             if (!string.IsNullOrWhiteSpace(dto.Requirements))
                 job.Requirements = dto.Requirements;
-
 
             if (dto.MinSalary.HasValue)
                 job.SalaryMin = dto.MinSalary.Value;
@@ -333,6 +277,26 @@ namespace Infrastructure.Implementation.JobService
 
             if (dto.IsActive.HasValue)
                 job.IsActive = dto.IsActive.Value;
+            var wasActive = job.IsActive;                       // before the "if (!string.IsNullOrWhiteSpace...)" block
+
+            // ... your existing field assignments stay as they are ...
+
+            var statusChanged = dto.IsActive.HasValue && dto.IsActive.Value != wasActive;
+            var contentChanged = _db.Entry(job).Properties
+                .Any(p => p.IsModified && p.Metadata.Name != nameof(JobPost.IsActive));
+
+            if (contentChanged)
+                await _activity.LogAsync(job.CompanyId, employer, null, ActivityType.JobUpdated,
+                    (a, _) => $"{a} updated the job \"{job.Title}\".", refId: job.Id);
+
+            if (statusChanged)
+                await _activity.LogAsync(job.CompanyId, employer, null,
+                    job.IsActive ? ActivityType.JobReopened : ActivityType.JobClosed,
+                    (a, _) => job.IsActive
+                        ? $"{a} reopened the job \"{job.Title}\"."
+                        : $"{a} closed the job \"{job.Title}\".",
+                    refId: job.Id);
+
 
             await _db.SaveChangesAsync();
 
@@ -342,6 +306,20 @@ namespace Infrastructure.Implementation.JobService
             };
         }
 
+        private bool CanManageJob(EmployerProfile employer, JobPost job)
+        {
+            if (employer.CompanyId == null || job.CompanyId != employer.CompanyId)
+                return false; // different company, never allowed
+
+            var isCreator = job.PostedByEmployerId == employer.Id;
+            var isRecruiterOrAbove = employer.Role is EmployerCompanyRole.Recruiter
+                                                    or EmployerCompanyRole.Admin
+                                                    or EmployerCompanyRole.Owner;
+
+            return isCreator || isRecruiterOrAbove;
+        }
+
+        // ───────────────────────── SEARCH ─────────────────────────
         public async Task<List<SearchResponseDto>> Search(JobFilterDto jobfiltereddto)
         {
             var query = _db.JobPosts.AsQueryable();
@@ -367,6 +345,7 @@ namespace Infrastructure.Implementation.JobService
                 })
                 .ToListAsync();
         }
+
         public async Task<List<SearchResDto>> SearchJobsAsync(GlobalSearchDto dto)
         {
             var query = _db.JobPosts.AsNoTracking();
@@ -383,7 +362,7 @@ namespace Infrastructure.Implementation.JobService
             {
                 if (!Enum.TryParse<JobType>(dto.EmploymentType, true, out var jobType)
                     || !Enum.IsDefined(typeof(JobType), jobType))
-                    return new List<SearchResDto>();  
+                    return new List<SearchResDto>();
 
                 query = query.Where(j => j.JobType == jobType);
             }
@@ -421,22 +400,10 @@ namespace Infrastructure.Implementation.JobService
                     Location = j.Location,
                     ExperienceLevel = j.ExperienceLevel,
                     JobType = j.JobType,
-                    MaxSalary=j.SalaryMax,
-                    MinSalary=j.SalaryMin
+                    MaxSalary = j.SalaryMax,
+                    MinSalary = j.SalaryMin
                 })
                 .ToListAsync();
-        }
-        private bool CanManageJob(EmployerProfile employer, JobPost job)
-        {
-            if (job.CompanyId != employer.CompanyId)
-                return false; // different company, never allowed
-
-            var isCreator = job.PostedByEmployerId == employer.Id;
-            var isRecruiterOrAbove = employer.Role is EmployerCompanyRole.Recruiter
-                                                    or EmployerCompanyRole.Admin
-                                                    or EmployerCompanyRole.Owner;
-
-            return isCreator || isRecruiterOrAbove;
         }
 
         private static string CalculateAgeText(DateTime startDate, DateTime endDate)
@@ -447,36 +414,32 @@ namespace Infrastructure.Implementation.JobService
             if (timeSpan.TotalDays < 365) return $"{(int)(timeSpan.TotalDays / 30)}m ago";
             return $"{(int)(timeSpan.TotalDays / 365)}y ago";
         }
+
+        // ───────────────────────── GET JOB (EMPLOYER VIEW) ─────────────────────────
         public async Task<ReturnedJobDto> GetJobById(int id)
         {
-
             var userId = GetCurrentUserId();
-            var currentEmployerProfile = await _db.EmployerProfiles
-               .Include(e => e.User) // Explicitly load User navigation property if FullName lives on User
-               .FirstOrDefaultAsync(x => x.UserId == userId);
+            var me = await _db.EmployerProfiles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == userId);
 
-            if (currentEmployerProfile == null)
-                return null;
+            if (me == null || me.CompanyId == null)
+                throw new UnauthorizedAccessException("You are not in a company.");
+
+            // company check is part of the query: other companies' jobs are "not found"
             var job = await _db.JobPosts
                 .Include(x => x.Company)
                     .ThenInclude(x => x.Logo)
-                .Include(x => x.PostedByEmployer).ThenInclude(x => x.User) // navigation to EmployerProfile who posted it
-                .Include(x => x.JobApplications)      // to count applications
-                .FirstOrDefaultAsync(j => j.Id == id);
+                .Include(x => x.PostedByEmployer).ThenInclude(x => x.User)
+                .Include(x => x.JobApplications)
+                .FirstOrDefaultAsync(j => j.Id == id && j.CompanyId == me.CompanyId)
+                ?? throw new KeyNotFoundException("Job not found");
 
-            if (job == null)
-                throw new KeyNotFoundException("Job not found");
-
-            // Get the current logged-in employer's profile (if any)
-
-            // Ownership check: job creator OR company owner
-            bool isJobCreator = currentEmployerProfile != null
-                && job.PostedByEmployerId == currentEmployerProfile.Id;
-
-            bool isCompanyOwner = currentEmployerProfile != null
-                && job.Company.CreatedByEmployerId == currentEmployerProfile.Id;
-
-            bool isOwnerView = isJobCreator || isCompanyOwner;
+            // Role based (always correct after ownership transfer / removal):
+            // job creator OR current Owner/Admin of this company
+            bool isOwnerView = job.PostedByEmployerId == me.Id
+                               || me.Role == EmployerCompanyRole.Owner
+                               || me.Role == EmployerCompanyRole.Admin;
 
             return new ReturnedJobDto
             {
@@ -489,8 +452,8 @@ namespace Infrastructure.Implementation.JobService
                 MaxSalary = job.SalaryMax,
                 EmploymentType = job.JobType.ToString(),
                 ExprianceLevel = job.ExperienceLevel.ToString(),
-                Requirements=job.Requirements,
-                Responsibilities=job.Responsibilities,
+                Requirements = job.Requirements,
+                Responsibilities = job.Responsibilities,
                 Status = job.IsActive ? "Active" : "Inactive",
 
                 CreatedAt = job.CreatedAt,
@@ -501,11 +464,13 @@ namespace Infrastructure.Implementation.JobService
 
                 TotalApplications = job.JobApplications?.Count ?? 0,
                 PostedByEmployerId = job.PostedByEmployerId.ToString(),
-                PostedByName = job.PostedByEmployer.User.FullName,
+                PostedByName = job.PostedByEmployer?.User?.FullName ?? "Company Admin",
                 IsOwnerView = isOwnerView
             };
         }
-        public async  Task<JobDetailsForJobseekerDto> GetJobDetailsForJobseeker(int jobId)
+
+        // ───────────────────────── GET JOB (JOB SEEKER VIEW) ─────────────────────────
+        public async Task<JobDetailsForJobseekerDto> GetJobDetailsForJobseeker(int jobId)
         {
             var userId = GetCurrentUserId();
             var job = await _db.JobPosts
@@ -515,6 +480,7 @@ namespace Infrastructure.Implementation.JobService
 
             if (job == null)
                 throw new KeyNotFoundException("Job post not found.");
+
             var seekerProfile = await _db.JobSeekers
                 .FirstOrDefaultAsync(s => s.UserId == userId);
             bool hasApplied = false;
@@ -534,7 +500,6 @@ namespace Infrastructure.Implementation.JobService
                 }
             }
 
-            // 4. Construct Response DTO
             return new JobDetailsForJobseekerDto
             {
                 Id = job.Id,
@@ -545,11 +510,11 @@ namespace Infrastructure.Implementation.JobService
                 MaxSalary = job.SalaryMax,
                 EmploymentType = job.JobType.ToString(),
                 ExperienceLevel = job.ExperienceLevel.ToString(),
-                
+
                 CreatedAt = job.CreatedAt,
                 PostedAge = GetTimeAgo(job.CreatedAt),
-                Requirements=job.Requirements,
-                Responsibilities=job.Responsibilities,
+                Requirements = job.Requirements,
+                Responsibilities = job.Responsibilities,
                 CompanyId = job.CompanyId,
                 CompanyName = job.Company?.CompanyName ?? string.Empty,
                 CompanyLogo = job.Company?.Logo?.ImageUrl,
@@ -561,6 +526,7 @@ namespace Infrastructure.Implementation.JobService
                 IsActive = job.IsActive
             };
         }
+
         private string GetTimeAgo(DateTime date)
         {
             var span = DateTime.UtcNow - date;
@@ -571,11 +537,13 @@ namespace Infrastructure.Implementation.JobService
             if (span.TotalHours >= 1) return $"{(int)span.TotalHours} hour(s) ago";
             return "Just now";
         }
+
         private string GetCompanyAge(DateTime foundedDate)
         {
             var years = (DateTime.UtcNow - foundedDate).TotalDays / 365;
             return years < 1 ? "Less than a year old" : $"{(int)years} year(s) old";
         }
+
         public async Task<IEnumerable<JobDto>> AllJobs()
         {
             return await _db.JobPosts
@@ -593,10 +561,6 @@ namespace Infrastructure.Implementation.JobService
                 })
                 .ToListAsync();
         }
-
-      
-     
-
 
         public async Task<JobDto> GetJob(int id)
         {
@@ -695,21 +659,19 @@ namespace Infrastructure.Implementation.JobService
                 .ToListAsync();
         }
 
-
-
-        public async  Task<PagedResult<EmployerJobCardDto>?> GetEmployerJobsAsync(EmployerJobsFilterDto filter)
+        // ───────────────────────── EMPLOYER: PAGED JOB CARDS ─────────────────────────
+        public async Task<PagedResult<EmployerJobCardDto>?> GetEmployerJobsAsync(EmployerJobsFilterDto filter)
         {
             var employer = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs);
-            if (employer == null)
+            if (employer == null || employer.CompanyId == null)
                 return null;
-
 
             var canSeeAllCompanyJobs = _Ipermision.HasPermission(employer, EmployerPermissions.ManageEmployerRoles);
             var now = DateTime.UtcNow;
 
             var query = _db.JobPosts
                         .AsNoTracking()
-                         .Where(j => j.CompanyId == employer.CompanyId);
+                        .Where(j => j.CompanyId == employer.CompanyId);
 
             if (!canSeeAllCompanyJobs)
                 query = query.Where(j => j.PostedByEmployerId == employer.Id);
@@ -730,7 +692,6 @@ namespace Infrastructure.Implementation.JobService
                     _ => query
                 };
             }
-
 
             if (filter.EmploymentType.HasValue)
                 query = query.Where(j => j.JobType == filter.EmploymentType.Value);
@@ -805,16 +766,15 @@ namespace Infrastructure.Implementation.JobService
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
-
-
         }
 
-        public async  Task<PagedResult<JobCardDto>> GetActiveJobsAsync(JobsFilterDto filter)
+        // ───────────────────────── PUBLIC: ACTIVE JOBS ─────────────────────────
+        public async Task<PagedResult<JobCardDto>> GetActiveJobsAsync(JobsFilterDto filter)
         {
             var now = DateTime.UtcNow;
 
-            var query = _db.JobPosts.Include(x=>x.Company)
-                                      .ThenInclude(x=>x.Logo)
+            var query = _db.JobPosts.Include(x => x.Company)
+                                      .ThenInclude(x => x.Logo)
                 .AsNoTracking()
                 .Where(j => j.IsActive && j.ExpirationDate > now);
 
@@ -838,26 +798,25 @@ namespace Infrastructure.Implementation.JobService
             var pageSize = Math.Clamp(filter.PageSize, 1, 50);
             var totalCount = await query.CountAsync();
 
-
-         var rawJobs = await query
-       .Skip((pageNumber - 1) * pageSize)
-       .Take(pageSize)
-       .Select(j => new
-       {
-           j.Id,
-           j.Title,
-           LogoUrl = j.Company.Logo != null ? j.Company.Logo.ImageUrl : null,
-           CompanyName = j.Company.CompanyName,         
-           j.Location,
-           j.JobType,
-           j.ExperienceLevel,
-           j.SalaryMin,
-           j.SalaryMax,
-           j.Currency,
-           j.CreatedAt,
-           j.ExpirationDate
-       })
-       .ToListAsync();
+            var rawJobs = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(j => new
+                {
+                    j.Id,
+                    j.Title,
+                    LogoUrl = j.Company.Logo != null ? j.Company.Logo.ImageUrl : null,
+                    CompanyName = j.Company.CompanyName,
+                    j.Location,
+                    j.JobType,
+                    j.ExperienceLevel,
+                    j.SalaryMin,
+                    j.SalaryMax,
+                    j.Currency,
+                    j.CreatedAt,
+                    j.ExpirationDate
+                })
+                .ToListAsync();
 
             var items = rawJobs.Select(j => new JobCardDto
             {
@@ -883,6 +842,122 @@ namespace Infrastructure.Implementation.JobService
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+        public async Task<Application.DTOs.JobPost.JobDTO.RecordsDTO.RecordPagedResult<Application.DTOs.JobPost.JobDTO.RecordsDTO.RecommendedJobDto>?> RecommendAsync(int page, int size, CancellationToken ct)
+        {
+
+            var userId = _currentuser.UserId;              
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            page = Math.Max(page, 0);
+            size = Math.Clamp(size, 1, 50);
+
+            var seeker = await _db.JobSeekers
+             .AsNoTracking()
+             .Where(s => s.UserId == userId)
+             .Select(s => new { s.Id, Skills = s.Skills.Select(k => k.Name).ToList() })
+             .FirstOrDefaultAsync(ct);
+
+            if (seeker == null) return null;
+
+            var skills = seeker.Skills
+                .Where(n => !string.IsNullOrWhiteSpace(n))
+                .Select(n => n.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            var now = DateTime.UtcNow;
+
+            // 2) Bounded candidate query: active, not expired, not already applied
+            var candidates = await _db.JobPosts
+                .AsNoTracking()
+                .Where(j => j.IsActive && j.ExpirationDate > now)
+                .Where(j => !_db.JobApplications.Any(a => a.JobPostId == j.Id && a.JobSeekerId == seeker.Id))
+                .OrderByDescending(j => j.CreatedAt)
+                .Take(300)
+                .Select(j => new
+                {
+                    j.Id,
+                    j.Title,
+                    LogoUrl = j.Company.Logo != null ? j.Company.Logo.ImageUrl : null,
+                    CompanyName = j.Company.CompanyName,
+                    j.Location,
+                    j.JobType,
+                    j.SalaryMin,
+                    j.SalaryMax,
+                    j.Currency,
+                    j.CreatedAt,
+                    j.Requirements
+                })
+                .ToListAsync(ct);
+
+
+            var matchers = skills
+        .Select(s => (Name: s, Rx: new Regex(
+            $@"(?<![A-Za-z0-9]){Regex.Escape(s)}(?![A-Za-z0-9])",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
+            TimeSpan.FromMilliseconds(50))))
+        .ToList();
+
+            var scored = candidates.Select(j =>
+            {
+                var text = j.Requirements ?? string.Empty;
+                var matched = matchers.Where(m => m.Rx.IsMatch(text)).Select(m => m.Name).ToList();
+                int score = matchers.Count == 0 ? 0 : matched.Count * 100 / matchers.Count;
+
+                return new RecommendedJobDto(
+                    j.Id,
+                    j.Title,
+                    j.LogoUrl, 
+                    j.CompanyName,
+                    j.Location,
+                    j.JobType.ToString(),
+                    j.SalaryMin,
+                    j.SalaryMax,
+                    j.Currency,
+                    score,
+                    matched,
+                    j.CreatedAt);
+            });
+
+            var ordered = (matchers.Count == 0
+           ? scored
+           : scored.Where(r => r.MatchScore > 0))
+          .OrderByDescending(r => r.MatchScore)
+           .ThenByDescending(r => r.PostedAtUtc)
+          .ToList();
+
+            var items = ordered.Skip(page * size).Take(size).ToList();
+            return new Application.DTOs.JobPost.JobDTO.RecordsDTO.RecordPagedResult<Application.DTOs.JobPost.JobDTO.RecordsDTO.RecommendedJobDto>(items, page, size, ordered.Count);
+        }
+
+        public async Task<IReadOnlyList<LatestJobDto>> GetLatestJobsAsync(int count = 6, CancellationToken ct = default)
+        {
+            count = Math.Clamp(count, 1, 20);
+
+            var cacheKey = $"latest_jobs_{count}";
+            if (_cache.TryGetValue(cacheKey, out IReadOnlyList<LatestJobDto>? cached) && cached is not null)
+                return cached;
+
+            var jobs = await _db.JobPosts.Include(c=>c.Company).ThenInclude(x=>x.Logo)
+                .AsNoTracking()
+                .Where(j => j.IsActive)
+                .OrderByDescending(j => j.CreatedAt)
+                .Take(count)
+                .Select(j => new LatestJobDto(
+                    j.Id,
+                    j.Title,
+                    j.Company.CompanyName,
+                    j.Company.Logo.ImageUrl,
+                    j.Location,
+                    j.JobType.ToString(),
+                    j.SalaryMin,
+                    j.SalaryMax,
+                    j.CreatedAt))
+                .ToListAsync(ct);
+
+            _cache.Set(cacheKey, jobs, CacheDuration);
+            return jobs;
         }
     }
 }

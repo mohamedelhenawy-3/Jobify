@@ -14,6 +14,10 @@ namespace Application.DTOs.CompanyMembers
         public string Email { get; set; } = "";
         public EmployerCompanyRole Role { get; set; }
         public bool IsActive { get; set; }
+        
+
+
+        public bool HasAccessed { get; set; }
         public List<string> Permissions { get; set; } = new();
         public int JobsPosted { get; set; }
         public DateTime? JoinedAt { get; set; }

@@ -17,7 +17,7 @@
       <!-- Main column -->
       <div class="main-card">
         <div class="job-header">
-    
+
           <div class="company-logo">
             <img *ngIf="job.companyLogo" [src]="job.companyLogo" [alt]="job.companyName" />
           </div>
@@ -30,18 +30,17 @@
           <span class="status-badge" [class.inactive]="!job.isActive">
             {{ job.isActive ? 'Open' : 'Closed' }}
           </span>
-                <div class="header-actions">
 
-
-  <button type="button" class="save-btn" [class.on]="isSaved"
-          [disabled]="savingBookmark"
-          [attr.aria-pressed]="isSaved"
-          [attr.aria-label]="isSaved ? 'Remove from saved jobs' : 'Save job'"
-          [title]="isSaved ? 'Saved. Click to remove' : 'Save job'"
-          (click)="toggleSave()">
-    <i [ngClass]="isSaved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
-  </button>
-</div>
+          <div class="header-actions">
+            <button type="button" class="save-btn" [class.on]="isSaved"
+                    [disabled]="savingBookmark"
+                    [attr.aria-pressed]="isSaved"
+                    [attr.aria-label]="isSaved ? 'Remove from saved jobs' : 'Save job'"
+                    [title]="isSaved ? 'Saved. Click to remove' : 'Save job'"
+                    (click)="toggleSave()">
+              <i [ngClass]="isSaved ? 'fas fa-bookmark' : 'far fa-bookmark'"></i>
+            </button>
+          </div>
         </div>
 
         <div class="chips">
@@ -76,7 +75,6 @@
           </span>
         </div>
 
-        <!-- Apply states -->
         <button *ngIf="!job.hasApplied && job.isActive" class="apply-btn" (click)="apply(job.id)">
           Apply Now
         </button>
@@ -105,6 +103,15 @@
       </aside>
 
     </div>
+
+    <!-- Similar jobs (separate component) -->
+    <app-similar-jobs
+      *ngIf="!loading && job"
+      [jobId]="job.id"
+      [take]="6">
+    </app-similar-jobs>
+
   </div>
+
   <div class="save-toast" *ngIf="saveMsg">{{ saveMsg }}</div>
 </div>

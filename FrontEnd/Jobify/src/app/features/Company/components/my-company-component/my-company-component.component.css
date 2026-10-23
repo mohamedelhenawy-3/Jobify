@@ -17,7 +17,7 @@
   color: var(--text);
 }
 
-.page { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+.page { max-width: 10000px; margin: 0 auto;  }
 
 /* States */
 .state { text-align: center; padding: 60px 16px; color: var(--muted); }
@@ -430,3 +430,72 @@ a.btn { text-decoration: none; }
   .member { flex-wrap: wrap; }
   .member-side { align-items: flex-start; }
 }
+/* Append to my-company-component.component.css.
+   Uses your existing variables if they exist, with fallbacks if not. */
+
+.act-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.act-input {
+  padding: 8px 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text, #1f2937);
+  font: inherit;
+  font-size: 14px;
+}
+.act-input:focus {
+  outline: none;
+  border-color: var(--primary, #4f46e5);
+  box-shadow: 0 0 0 3px var(--primary-soft, #eef2ff);
+}
+.act-search { flex: 1 1 200px; min-width: 0; }
+.act-date { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted, #6b7280); }
+.act-total { font-size: 14px; color: var(--muted, #6b7280); }
+
+.act-list { list-style: none; margin: 0; padding: 0; transition: opacity .15s; }
+.act-list.loading { opacity: .5; }
+.act-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+.act-item:last-child { border-bottom: none; }
+.act-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-soft, #eef2ff);
+  color: var(--primary, #4f46e5);
+  font-size: 13px;
+  font-weight: 700;
+}
+.act-body { flex: 1; min-width: 0; }
+.act-body p { margin: 0 0 4px; font-size: 14px; line-height: 1.5; color: var(--text, #1f2937); white-space: normal; }
+.act-body small {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted, #6b7280);
+}
+.act-cat { padding: 1px 8px; border-radius: 999px; background: #f1f5f9; }
+
+.act-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+.act-pager .btn:disabled { opacity: .5; cursor: not-allowed; }

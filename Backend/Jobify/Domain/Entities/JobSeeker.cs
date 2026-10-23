@@ -38,6 +38,9 @@ namespace Domain.Entities
         public ICollection<Experience> Experiences { get; set; } = new List<Experience>();
         public ICollection<Education> Educations { get; set; } = new List<Education>();
         public ICollection<Skill> Skills { get; set; } = new List<Skill>();
+        public ICollection<SeekerLanguage> Languages { get; set; } = new List<SeekerLanguage>();
+        public ICollection<SeekerCertificate> Certificates { get; set; } = new List<SeekerCertificate>();
+        public ICollection<SeekerProject> Projects { get; set; } = new List<SeekerProject>();
         public ProfileImage? ProfileImage { get; set; }
 
         public string? ResumeUrl { get; set; }

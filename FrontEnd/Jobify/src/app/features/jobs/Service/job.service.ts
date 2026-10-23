@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { EmployerJobsFilter, JobSearchFilter } from '../models/job-search-filter.model';
 import { PagedResult } from '../../../Shared/models/paged-result.model';
-import { CreateJobRequest, EmployerJobCard, Job, JobCard, JobDetails } from '../models/Job';
+import { CreateJobRequest, EmployerJobCard, Job, JobCard, JobDetails, JobMatch } from '../models/Job';
 import { SuccessResponse } from '../../../Models/Job/SuccessResponse';
 import { EmployerJob } from '../../Owner-Profile/Models/OwnerProfile';
 
@@ -57,5 +57,7 @@ getEmployerJobs(filter: EmployerJobsFilter) {
 getJobs(filter: EmployerJobsFilter) {
   return this.http.get<PagedResult<JobCard>>(`${this.baseUrl}/Jobs`, { params: this.toParams(filter) });
 }
-
+getSimilar(id: number, take = 5) {
+  return this.http.get<JobMatch[]>(`${this.baseUrl}/${id}/similar?take=${take}`);
+}
 }

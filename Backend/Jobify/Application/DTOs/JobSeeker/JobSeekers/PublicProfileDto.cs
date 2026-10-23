@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.DTOs.User;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.JobSeeker.JobSeekers
 {
-    public class PublicProfileDto
+    public class PublicProfileDto : PublicUserProfileDto
 
     {
         public string FullName { get; set; } = "";
@@ -22,7 +23,10 @@ namespace Application.DTOs.JobSeeker.JobSeekers
         public string? GitHubUrl { get; set; }
         public string? WebsiteUrl { get; set; }
         public List<ExperienceDto> Experiences { get; set; } = new();
-        public List<EducationDto> Educations { get; set; } = new();
+        public List<ProjectDto>? Projects { get; set; } = new();
+        public List<CertificateDto>? Certificates { get; set; } = new();
+        public List<LanguageDto> Languages { get; set; } = new();
         public List<string> Skills { get; set; } = new();
+        public List<EducationDto> Educations { get; set; }
     }
 }

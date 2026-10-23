@@ -1,11 +1,14 @@
 ﻿using Application.DTOs.JobPost;
 using Application.DTOs.JobPost.JobDTO;
+using Application.DTOs.JobPost.JobDTO.RecordsDTO;
 using Application.Interfaces.Company;
 using Application.Interfaces.Job;
 using Domain.Entities.LooksUp;
+using Infrastructure.Implementation.JobService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace Jobify.Controllers
@@ -17,11 +20,13 @@ namespace Jobify.Controllers
     public class JobController : ControllerBase
     {
         private readonly IJobService _jobService;
+        private readonly ISimilarJobsService _similar;
 
         public JobController(
-            IJobService jobService)
+            IJobService jobService,ISimilarJobsService similar)
         {
             _jobService = jobService;
+            _similar = similar;
         }
 
         [HttpGet("EmpJobs")]
@@ -135,6 +140,14 @@ namespace Jobify.Controllers
             return Ok(jobs);
         }
 
+        [AllowAnonymous]
+        [HttpGet("{id:int}/similar")]
+        public async Task<ActionResult<List<SimilarJobDto>>> GetSimilar(int id, [FromQuery] int take = 5)
+        {
+            var result = await _similar.GetSimilarAsync(id, take);
+            return result == null ? NotFound() : Ok(result);
+        }
+
         [HttpPost("SaveAlert")]
         public async Task<IActionResult> SaveAlert([FromBody]string keyword)
         {
@@ -148,6 +161,27 @@ namespace Jobify.Controllers
             var result = await _jobService.Search(dto);
             return Ok(result);
         }
-     
+
+        [HttpGet("recommended-jobs")]
+        public async Task<ActionResult> GetRecommendedJobs(
+        [FromQuery, Range(0, 1000)] int page = 0,
+        [FromQuery, Range(1, 50)] int size = 10,
+        CancellationToken ct = default)
+        {
+            var result = await _jobService.RecommendAsync(page, size, ct);
+
+            if (result is null)
+                return NotFound(new { message = "Job seeker profile not found." });
+
+            return Ok(result);
+        }
+        [HttpGet("latest")]
+        [ProducesResponseType(typeof(IReadOnlyList<LatestJobDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<LatestJobDto>>> GetLatest(
+    [FromQuery] int count = 6, CancellationToken ct = default)
+        {
+            var jobs = await _jobService.GetLatestJobsAsync(count, ct);
+            return Ok(jobs);
+        }
     }
 }

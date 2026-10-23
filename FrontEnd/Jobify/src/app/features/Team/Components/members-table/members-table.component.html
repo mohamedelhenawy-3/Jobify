@@ -5,6 +5,7 @@
         <th>Member</th>
         <th>Role</th>
         <th>Status</th>
+        <th>Access</th>
         <th>Jobs</th>
         <th>Joined</th>
         <th></th>
@@ -23,10 +24,10 @@
           </div>
         </td>
         <td><span class="role r{{ roleId(m.role) }}">{{ roleName(m.role) }}</span></td>
-        <td><span class="status" [class.off]="!m.isActive">{{ m.isActive ? 'Active' : 'Inactive' }}</span></td>
+        <td><span class="status" [class.off]="!m.isActive">{{ m.isActive ? 'Active' : 'Suspended' }}</span></td>
+        <td><span class="status" [class.off]="!m.hasAccessed">{{ m.hasAccessed ? 'Allowed' : 'Denied' }}</span></td>
         <td>{{ m.jobsPosted }}</td>
         <td>{{ m.joinedAt | date: 'mediumDate' }}</td>
-
         <td class="actions">
           <ng-container *ngIf="canManage(m)">
             <button class="dots" type="button" (click)="toggleMenu($event, m.id)">⋯</button>
@@ -36,24 +37,25 @@
                   (click)="choose(m, a.key)">{{ a.label }}</li>
             </ul>
           </ng-container>
+          <button *ngIf="canLeave(m)" type="button" class="leave" (click)="startLeave(m)">Leave</button>
         </td>
       </tr>
 
       <tr *ngIf="members.length === 0">
-        <td colspan="6" class="empty">No members found.</td>
+        <td colspan="7" class="empty">No members found.</td>
       </tr>
     </tbody>
   </table>
 </div>
 
-<!-- ============ MODAL ============ -->
+<p class="error" *ngIf="error && !mode">{{ error }}</p>
+
 <div class="backdrop" *ngIf="target && mode" (click)="!saving && close()">
   <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
 
     <ng-container *ngIf="target as m">
 
-      <!-- CHANGE ROLE -->
-      <form *ngIf="mode === 'role'" (ngSubmit)="saveRole(m)">
+      <form *ngIf="mode === 'role'" (submit)="$event.preventDefault(); saveRole(m)">
         <div class="modal-head">
           <div class="avatar">{{ initials(m.fullName) }}</div>
           <div>
@@ -63,10 +65,8 @@
         </div>
 
         <div class="modal-body">
-          <label class="option" *ngFor="let r of assignableRoles"
-                 [class.selected]="selectedRole === r">
-            <input type="radio" name="role" [checked]="selectedRole === r"
-                   (change)="selectedRole = r" />
+          <label class="option" *ngFor="let r of assignableRoles" [class.selected]="selectedRole === r">
+            <input type="radio" name="role" [checked]="selectedRole === r" (change)="selectedRole = r" />
             <span>{{ r }}</span>
           </label>
           <p class="hint">Permissions will reset to the defaults of the new role.</p>
@@ -75,15 +75,13 @@
 
         <div class="modal-foot">
           <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
-          <button type="submit" class="primary"
-                  [disabled]="saving || selectedRole === roleName(m.role)">
+          <button type="submit" class="primary" [disabled]="saving || selectedRole === roleName(m.role)">
             {{ saving ? 'Saving…' : 'Save changes' }}
           </button>
         </div>
       </form>
 
-      <!-- EDIT PERMISSIONS -->
-      <form *ngIf="mode === 'permissions'" (ngSubmit)="savePermissions(m)">
+      <form *ngIf="mode === 'permissions'" (submit)="$event.preventDefault(); savePermissions(m)">
         <div class="modal-head">
           <div class="avatar">{{ initials(m.fullName) }}</div>
           <div>
@@ -112,8 +110,7 @@
         </div>
       </form>
 
-      <!-- REMOVE -->
-      <form *ngIf="mode === 'remove'" (ngSubmit)="doRemove(m)">
+      <form *ngIf="mode === 'remove'" (submit)="$event.preventDefault(); doRemove(m)">
         <div class="modal-head">
           <div class="avatar danger">!</div>
           <div>
@@ -124,6 +121,17 @@
 
         <div class="modal-body">
           <p>{{ m.fullName }} will lose access to the company immediately.</p>
+
+          <label class="field">
+            <span>Who takes over their jobs?</span>
+            <select (change)="onReassign($event)">
+              <option value="">Me (default)</option>
+              <option *ngFor="let o of reassignOptions" [value]="o.id">
+                {{ o.fullName }} ({{ roleName(o.role) }})
+              </option>
+            </select>
+          </label>
+
           <p class="error" *ngIf="error">{{ error }}</p>
         </div>
 
@@ -135,8 +143,7 @@
         </div>
       </form>
 
-      <!-- TRANSFER OWNERSHIP -->
-      <form *ngIf="mode === 'transfer'" (ngSubmit)="doTransfer(m)">
+      <form *ngIf="mode === 'transfer'" (submit)="$event.preventDefault(); doTransfer(m)">
         <div class="modal-head">
           <div class="avatar danger">!</div>
           <div>
@@ -147,6 +154,7 @@
 
         <div class="modal-body">
           <p>{{ m.fullName }} will become the Owner and you will become an Admin.</p>
+          <p class="hint">The new owner gets full control of the company. You can't undo this yourself.</p>
           <p class="error" *ngIf="error">{{ error }}</p>
         </div>
 
@@ -154,6 +162,39 @@
           <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
           <button type="submit" class="danger-btn" [disabled]="saving">
             {{ saving ? 'Transferring…' : 'Transfer' }}
+          </button>
+        </div>
+      </form>
+
+      <form *ngIf="mode === 'leave'" (submit)="$event.preventDefault(); doLeave()">
+        <div class="modal-head">
+          <div class="avatar danger">!</div>
+          <div>
+            <h3>Leave company</h3>
+            <small>You will lose access immediately</small>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <p>You will no longer be part of this company.</p>
+
+          <label class="field">
+            <span>Who takes over your jobs?</span>
+            <select (change)="onReassign($event)">
+              <option value="">The Owner (default)</option>
+              <option *ngFor="let o of reassignOptions" [value]="o.id">
+                {{ o.fullName }} ({{ roleName(o.role) }})
+              </option>
+            </select>
+          </label>
+
+          <p class="error" *ngIf="error">{{ error }}</p>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" (click)="close()" [disabled]="saving">Cancel</button>
+          <button type="submit" class="danger-btn" [disabled]="saving">
+            {{ saving ? 'Leaving…' : 'Leave company' }}
           </button>
         </div>
       </form>

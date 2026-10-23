@@ -37,7 +37,7 @@ tr:hover td { background: #f8fafc; }
 .empty { text-align: center; color: #64748b; padding: 30px; }
 
 /* ---------- actions menu ---------- */
-.actions { position: relative; width: 48px; text-align: right; }
+.actions { position: relative; width: 80px; text-align: right; white-space: nowrap; }
 .dots {
   background: none; border: 0; font-size: 22px; line-height: 1;
   cursor: pointer; padding: 2px 8px; border-radius: 6px; color: #475569;
@@ -53,35 +53,28 @@ tr:hover td { background: #f8fafc; }
 .menu li:hover { background: #f4f4f4; }
 .menu li.danger { color: #c0392b; }
 
-/* ---------- inline panel ---------- */
-tr.is-active td,
-tr.is-active:hover td,
-.panel-row td,
-.panel-row:hover td { background: #f8f9ff; }
-.panel-row td { padding: 0; }
+/* ---------- leave button ---------- */
+.leave {
+  border: 1px solid #fecaca; background: #fff; color: #b91c1c;
+  border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: .8rem;
+}
+.leave:hover { background: #fee2e2; }
 
-.panel { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
-.panel h4 { margin: 0; }
-.panel label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.panel label.disabled { opacity: .5; cursor: not-allowed; }
-.perm-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px;
+/* ---------- form field (reassign select) ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; font-size: .875rem; }
+.field span { color: #475569; font-weight: 600; }
+.field select {
+  padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff;
 }
-.hint { color: #777; font-size: 12px; margin: 0; }
-.footer { display: flex; justify-content: flex-end; gap: 8px; }
-.footer button {
-  border: 1px solid #cbd5e1; background: #fff; border-radius: 6px;
-  padding: 6px 14px; cursor: pointer;
-}
-.footer button:disabled { opacity: .6; cursor: not-allowed; }
-.footer .primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-.footer .danger-btn { background: #c0392b; color: #fff; border-color: #c0392b; }
+
+.hint { color: #64748b; font-size: 12px; margin: 0; }
 .error { color: #c0392b; font-size: 13px; margin: 0; }
 
 /* small screens: allow horizontal scroll instead of clipping the layout */
 @media (max-width: 768px) {
   .table-wrap { overflow-x: auto; }
 }
+
 /* ---------- modal ---------- */
 .backdrop {
   position: fixed; inset: 0; z-index: 1000;
@@ -114,9 +107,6 @@ tr.is-active:hover td,
 .option:hover { background: #f8fafc; }
 .option.selected { border-color: #4f46e5; background: #eef2ff; }
 .option.disabled { opacity: .5; cursor: not-allowed; }
-
-.hint { color: #64748b; font-size: 12px; }
-.error { color: #c0392b; font-size: 13px; }
 
 .modal-foot {
   display: flex; justify-content: flex-end; gap: 8px;

@@ -1,6 +1,9 @@
 export interface EmployerProfileDto {
   fullName: string;
+  position:string;
   headline: string | null;
+    linkedIn?: string | null;         // NEW
+
   bio: string | null;
   email: string;
   phone: string | null;
@@ -21,6 +24,8 @@ export interface UpdateProfileForm {
   location?: string| null;
   position?: string| null;
   bio?: string| null;
+    linkedIn?: string | null;         // NEW
+
 }
 export interface EmployerJob {
   id: number;

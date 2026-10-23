@@ -8,7 +8,7 @@ namespace Application.DTOs.CompanyMembers
 {
     public class SetActiveDto
     {
-        public bool IsActive { get; set; }
+        public bool HasAccessed { get; set; }
 
     }
 }
