@@ -1,4 +1,4 @@
-﻿using Infrastructure.DBContext;
+﻿using Infrastructure.Implementation.AuthService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -45,15 +45,15 @@ namespace Jobify.Controllers
 
             return Ok(modes);
         }
-        [HttpGet("Statuses")]
-        public async Task<IActionResult> GetStatus()
-        {
-            var modes = await _db.JobStatuses
-                .Select(w => new { w.Id, w.StatusName })
-                .ToListAsync();
+        //[HttpGet("Statuses")]
+        //public async Task<IActionResult> GetStatus()
+        //{
+        //    var modes = await _db.JobStatuses
+        //        .Select(w => new { w.Id, w.StatusName })
+        //        .ToListAsync();
 
-            return Ok(modes);
-        }
+        //    return Ok(modes);
+        //}
 
 
      

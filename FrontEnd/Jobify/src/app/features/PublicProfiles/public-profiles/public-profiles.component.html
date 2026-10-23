@@ -1,0 +1,197 @@
+<div class="cover" [attr.data-type]="profile?.type">
+  <div class="cover-glow"></div>
+</div>
+
+<main class="wrap" [attr.data-type]="profile?.type">
+
+  <div class="state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <div class="state card" *ngIf="notFound">
+    <h2>Profile not found</h2>
+    <p>This profile does not exist.</p>
+    <a routerLink="/search" class="btn primary">Back to search</a>
+  </div>
+
+  <ng-container *ngIf="profile">
+
+    <header class="head">
+      <div class="avatar-ring">
+        <img *ngIf="profile.imageUrl; else noImage" class="avatar" [src]="profile.imageUrl" [alt]="profile.fullName" />
+        <ng-template #noImage><div class="avatar">{{ initials(profile.fullName) }}</div></ng-template>
+      </div>
+
+      <div class="head-row">
+        <div class="head-main">
+          <div class="name-row">
+            <h1>{{ profile.fullName }}</h1>
+            <span class="pill type">{{ profile.type === 'employer' ? 'Employer' : 'Job seeker' }}</span>
+            <span class="pill open" *ngIf="seeker?.isOpenToWork && !isPrivate">
+              <span class="dot"></span>Open to work
+            </span>
+            <span class="pill lock-pill" *ngIf="isPrivate">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Private
+            </span>
+          </div>
+
+          <p class="headline" *ngIf="headline">{{ headline }}</p>
+
+          <div class="meta">
+            <span class="meta-item" *ngIf="seeker?.location">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ seeker?.location }}
+            </span>
+            <span class="meta-item" *ngIf="!isPrivate && employer?.role">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              {{ employer?.role }}
+            </span>
+            <span class="meta-item" *ngIf="employer?.companyName">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg>
+              {{ employer?.companyName }}
+            </span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a *ngFor="let l of links" class="btn" [href]="l.url" target="_blank" rel="noopener noreferrer">
+            {{ l.label }}
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+          </a>
+          <button class="btn primary" type="button" (click)="copyLink()">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            {{ copied ? 'Link copied' : 'Copy link' }}
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid" [class.single]="isPrivate">
+      <div class="col">
+
+        <ng-container *ngIf="employer as e">
+          <section class="card" *ngIf="e.bio">
+            <h2><span class="bar"></span>About</h2>
+            <p class="text">{{ e.bio }}</p>
+          </section>
+
+          <section class="card" *ngIf="e.companyName">
+            <h2><span class="bar"></span>Company</h2>
+            <a class="company" [routerLink]="companyPageReady && e.companyId ? ['/Jobify/public-Profiles-Comapny', e.companyId] : null">
+              <img *ngIf="e.companyLogo; else noLogo" class="company-logo" [src]="e.companyLogo" [alt]="e.companyName" />
+              <ng-template #noLogo><div class="company-logo ph">{{ initials(e.companyName || '') }}</div></ng-template>
+              <div>
+                <strong>{{ e.companyName }}</strong>
+                <small>{{ e.position || 'Team member' }}</small>
+              </div>
+            </a>
+          </section>
+
+          <section class="card" *ngIf="!e.isPrivate">
+            <h2><span class="bar"></span>Open jobs <span class="count" *ngIf="e.openJobsCount">{{ e.openJobsCount }}</span></h2>
+            <p class="muted" *ngIf="!e.recentJobs.length">No open jobs right now.</p>
+            <a class="job" *ngFor="let j of e.recentJobs" [routerLink]="['/Jobify/jobs', j.id]">
+              <div class="job-icon">{{ j.title.charAt(0).toUpperCase() }}</div>
+              <div class="job-body">
+                <span class="job-title">{{ j.title }}</span>
+                <span class="job-meta">
+                  <span *ngIf="j.location">{{ j.location }}</span>
+                  <span *ngIf="j.createdAt">{{ j.createdAt | date:'mediumDate' }}</span>
+                </span>
+              </div>
+              <svg class="chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+          </section>
+        </ng-container>
+
+        <ng-container *ngIf="seeker as s">
+          <section class="card" *ngIf="s.about || s.summary">
+            <h2><span class="bar"></span>About</h2>
+            <p class="text">{{ s.about || s.summary }}</p>
+          </section>
+
+          <ng-container *ngIf="!s.isPrivate">
+            <section class="card" *ngIf="s.experiences.length">
+              <h2><span class="bar"></span>Experience</h2>
+              <ul class="timeline">
+                <li *ngFor="let x of s.experiences">
+                  <div class="t-title">{{ x.title }}</div>
+                  <div class="t-sub">{{ x.company }}<span *ngIf="x.location"> · {{ x.location }}</span></div>
+                  <div class="t-date">
+                    {{ x.startDate | date:'MMM y' }} – {{ x.isCurrent ? 'Present' : (x.endDate | date:'MMM y') }}
+                  </div>
+                  <p class="text small" *ngIf="x.description">{{ x.description }}</p>
+                </li>
+              </ul>
+            </section>
+
+            <section class="card" *ngIf="s.educations.length">
+              <h2><span class="bar"></span>Education</h2>
+              <ul class="timeline">
+                <li *ngFor="let x of s.educations">
+                  <div class="t-title">{{ x.school }}</div>
+                  <div class="t-sub" *ngIf="x.degree || x.fieldOfStudy">
+                    {{ x.degree }}<span *ngIf="x.degree && x.fieldOfStudy"> · </span>{{ x.fieldOfStudy }}
+                  </div>
+                  <div class="t-date" *ngIf="x.startDate || x.endDate">
+                    {{ x.startDate | date:'y' }} – {{ x.endDate ? (x.endDate | date:'y') : 'Present' }}
+                  </div>
+                  <p class="text small" *ngIf="x.description">{{ x.description }}</p>
+                </li>
+              </ul>
+            </section>
+
+            <section class="card" *ngIf="s.skills.length">
+              <h2><span class="bar"></span>Skills <span class="count">{{ s.skills.length }}</span></h2>
+              <div class="chips"><span class="chip" *ngFor="let k of s.skills">{{ k }}</span></div>
+            </section>
+          </ng-container>
+        </ng-container>
+
+        <section class="card private-card" *ngIf="isPrivate">
+          <div class="lock">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3>This profile is private</h3>
+          <p class="muted">{{ profile.fullName }} has chosen to keep the rest of their profile private.</p>
+          <div class="ghost" aria-hidden="true">
+            <span style="width:70%"></span><span style="width:90%"></span><span style="width:55%"></span>
+          </div>
+        </section>
+      </div>
+
+      <aside class="col" *ngIf="!isPrivate">
+        <section class="card">
+          <h2><span class="bar"></span>Details</h2>
+          <dl class="facts">
+            <ng-container *ngIf="employer as e">
+              <div><dt>Position</dt><dd>{{ e.position || '-' }}</dd></div>
+              <div><dt>Role</dt><dd>{{ e.role || '-' }}</dd></div>
+              <div><dt>Jobs posted</dt><dd>{{ e.jobsPosted }}</dd></div>
+              <div *ngIf="e.joinedCompanyAt"><dt>Joined company</dt><dd>{{ e.joinedCompanyAt | date:'MMM y' }}</dd></div>
+            </ng-container>
+            <ng-container *ngIf="seeker as s">
+              <div><dt>Location</dt><dd>{{ s.location || '-' }}</dd></div>
+              <div>
+                <dt>Availability</dt>
+                <dd>
+                  <span class="status" [class.off]="!s.isOpenToWork">
+                    {{ s.isOpenToWork ? 'Open to work' : 'Not looking' }}
+                  </span>
+                </dd>
+              </div>
+              <div><dt>Skills</dt><dd>{{ s.skills.length }}</dd></div>
+              <div><dt>Experience entries</dt><dd>{{ s.experiences.length }}</dd></div>
+            </ng-container>
+          </dl>
+        </section>
+      </aside>
+    </div>
+  </ng-container>
+</main>

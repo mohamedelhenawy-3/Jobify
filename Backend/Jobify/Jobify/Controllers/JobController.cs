@@ -1,11 +1,14 @@
 ﻿using Application.DTOs.JobPost;
+using Application.DTOs.JobPost.JobDTO;
+using Application.DTOs.JobPost.JobDTO.RecordsDTO;
 using Application.Interfaces.Company;
 using Application.Interfaces.Job;
 using Domain.Entities.LooksUp;
-using Infrastructure.Implementation.CompanyService;
+using Infrastructure.Implementation.JobService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace Jobify.Controllers
@@ -17,51 +20,51 @@ namespace Jobify.Controllers
     public class JobController : ControllerBase
     {
         private readonly IJobService _jobService;
+        private readonly ISimilarJobsService _similar;
 
         public JobController(
-            IJobService jobService)
+            IJobService jobService,ISimilarJobsService similar)
         {
             _jobService = jobService;
+            _similar = similar;
+        }
+
+        [HttpGet("EmpJobs")]
+        public async Task<IActionResult> GetMyJobs()
+        {
+            return Ok(await _jobService.GetMyJobsAsync());
+        }
+        [HttpGet("EmployerJobs")]
+        public async Task<IActionResult> GetMyJobs([FromQuery] EmployerJobsFilterDto filter)
+        {
+            var result = await _jobService.GetEmployerJobsAsync(filter);
+
+            if (result == null)
+                return Forbid();
+
+            return Ok(result);
         }
 
         [HttpPost("CreateJob")]
-
-        public  async Task<IActionResult> CreateJob([FromBody] CreateJob createjob)
+        public  async Task<IActionResult> CreateJob([FromBody] CreateJobPostDto createjob)
         {
             var result = await _jobService.CreateJob(createjob);
             return Ok(result);
 
         }
-        [HttpGet("JobsIndustry/{id:int}")]
-        public async Task<IActionResult> IndustryWithJobs(int id )
+        [HttpGet("{id}/detailsJobSeeker-Job")]
+        [Authorize] 
+        public async Task<IActionResult> GetJobDetailsForJobseeker(int id)
         {
-            var result = await _jobService.JobWithIndustry(id);
+            var result = await _jobService.GetJobDetailsForJobseeker(id);
             return Ok(result);
-
-        }
-        [HttpGet("GetAllIndustriesWithJobCount")]
-        public async Task<IActionResult> IndustriesWithJobs()
-        {
-            var result = await _jobService.Industries();
-            return Ok(result);
-
-        }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchJobs([FromQuery] JobFilterDto filters,  int pageSize = 10, int page = 1)
-        {
-            try
-            {
-                var result = await  _jobService.FilteredJobs(filters, pageSize, page );
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = ex.Message });
-            }
         }
 
 
+        [HttpGet("Jobs")]
+        [AllowAnonymous]  
+        public async Task<IActionResult> GetJobs([FromQuery] JobsFilterDto filter)
+     => Ok(await _jobService.GetActiveJobsAsync(filter));
 
 
         [HttpGet("{id:int}")]
@@ -84,24 +87,21 @@ namespace Jobify.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllJobs()
-        {
-            var jobs = await _jobService.AllJobs();
-            return Ok(jobs);
-        }
-
-       
-        [Authorize(Roles = "Employer")]
         [HttpGet("my-jobs")]
-        public async Task<IActionResult> GetMyJobs()
+        public async Task<IActionResult> GetMyJobss()
         {
-
-            var employerJobs = await _jobService.AllJobsOfEmployer();
-           
-
-            return Ok(employerJobs);
+            var jobs = await _jobService.GetEmployerJobsAsync();
+            return jobs == null ? Forbid() : Ok(jobs);
         }
+
+
+
+
+        /// <summary>
+        /// ///////////////////////////////////////////////////////////////////Finish until here
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
 
         // DELETE JOB (Owner only)
         [Authorize(Roles = "Employer")]
@@ -112,20 +112,40 @@ namespace Jobify.Controllers
             return Ok(result);
         }
         // Update JOB (Owner only)
-        [Authorize(Roles = "Employer")]
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateJob([FromBody]UpdateJobDto dto, int id)
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateJob([FromBody] UpdateJobDto dto, int id)
         {
-            var result = await _jobService.UpdateJob(dto,id);
-            return Ok(result);
+            try
+            {
+                var result = await _jobService.UpdateJob(dto,id);
+                return Ok(new { message = "Job post updated successfully." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { status = 403, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { status = 404, message = ex.Message });
+            }
         }
-   
+
+
 
         [HttpGet("recommended")]
         public async Task<IActionResult> GetRecommendedJobs()
         {
             var jobs = await _jobService.GetRecommendedJobs();
             return Ok(jobs);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id:int}/similar")]
+        public async Task<ActionResult<List<SimilarJobDto>>> GetSimilar(int id, [FromQuery] int take = 5)
+        {
+            var result = await _similar.GetSimilarAsync(id, take);
+            return result == null ? NotFound() : Ok(result);
         }
 
         [HttpPost("SaveAlert")]
@@ -141,11 +161,27 @@ namespace Jobify.Controllers
             var result = await _jobService.Search(dto);
             return Ok(result);
         }
-        [HttpGet("OpeningJobs")]
-        public async Task<IActionResult> OpeningJibs()
+
+        [HttpGet("recommended-jobs")]
+        public async Task<ActionResult> GetRecommendedJobs(
+        [FromQuery, Range(0, 1000)] int page = 0,
+        [FromQuery, Range(1, 50)] int size = 10,
+        CancellationToken ct = default)
         {
-            var result = await _jobService.AvalibleJobs();
+            var result = await _jobService.RecommendAsync(page, size, ct);
+
+            if (result is null)
+                return NotFound(new { message = "Job seeker profile not found." });
+
             return Ok(result);
+        }
+        [HttpGet("latest")]
+        [ProducesResponseType(typeof(IReadOnlyList<LatestJobDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<LatestJobDto>>> GetLatest(
+    [FromQuery] int count = 6, CancellationToken ct = default)
+        {
+            var jobs = await _jobService.GetLatestJobsAsync(count, ct);
+            return Ok(jobs);
         }
     }
 }

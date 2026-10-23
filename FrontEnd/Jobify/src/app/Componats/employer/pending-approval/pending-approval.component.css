@@ -1,0 +1,249 @@
+/* ==========================================================================
+   Base Container & Flexbox Setup
+   ========================================================================== */
+.pending-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f6f9;
+  padding: 2rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Card Styling
+   ========================================================================== */
+.pending-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.card-accent {
+  height: 4px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  width: 100%;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 2rem 2rem 2rem;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Badge & Icon Header
+   ========================================================================== */
+.badge-wrapper {
+  margin-bottom: 1.25rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.icon-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #fffbeb;
+  color: #d97706;
+  font-size: 2.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 0 0 8px rgba(254, 243, 199, 0.5);
+  animation: pulse-ring 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0px rgba(254, 243, 199, 0.8);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(254, 243, 199, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0px rgba(254, 243, 199, 0);
+  }
+}
+
+/* ==========================================================================
+   Typography & Info Box
+   ========================================================================== */
+.card-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.status-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.description {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.company-name {
+  color: #0f172a;
+}
+
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.info-icon {
+  color: #2563eb;
+  font-size: 1.1rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.info-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #475569;
+}
+
+/* ==========================================================================
+   Action Buttons
+   ========================================================================== */
+.action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 1.75rem;
+}
+
+.btn-primary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  color: #64748b;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-ghost:hover {
+  color: #1e293b;
+}
+
+/* ==========================================================================
+   Spinner
+   ========================================================================== */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+  font-size: 0.825rem;
+  color: #94a3b8;
+}
+
+.support-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.support-link:hover {
+  text-decoration: underline;
+}

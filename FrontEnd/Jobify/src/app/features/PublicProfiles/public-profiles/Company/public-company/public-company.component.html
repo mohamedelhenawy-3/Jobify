@@ -1,0 +1,94 @@
+<div class="cover"></div>
+
+<main class="wrap">
+
+  <div class="state" *ngIf="loading">Loading company...</div>
+
+  <div class="state" *ngIf="notFound">
+    <h2>Company not found</h2>
+    <p>This company does not exist or is not public.</p>
+    <a routerLink="/search" class="btn">Back to search</a>
+  </div>
+
+  <ng-container *ngIf="company as c">
+
+    <!-- HEADER (same layout as the employer and job seeker pages) -->
+    <header class="head">
+      <img *ngIf="c.logo; else noLogo" class="avatar" [src]="c.logo" [alt]="c.companyName" />
+      <ng-template #noLogo><div class="avatar">{{ initials(c.companyName) }}</div></ng-template>
+
+      <div class="head-row">
+        <div>
+          <span class="badge">Company</span>
+          <h1>
+            {{ c.companyName }}
+            <span class="verified" *ngIf="c.isVerified">Verified</span>
+          </h1>
+          <p class="headline" *ngIf="c.industry">{{ c.industry }}</p>
+          <div class="meta">
+            <span *ngIf="c.location">{{ c.location }}</span>
+            <span *ngIf="c.companySize">{{ c.companySize }}</span>
+            <span *ngIf="c.founded">Founded {{ c.founded }}</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a *ngIf="isSafeUrl(c.companyWebsite)" class="btn" [href]="c.companyWebsite"
+             target="_blank" rel="noopener noreferrer">Website</a>
+          <button class="btn primary" type="button" (click)="copyLink()">{{ copied ? 'Link copied' : 'Copy link' }}</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <section class="card" *ngIf="c.description">
+          <h2>About the company</h2>
+          <p class="text">{{ c.description }}</p>
+        </section>
+
+        <section class="card">
+          <h2>Open jobs <span class="count" *ngIf="c.openJobsCount">{{ c.openJobsCount }}</span></h2>
+          <p class="muted" *ngIf="!c.openJobs.length">No open jobs right now.</p>
+          <!-- ADAPT: the route of your job details page -->
+          <a class="job" *ngFor="let j of c.openJobs" [routerLink]="['/jobs', j.id]">
+            <span class="job-title">{{ j.title }}</span>
+            <span class="job-meta">
+              <span *ngIf="j.location">{{ j.location }}</span>
+              <span *ngIf="j.createdAt">{{ j.createdAt | date:'mediumDate' }}</span>
+            </span>
+          </a>
+        </section>
+
+        <!-- <section class="card" *ngIf="c.members.length">
+          <h2>Team <span class="count">{{ c.membersCount }}</span></h2>
+          <div class="team">
+            <a class="member" *ngFor="let m of c.members" [routerLink]="['/profile', m.userId]">
+              <img *ngIf="m.imageUrl; else noPic" class="m-avatar" [src]="m.imageUrl" [alt]="m.fullName" />
+              <ng-template #noPic><div class="m-avatar">{{ initials(m.fullName) }}</div></ng-template>
+              <div>
+                <div class="m-name">{{ m.fullName }}</div>
+                <div class="m-sub">{{ m.position || m.role }}</div>
+              </div>
+            </a>
+          </div>
+        </section> -->
+      </div>
+
+      <aside>
+        <section class="card">
+          <h2>Details</h2>
+          <dl class="facts">
+            <div><dt>Industry</dt><dd>{{ c.industry || '-' }}</dd></div>
+            <div><dt>Company size</dt><dd>{{ c.companySize || '-' }}</dd></div>
+            <div *ngIf="c.founded"><dt>Founded</dt><dd>{{ c.founded }}</dd></div>
+            <div><dt>Location</dt><dd>{{ c.location || '-' }}</dd></div>
+            <div><dt>Team members</dt><dd>{{ c.membersCount }}</dd></div>
+            <div *ngIf="isSafeUrl(c.companyWebsite)"><dt>Website</dt>
+              <dd><a [href]="c.companyWebsite" target="_blank" rel="noopener noreferrer">{{ websiteLabel(c.companyWebsite!) }}</a></dd></div>
+          </dl>
+        </section>
+      </aside>
+    </div>
+  </ng-container>
+</main>

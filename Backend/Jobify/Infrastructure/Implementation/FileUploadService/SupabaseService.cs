@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
@@ -56,6 +56,26 @@ namespace Infrastructure.Implementation.FileUploadService
 
             // Return public URL for browser access
             return $"{_settings.Url}/storage/v1/object/public/{_settings.Bucket}/{fileName}";
+        }
+
+        public async Task DeleteResume(string? resumeUrl)
+        {
+            if (string.IsNullOrWhiteSpace(resumeUrl)) return;
+
+            var fileName = resumeUrl.Split('/').Last();
+            var deleteUrl = $"{_settings.Url}/storage/v1/object/{_settings.Bucket}/{fileName}";
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("apikey", _settings.ApiKey);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_settings.ApiKey}");
+
+            var response = await client.DeleteAsync(deleteUrl);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Delete failed. Status: {response.StatusCode}, Body: {body}");
+            }
         }
     }
 }

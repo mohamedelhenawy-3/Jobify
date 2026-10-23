@@ -1,5 +1,7 @@
 ﻿using Application.DTOs.Auth.AuthResponse;
 using Application.DTOs.Comapny;
+using Application.DTOs.Comapny.RefactorCompany;
+using Application.DTOs.Comapny.RefactorCompany.RecordDto;
 using Application.DTOs.SuccefullOp;
 using Application.SearchFeature.Dtos;
 using System;
@@ -12,19 +14,16 @@ namespace Application.Interfaces.Company
 {
     public interface ICompanyService
     {
+
+        Task<IReadOnlyList<TopHiringCompanyDto>> GetTopHiringCompaniesAsync(int count = 8, CancellationToken ct = default);
+
+        Task<PublicCompanyDto> GetByIdAsync(int id);
         Task<CompanyOwnerDto> PrivateCompany();
-        Task<SuccessResponse> CreateCompany(CreateCompanyDto dto);
-        Task<SuccessResponse> UpdateCompany(int companyId, UpdateCompanyDto dto);
         Task<CompanyResponseDto> GetCompanyById(int companyId);
         Task<IEnumerable<CompanyResponseDto>> GetAllCompanies();
-        Task<SuccessResponse> DeleteCompany(int companyId);
-
-        // ===== MY COMPANY =====
-        Task<CompanyResponseDto> GetMyCompany();
-
         // ===== JOBS =====
-        //Task<IEnumerable<JobPostResponseDto>> GetCompanyJobs(int companyId);
         Task<List<SearchCompanyDto>> SearchCompaniesAsync(GlobalSearchDto dto);
 
+        Task<HiringSnapshotDto?> GetHiringSnapshotAsync();
     }
 }

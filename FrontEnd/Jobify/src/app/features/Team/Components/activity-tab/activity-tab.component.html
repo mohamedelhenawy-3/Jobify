@@ -1,0 +1,46 @@
+<section class="activity">
+  <div class="chips-row" role="group" aria-label="Filter activity by type">
+    <button type="button"
+            *ngFor="let f of filters"
+            [class.active]="filter.type === f.value"
+            [attr.aria-pressed]="filter.type === f.value"
+            (click)="setType(f.value)">
+      {{ f.label }}
+    </button>
+  </div>
+
+  <p class="state" *ngIf="loading && !result" role="status">
+    <span class="spinner" aria-hidden="true"></span>
+    Loading activity...
+  </p>
+
+  <p class="state error" *ngIf="error" role="alert">{{ error }}</p>
+
+  <ng-container *ngIf="result && !error">
+    <div class="state empty" *ngIf="result.items.length === 0">
+      <span class="empty-icon" aria-hidden="true">○</span>
+      <p class="empty-title">No activity yet</p>
+      <p class="empty-text">New events will show up here as they happen.</p>
+    </div>
+
+    <ul class="feed" *ngIf="result.items.length">
+      <li *ngFor="let a of result.items">
+        <span class="dot" [ngClass]="icon(a.type)" aria-hidden="true"></span>
+        <div class="feed-body">
+          <p>{{ a.message }}</p>
+          <small>
+            <time [attr.datetime]="a.createdAt">{{ timeAgo(a.createdAt) }}</time>
+            <span class="sep" aria-hidden="true">•</span>
+            <span class="full-date">{{ a.createdAt | date:'medium' }}</span>
+          </small>
+        </div>
+      </li>
+    </ul>
+
+    <app-pager
+      [page]="filter.pageNumber"
+      [totalPages]="result.totalPages"
+      [totalCount]="result.totalCount"
+      (pageChange)="onPage($event)" />
+  </ng-container>
+</section>

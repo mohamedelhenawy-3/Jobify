@@ -1,0 +1,25 @@
+<div class="toolbar">
+  <input type="search" placeholder="Search by name or email"
+         [(ngModel)]="search" (ngModelChange)="onSearch($event)" />
+
+  <select [(ngModel)]="role" (ngModelChange)="onDropdownChange()">
+    <option [ngValue]="null">All roles</option>
+    <option [ngValue]="3">Admin</option>
+    <option [ngValue]="4">Recruiter</option>
+    <option [ngValue]="3">Employer</option>
+  </select>
+
+  <select [(ngModel)]="status" (ngModelChange)="onDropdownChange()">
+    <option [ngValue]="null">All statuses</option>
+    <option [ngValue]="true">Active</option>
+    <option [ngValue]="false">Inactive</option>
+  </select>
+
+  <select [(ngModel)]="sortBy" (ngModelChange)="onDropdownChange()">
+    <option value="name">Sort: Name</option>
+    <option value="joined">Sort: Joined</option>
+    <option value="jobs">Sort: Jobs posted</option>
+  </select>
+
+  <button type="button" (click)="reset()">Reset</button>
+</div>

@@ -1,0 +1,17 @@
+<div class="employer-jobs">
+
+<app-jobs-filter [filter]="filter" (filterChange)="onFilterChange($event)" />
+
+<p class="state" *ngIf="loading">Loading jobs...</p>
+<p class="state error" *ngIf="error">{{ error }}</p>
+<p class="state" *ngIf="!loading && !error && result?.items?.length === 0">No jobs found.</p>
+
+<app-job-card *ngFor="let job of result?.items" [job]="job" />
+
+<div class="pager" *ngIf="result && result.totalCount > result.pageSize">
+  <button type="button" (click)="goToPage(filter.pageNumber - 1)" [disabled]="filter.pageNumber <= 1">Previous</button>
+  <span>Page {{ filter.pageNumber }} of {{ totalPages }}</span>
+  <button type="button" (click)="goToPage(filter.pageNumber + 1)" [disabled]="filter.pageNumber >= totalPages">Next</button>
+</div>
+
+</div>

@@ -1,0 +1,194 @@
+/* ===== Page ===== */
+.page-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background-color: #f8f9fc;
+  min-height: calc(100vh - 60px);
+}
+
+/* ===== Card ===== */
+.job-form-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 850px;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(26, 26, 46, 0.05);
+  border: 1px solid #edf2f7;
+}
+
+.form-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 30px;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.form-title::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: #6366f1;
+  border-radius: 2px;
+  margin-top: 8px;
+}
+
+/* ===== Alerts ===== */
+.alert {
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+.alert.success { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.alert.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* ===== Form ===== */
+.job-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group > label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.optional {
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.form-group input:not([type="checkbox"]),
+.form-group textarea,
+.form-group select {
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #fcfdfe;
+  color: #1a1a2e;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #6366f1;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Validation state */
+.form-group .invalid {
+  border-color: #ef4444 !important;
+  background: #fffafa;
+}
+.form-group .invalid:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+.error-text {
+  color: #ef4444;
+  font-size: 13px;
+}
+
+::placeholder { color: #94a3b8; opacity: 1; }
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.uppercase { text-transform: uppercase; }
+
+/* ===== Grid rows ===== */
+.form-row { display: grid; gap: 24px; }
+.form-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.form-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* ===== Toggle switch ===== */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  height: 48px;
+}
+.switch input { display: none; }
+
+.slider {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.slider::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.switch input:checked + .slider { background: #6366f1; }
+.switch input:checked + .slider::before { transform: translateX(20px); }
+.switch-text { font-size: 15px; color: #1a1a2e; font-weight: 500; }
+
+/* ===== Button ===== */
+.submit-btn {
+  margin-top: 10px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+.submit-btn:hover:not(:disabled) {
+  background: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+}
+.submit-btn:active:not(:disabled) { transform: translateY(0); }
+.submit-btn:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .job-form-container { padding: 25px; border-radius: 0; }
+  .form-row.cols-2,
+  .form-row.cols-3 { grid-template-columns: 1fr; gap: 20px; }
+  .form-title { font-size: 24px; }
+}

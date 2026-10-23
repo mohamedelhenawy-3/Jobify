@@ -1,0 +1,616 @@
+<main class="main">
+
+  <div *ngIf="loading" class="stack">
+    <div class="card"><div class="sk sk-cover"></div><div class="sk sk-line w40"></div><div class="sk sk-line w60"></div></div>
+    <div class="layout">
+      <div class="stack">
+        <div class="card"><div class="sk sk-line w30"></div><div class="sk sk-line"></div><div class="sk sk-line w80"></div></div>
+        <div class="card"><div class="sk sk-line w30"></div><div class="sk sk-line"></div><div class="sk sk-line w60"></div></div>
+      </div>
+      <div class="stack">
+        <div class="card"><div class="sk sk-line w50"></div><div class="sk sk-line"></div></div>
+        <div class="card"><div class="sk sk-line w50"></div><div class="sk sk-line"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !profile" class="alert">{{ error || 'Could not load profile.' }}</div>
+
+  <div *ngIf="profile" class="stack">
+
+    <div class="alert" *ngIf="error && !anyModalOpen">{{ error }}</div>
+
+    <section class="card profile-head">
+      <div class="cover"></div>
+      <div class="head-body">
+        <div class="avatar-wrap">
+          <img class="avatar" [src]="profile.photoUrl || 'assets/default-avatar.png'" alt="Profile photo" />
+          <label class="avatar-edit" title="Change photo" [class.disabled]="busy">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            <input type="file" accept="image/*" hidden (change)="onPhoto($event)" [disabled]="busy" />
+          </label>
+        </div>
+
+        <div class="head-info">
+          <div class="name-row">
+            <h1>{{ profile.fullName }}</h1>
+            <span class="badge" *ngIf="profile.isOpenToWork">Open to work</span>
+          </div>
+          <p class="headline">{{ profile.headline || 'Add a headline to introduce yourself' }}</p>
+          <p class="small muted">
+            <span *ngIf="profile.location">{{ profile.location }} · </span>{{ profile.email }}
+          </p>
+          <div class="links" *ngIf="profile.linkedInUrl || profile.gitHubUrl || profile.websiteUrl">
+            <a *ngIf="profile.linkedInUrl" [href]="profile.linkedInUrl" target="_blank" rel="noopener">LinkedIn</a>
+            <a *ngIf="profile.gitHubUrl" [href]="profile.gitHubUrl" target="_blank" rel="noopener">GitHub</a>
+            <a *ngIf="profile.websiteUrl" [href]="profile.websiteUrl" target="_blank" rel="noopener">Website</a>
+          </div>
+        </div>
+
+        <button class="btn btn-outline" (click)="showBasic = true">Edit profile</button>
+      </div>
+    </section>
+
+    <div class="layout">
+
+      <div class="stack min0">
+
+        <section class="card">
+          <div class="card-head">
+            <h3>About</h3>
+            <button class="btn btn-ghost btn-small" (click)="showAbout = true">Edit</button>
+          </div>
+          <p class="about" *ngIf="profile.about">{{ profile.about }}</p>
+          <p class="muted" *ngIf="!profile.about">Tell employers about yourself.</p>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Experience</h3>
+            <button class="btn btn-outline btn-small" (click)="openAddExp()" [disabled]="busy">+ Add</button>
+          </div>
+          <p class="muted" *ngIf="profile.experiences.length === 0">No experience added yet.</p>
+
+          <div class="item" *ngFor="let e of profile.experiences">
+            <div class="item-icon">{{ e.company.charAt(0).toUpperCase() }}</div>
+            <div class="item-body">
+              <b>{{ e.title }}</b>
+              <div>{{ e.company }}<span *ngIf="e.location"> · {{ e.location }}</span></div>
+              <div class="small muted">
+                {{ e.startDate | date:'MMM yyyy' }} -
+                {{ e.isCurrent ? 'Present' : (e.endDate | date:'MMM yyyy') }}
+              </div>
+              <p class="desc" *ngIf="e.description">{{ e.description }}</p>
+            </div>
+            <div class="item-actions">
+              <button class="btn btn-ghost btn-small" (click)="openEditExp(e)" [disabled]="busy">Edit</button>
+              <button class="btn btn-ghost btn-small danger-text" (click)="deleteExp(e.id!)" [disabled]="busy">Delete</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Education</h3>
+            <button class="btn btn-outline btn-small" (click)="openAddEdu()" [disabled]="busy">+ Add</button>
+          </div>
+          <p class="muted" *ngIf="profile.educations.length === 0">No education added yet.</p>
+
+          <div class="item" *ngFor="let e of profile.educations">
+            <div class="item-icon">{{ e.school.charAt(0).toUpperCase() }}</div>
+            <div class="item-body">
+              <b>{{ e.school }}</b>
+              <div>{{ e.degree }}<span *ngIf="e.fieldOfStudy"> · {{ e.fieldOfStudy }}</span></div>
+              <div class="small muted">
+                {{ e.startDate | date:'MMM yyyy' }} -
+                {{ e.endDate ? (e.endDate | date:'MMM yyyy') : 'Present' }}
+              </div>
+              <p class="desc" *ngIf="e.description">{{ e.description }}</p>
+            </div>
+            <div class="item-actions">
+              <button class="btn btn-ghost btn-small" (click)="openEditEdu(e)" [disabled]="busy">Edit</button>
+              <button class="btn btn-ghost btn-small danger-text" (click)="deleteEdu(e.id!)" [disabled]="busy">Delete</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= PROJECTS GALLERY ================= -->
+        <section class="card">
+          <div class="card-head">
+            <h3>
+              Projects
+              <span class="muted count" *ngIf="profile.projects.length">({{ profile.projects.length }})</span>
+            </h3>
+            <div class="head-tools">
+              <ng-container *ngIf="profile.projects.length > 4">
+                <button type="button" class="btn btn-outline btn-small arrow" (click)="scrollGallery(-1)" aria-label="Scroll left">&#8249;</button>
+                <button type="button" class="btn btn-outline btn-small arrow" (click)="scrollGallery(1)" aria-label="Scroll right">&#8250;</button>
+              </ng-container>
+              <button class="btn btn-outline btn-small" (click)="openAddProj()" [disabled]="busy">+ Add</button>
+            </div>
+          </div>
+
+          <p class="muted" *ngIf="profile.projects.length === 0">Show employers what you have built.</p>
+
+          <div class="gallery" #gal *ngIf="profile.projects.length">
+            <article class="g-card" *ngFor="let p of profile.projects; trackBy: trackById"
+                     tabindex="0" role="button" [attr.aria-label]="'Open ' + p.title"
+                     (click)="openView(p)" (keydown.enter)="openView(p)">
+              <div class="g-thumb">
+                <img *ngIf="p.coverImageUrl" [src]="p.coverImageUrl" [alt]="p.title" loading="lazy" />
+                <div class="g-ph" *ngIf="!p.coverImageUrl">{{ p.title.charAt(0).toUpperCase() }}</div>
+
+                <span class="g-count" *ngIf="p.images.length > 1">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  {{ p.images.length }}
+                </span>
+
+                <div class="g-hover"><span>View project</span></div>
+              </div>
+
+              <div class="g-body">
+                <b class="g-title">{{ p.title }}</b>
+                <p class="g-desc" *ngIf="p.description">{{ p.description }}</p>
+                <div class="g-tech" *ngIf="p.technologies">
+                  <span class="chip" *ngFor="let t of techList(p.technologies).slice(0, 3)">{{ t }}</span>
+                  <span class="chip more" *ngIf="techList(p.technologies).length > 3">+{{ techList(p.technologies).length - 3 }}</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Certificates</h3>
+            <button class="btn btn-outline btn-small" (click)="openAddCert()" [disabled]="busy">+ Add</button>
+          </div>
+          <p class="muted" *ngIf="profile.certificates.length === 0">No certificates added yet.</p>
+
+          <div class="item" *ngFor="let c of profile.certificates">
+            <div class="item-icon">{{ c.issuer.charAt(0).toUpperCase() }}</div>
+            <div class="item-body">
+              <b>{{ c.name }}</b>
+              <div>{{ c.issuer }}</div>
+              <div class="small muted">
+                Issued {{ c.issueDate | date:'MMM yyyy' }}<span *ngIf="c.expiryDate"> · Expires {{ c.expiryDate | date:'MMM yyyy' }}</span>
+              </div>
+              <a class="item-link" *ngIf="c.credentialUrl" [href]="c.credentialUrl" target="_blank" rel="noopener">Show credential</a>
+            </div>
+            <div class="item-actions">
+              <button class="btn btn-ghost btn-small" (click)="openEditCert(c)" [disabled]="busy">Edit</button>
+              <button class="btn btn-ghost btn-small danger-text" (click)="deleteCert(c.id!)" [disabled]="busy">Delete</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <aside class="stack">
+
+        <section class="card">
+          <h3>Profile strength</h3>
+          <div class="strength">
+            <div class="ring">
+              <svg viewBox="0 0 80 80" width="80" height="80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#e5e7eb" stroke-width="8" />
+                <circle cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+                        transform="rotate(-90 40 40)"
+                        stroke-dasharray="213.6"
+                        [attr.stroke-dashoffset]="ringOffset(profile.strength)"
+                        [attr.stroke]="barColor(profile.strength)" />
+              </svg>
+              <span class="ring-text">{{ profile.strength }}%</span>
+            </div>
+            <p class="small muted" *ngIf="profile.missing.length > 0">Complete these to stand out:</p>
+            <p class="small muted" *ngIf="profile.missing.length === 0">Your profile is complete!</p>
+          </div>
+          <ul class="tips" *ngIf="profile.missing.length > 0">
+            <li *ngFor="let m of profile.missing">{{ m }}</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Skills</h3>
+            <button class="btn btn-outline btn-small" (click)="showSkills = true">Edit</button>
+          </div>
+          <div class="chips">
+            <span class="chip" *ngFor="let s of profile.skills">{{ s }}</span>
+            <span class="muted" *ngIf="profile.skills.length === 0">No skills added yet.</span>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Profile visibility</h3>
+            <button type="button" class="switch" role="switch"
+                    [class.on]="profile.isPublic"
+                    [attr.aria-checked]="profile.isPublic"
+                    [disabled]="visBusy"
+                    (click)="toggleVisibility()">
+              <span class="knob"></span>
+            </button>
+          </div>
+
+          <p class="vis-status" [class.on]="profile.isPublic">
+            {{ profile.isPublic ? 'Public' : 'Private' }}
+          </p>
+          <p class="small muted" *ngIf="profile.isPublic">
+            Employers and other users can find and view your profile.
+          </p>
+          <p class="small muted" *ngIf="!profile.isPublic">
+            Only you can see your profile. Employers won't be able to find you in search.
+          </p>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Languages</h3>
+            <button class="btn btn-outline btn-small" (click)="openAddLang()" [disabled]="busy">+ Add</button>
+          </div>
+          <p class="muted" *ngIf="profile.languages.length === 0">No languages added yet.</p>
+
+          <div class="item lang-item" *ngFor="let l of profile.languages">
+            <div class="item-body">
+              <b>{{ l.name }}</b>
+              <div class="small muted">{{ l.level }}</div>
+            </div>
+            <div class="item-actions">
+              <button class="btn btn-ghost btn-small" (click)="openEditLang(l)" [disabled]="busy">Edit</button>
+              <button class="btn btn-ghost btn-small danger-text" (click)="deleteLang(l.id!)" [disabled]="busy">Delete</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>CV</h3>
+          <p class="muted">{{ hasCv ? 'A CV is uploaded.' : 'No CV uploaded yet.' }}</p>
+          <div class="actions">
+            <label class="btn btn-primary btn-small" [class.disabled]="busy">
+              {{ hasCv ? 'Replace CV' : 'Upload CV' }}
+              <input type="file" accept="application/pdf" hidden (change)="onCv($event)" [disabled]="busy" />
+            </label>
+            <button *ngIf="hasCv" class="btn btn-danger btn-small" (click)="removeCv()" [disabled]="busy">Remove</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3>Job preferences</h3>
+            <button class="btn btn-outline btn-small" (click)="showPrefs = true">Edit</button>
+          </div>
+
+          <p class="muted" *ngIf="!hasPrefs">Tell employers what you are looking for.</p>
+
+          <dl class="prefs" *ngIf="hasPrefs">
+            <div *ngIf="profile.desiredRole"><dt>Desired role</dt><dd>{{ profile.desiredRole }}</dd></div>
+            <div *ngIf="profile.preferredJobType"><dt>Job type</dt><dd>{{ profile.preferredJobType }}</dd></div>
+            <div *ngIf="profile.expectedSalary"><dt>Expected salary</dt><dd>{{ profile.expectedSalary | number }}</dd></div>
+            <div *ngIf="profile.noticePeriod"><dt>Notice period</dt><dd>{{ profile.noticePeriod }}</dd></div>
+            <div *ngIf="profile.preferredLocations"><dt>Locations</dt><dd>{{ profile.preferredLocations }}</dd></div>
+          </dl>
+        </section>
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- ================= MODALS ================= -->
+
+<div class="overlay" *ngIf="showBasic" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>Edit profile</h3><button class="x" (click)="closeAll()">&times;</button></div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="field"><label>Headline</label><input [(ngModel)]="headline" maxlength="120" placeholder="e.g. .NET Developer" /></div>
+      <div class="field"><label>Location</label><input [(ngModel)]="location" maxlength="100" placeholder="City, Country" /></div>
+      <div class="field"><label>Phone</label><input [(ngModel)]="phone" maxlength="30" placeholder="Phone number" /></div>
+      <div class="field"><label>LinkedIn</label><input [(ngModel)]="linkedInUrl" placeholder="https://..." /></div>
+      <div class="field"><label>GitHub</label><input [(ngModel)]="gitHubUrl" placeholder="https://..." /></div>
+      <div class="field"><label>Website</label><input [(ngModel)]="websiteUrl" placeholder="https://..." /></div>
+      <label class="check"><input type="checkbox" [(ngModel)]="isOpenToWork" /> Open to work</label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveBasic()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showAbout" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>Edit about</h3><button class="x" (click)="closeAll()">&times;</button></div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="field">
+        <label>Bio</label>
+        <textarea [(ngModel)]="about" maxlength="2000" rows="7" placeholder="Tell employers about yourself..."></textarea>
+        <small class="muted">{{ about.length }}/2000</small>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveAbout()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showExpForm" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <h3>{{ expId ? 'Edit experience' : 'Add experience' }}</h3>
+        <p class="small muted">Share your role, impact and timeline.</p>
+      </div>
+      <button class="x" (click)="closeAll()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="field"><label>Job title *</label><input [(ngModel)]="exp.title" maxlength="100" placeholder="e.g. Backend Developer" /></div>
+      <div class="field"><label>Company *</label><input [(ngModel)]="exp.company" maxlength="100" placeholder="Company name" /></div>
+      <div class="field"><label>Location</label><input [(ngModel)]="exp.location" maxlength="100" placeholder="City, Country" /></div>
+      <div class="two">
+        <div class="field"><label>Start date *</label><input type="date" [(ngModel)]="exp.startDate" /></div>
+        <div class="field"><label>End date</label><input type="date" [(ngModel)]="exp.endDate" [disabled]="exp.isCurrent" /></div>
+      </div>
+      <label class="check"><input type="checkbox" [(ngModel)]="exp.isCurrent" /> I currently work here</label>
+      <div class="field">
+        <label>Description</label>
+        <textarea [(ngModel)]="exp.description" maxlength="1500" rows="4" placeholder="What did you do there?"></textarea>
+        <small class="muted">{{ exp.description.length }}/1500</small>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveExp()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showEduForm" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>{{ eduId ? 'Edit education' : 'Add education' }}</h3><button class="x" (click)="closeAll()">&times;</button></div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="field"><label>School *</label><input [(ngModel)]="edu.school" maxlength="120" placeholder="University / school" /></div>
+      <div class="field"><label>Degree *</label><input [(ngModel)]="edu.degree" maxlength="120" placeholder="e.g. Bachelor's" /></div>
+      <div class="field"><label>Field of study</label><input [(ngModel)]="edu.fieldOfStudy" maxlength="120" placeholder="e.g. Computer Science" /></div>
+      <div class="two">
+        <div class="field"><label>Start date *</label><input type="date" [(ngModel)]="edu.startDate" /></div>
+        <div class="field"><label>End date</label><input type="date" [(ngModel)]="edu.endDate" /></div>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea [(ngModel)]="edu.description" maxlength="1000" rows="3" placeholder="Activities, achievements..."></textarea>
+        <small class="muted">{{ edu.description.length }}/1000</small>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveEdu()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showSkills" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>Edit skills <span class="muted">({{ skills.length }}/30)</span></h3><button class="x" (click)="closeAll()">&times;</button></div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="chips">
+        <span class="chip" *ngFor="let s of skills">
+          {{ s }}
+          <button type="button" (click)="removeSkill(s)" aria-label="Remove skill">&times;</button>
+        </span>
+        <span class="muted" *ngIf="skills.length === 0">No skills added yet.</span>
+      </div>
+      <div class="skill-input">
+        <input [(ngModel)]="newSkill" (keydown.enter)="addSkill()" maxlength="40" placeholder="e.g. Kubernetes" />
+        <button class="btn btn-outline" (click)="addSkill()">Add</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveSkills()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showPrefs" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>Job preferences</h3>
+      <button class="x" (click)="closeAll()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+
+      <div class="field">
+        <label>Desired role</label>
+        <input [(ngModel)]="prefRole" maxlength="100" placeholder="e.g. Backend Developer" />
+      </div>
+
+      <div class="field">
+        <label>Job type</label>
+        <select [(ngModel)]="prefJobType">
+          <option value="">Select a job type</option>
+          <option *ngIf="prefJobType && !jobTypes.includes(prefJobType)" [value]="prefJobType">{{ prefJobType }}</option>
+          <option *ngFor="let t of jobTypes" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Expected salary</label>
+        <input type="number" min="0" [(ngModel)]="prefSalary" placeholder="e.g. 15000" />
+      </div>
+
+      <div class="field">
+        <label>Notice period</label>
+        <select [(ngModel)]="prefNotice">
+          <option value="">Select a notice period</option>
+          <option *ngIf="prefNotice && !noticePeriods.includes(prefNotice)" [value]="prefNotice">{{ prefNotice }}</option>
+          <option *ngFor="let n of noticePeriods" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Preferred locations</label>
+        <input [(ngModel)]="prefLocations" maxlength="200" placeholder="e.g. Cairo, Remote" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="savePrefs()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showLangForm" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ langId ? 'Edit language' : 'Add language' }}</h3>
+      <button class="x" (click)="closeAll()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="field"><label>Language *</label><input [(ngModel)]="lang.name" maxlength="50" placeholder="e.g. English" /></div>
+      <div class="field">
+        <label>Level *</label>
+        <select [(ngModel)]="lang.level">
+          <option *ngFor="let lv of languageLevels" [value]="lv">{{ lv }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveLang()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" *ngIf="showCertForm" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ certId ? 'Edit certificate' : 'Add certificate' }}</h3>
+      <button class="x" (click)="closeAll()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+      <div class="field"><label>Name *</label><input [(ngModel)]="cert.name" maxlength="150" placeholder="e.g. AWS Cloud Practitioner" /></div>
+      <div class="field"><label>Issuing organization *</label><input [(ngModel)]="cert.issuer" maxlength="150" placeholder="e.g. Amazon Web Services" /></div>
+      <div class="two">
+        <div class="field"><label>Issue date *</label><input type="date" [(ngModel)]="cert.issueDate" /></div>
+        <div class="field"><label>Expiry date</label><input type="date" [(ngModel)]="cert.expiryDate" /></div>
+      </div>
+      <div class="field"><label>Credential link</label><input [(ngModel)]="cert.credentialUrl" placeholder="https://..." /></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveCert()" [disabled]="busy">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADD / EDIT PROJECT (with images) ============ -->
+<div class="overlay" *ngIf="showProjForm" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ projId ? 'Edit project' : 'Add project' }}</h3>
+      <button class="x" (click)="closeAll()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+
+      <div class="field"><label>Title *</label><input [(ngModel)]="proj.title" maxlength="120" placeholder="e.g. Job portal website" /></div>
+      <div class="field">
+        <label>Description</label>
+        <textarea [(ngModel)]="proj.description" maxlength="1500" rows="4" placeholder="What does it do and what was your part?"></textarea>
+        <small class="muted">{{ proj.description.length }}/1500</small>
+      </div>
+      <div class="field"><label>Technologies</label><input [(ngModel)]="proj.technologies" maxlength="200" placeholder="Angular, .NET, SQL Server" /></div>
+      <div class="field"><label>Project link</label><input [(ngModel)]="proj.url" placeholder="https://github.com/..." /></div>
+
+      <div class="field">
+        <label>Images <span class="muted">({{ imageCount }}/{{ MAX_IMAGES }})</span></label>
+
+        <div class="thumbs">
+          <!-- already uploaded -->
+          <div class="thumb" *ngFor="let img of editingProject?.images">
+            <img [src]="img.imageUrl" alt="Project image" />
+            <span class="tag" *ngIf="img.isCover">Cover</span>
+            <div class="thumb-actions">
+              <button type="button" *ngIf="!img.isCover" (click)="setCover(img.id)" [disabled]="busy" title="Set as cover">&#9733;</button>
+              <button type="button" (click)="deleteImage(img.id)" [disabled]="busy" title="Delete image">&times;</button>
+            </div>
+          </div>
+
+          <!-- chosen, uploaded when you press Save -->
+          <div class="thumb" *ngFor="let n of pending; let i = index">
+            <img [src]="n.url" alt="New image" />
+            <span class="tag new">New</span>
+            <div class="thumb-actions">
+              <button type="button" (click)="removePending(i)" [disabled]="busy" title="Remove">&times;</button>
+            </div>
+          </div>
+
+          <label class="thumb add" *ngIf="imageCount < MAX_IMAGES" [class.disabled]="busy">
+            <span>+</span>
+            <small>Add photos</small>
+            <input type="file" accept="image/*" multiple hidden (change)="onProjImages($event)" [disabled]="busy" />
+          </label>
+        </div>
+        <small class="muted">JPG, PNG or WEBP, up to 5 MB each. The first image becomes the cover; use the star to change it.</small>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" (click)="closeAll()" [disabled]="busy">Cancel</button>
+      <button class="btn btn-primary" (click)="saveProj()" [disabled]="busy">{{ busy ? 'Saving...' : 'Save' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROJECT VIEWER ============ -->
+<div class="overlay" *ngIf="viewProject as vp" (click)="closeAll()">
+  <div class="modal wide" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ vp.title }}</h3>
+      <button class="x" (click)="closeAll()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert" *ngIf="error">{{ error }}</div>
+
+      <ng-container *ngIf="vp.images.length">
+        <div class="viewer" [class.fit]="fitFull">
+          <img class="viewer-img" [src]="(vp.images[activeImg] || vp.images[0]).imageUrl" [alt]="vp.title"
+               (click)="fitFull = !fitFull" [title]="fitFull ? 'Fill frame' : 'Show full image'" />
+          <ng-container *ngIf="vp.images.length > 1">
+            <button type="button" class="nav prev" (click)="stepImg(-1, vp)" aria-label="Previous image">&#8249;</button>
+            <button type="button" class="nav next" (click)="stepImg(1, vp)" aria-label="Next image">&#8250;</button>
+            <span class="viewer-count">{{ activeImg + 1 }} / {{ vp.images.length }}</span>
+          </ng-container>
+        </div>
+
+        <div class="strip" *ngIf="vp.images.length > 1">
+          <img *ngFor="let img of vp.images; let i = index" [src]="img.imageUrl" alt=""
+               [class.active]="i === activeImg" (click)="activeImg = i" />
+        </div>
+      </ng-container>
+
+      <p class="desc" *ngIf="vp.description">{{ vp.description }}</p>
+      <div class="chips" *ngIf="vp.technologies">
+        <span class="chip" *ngFor="let t of techList(vp.technologies)">{{ t }}</span>
+      </div>
+      <a class="item-link" *ngIf="vp.url" [href]="vp.url" target="_blank" rel="noopener">View project &rarr;</a>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-danger" (click)="deleteProj(vp.id!)" [disabled]="busy">Delete</button>
+      <button class="btn btn-primary" (click)="openEditProj(vp)" [disabled]="busy">Edit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" *ngIf="toastMsg">{{ toastMsg }}</div>

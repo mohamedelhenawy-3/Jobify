@@ -1,0 +1,6 @@
+.filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.filters input, .filters select { padding:9px 12px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; font:inherit; font-size:14px; }
+.filters input { flex:1; min-width:180px; }
+.filters button { padding:9px 16px; border-radius:8px; font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.apply { background:#4f46e5; border:1px solid #4f46e5; color:#fff; }
+.reset { background:#fff; border:1px solid #e5e7eb; color:#1f2937; }

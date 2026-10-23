@@ -1,0 +1,27 @@
+<form class="filters" (ngSubmit)="apply()">
+  <input name="keyword" [(ngModel)]="form.keyword" placeholder="Search title or location" />
+
+  <select name="status" [(ngModel)]="form.status" *ngIf="employerMode">
+    <option [ngValue]="null">All statuses</option>
+    <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
+  </select>
+
+  <select name="employmentType" [(ngModel)]="form.employmentType">
+    <option [ngValue]="null">All job types</option>
+    <option *ngFor="let t of jobTypes" [ngValue]="t">{{ t }}</option>
+  </select>
+
+  <select name="experienceLevel" [(ngModel)]="form.experienceLevel">
+    <option [ngValue]="null">All levels</option>
+    <option *ngFor="let l of levels" [ngValue]="l">{{ l }}</option>
+  </select>
+
+  <select name="sortBy" [(ngModel)]="form.sortBy">
+    <option value="newest">Newest</option>
+    <option value="oldest">Oldest</option>
+    <option value="applicants_desc" *ngIf="employerMode">Most applicants</option>
+  </select>
+
+  <button type="submit" class="apply">Apply</button>
+  <button type="button" class="reset" (click)="reset()">Reset</button>
+</form>

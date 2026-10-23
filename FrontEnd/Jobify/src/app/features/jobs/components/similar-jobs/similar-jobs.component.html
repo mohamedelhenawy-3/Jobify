@@ -1,0 +1,42 @@
+<section class="similar" *ngIf="loading || jobs.length">
+  <h2 class="similar-title">Similar jobs</h2>
+  <p class="similar-sub">Based on this job's title, requirements and location</p>
+
+  <div class="similar-grid">
+
+    <!-- Loading skeleton -->
+    <ng-container *ngIf="loading">
+      <div class="skeleton" *ngFor="let i of [1,2,3]"></div>
+    </ng-container>
+
+    <!-- Cards -->
+    <ng-container *ngIf="!loading">
+      <a class="s-card" *ngFor="let job of jobs" [routerLink]="['/Jobify/jobs', job.id]">
+        <span class="badge" [class.high]="job.matchPercent >= 75">{{ job.matchPercent }}% match</span>
+
+        <div class="s-top">
+          <div class="s-logo">
+            <img *ngIf="job.logo" [src]="job.logo" alt="" />
+          </div>
+          <div class="s-info">
+            <h3 class="s-job-title">{{ job.title }}</h3>
+            <p class="s-company" *ngIf="job.companyName">{{ job.companyName }}</p>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-chip" *ngIf="job.location"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+          <span class="s-chip" *ngIf="job.jobType"><i class="fas fa-briefcase"></i> {{ job.jobType }}</span>
+        </div>
+
+        <div class="s-bottom">
+          <span *ngIf="job.minSalary || job.maxSalary">
+            {{ job.minSalary | number }} - {{ job.maxSalary | number }}
+          </span>
+          <span>{{ job.createdAt | date:'MMM d' }}</span>
+        </div>
+      </a>
+    </ng-container>
+
+  </div>
+</section>

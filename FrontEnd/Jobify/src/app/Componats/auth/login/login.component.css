@@ -1,23 +1,21 @@
 /* =========================================
    1. LAYOUT & BACKGROUND
    ========================================= */
-.main-wrapper {
+/* .main-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   padding: 20px;
   font-family: 'Inter', sans-serif;
-}
+} */
 
 .login-container {
   display: flex;
-  width: 900px;
-  height: 520px; /* FIXED PERFECT HEIGHT */
-  background: #f0e9e9;
-  border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  margin: 0;
+  height: 100vh;
 }
 
 /* =========================================

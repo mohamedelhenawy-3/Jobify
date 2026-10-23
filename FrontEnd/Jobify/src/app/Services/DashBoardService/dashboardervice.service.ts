@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class DashboarderviceService {
 
- private apiUrl = 'https://localhost:44309/api/JobSeekerDashBoard/me';
+ private apiUrl = 'https://localhost:7026/api/JobSeekerDashBoard/me';
 
   constructor(private http: HttpClient) { }
 

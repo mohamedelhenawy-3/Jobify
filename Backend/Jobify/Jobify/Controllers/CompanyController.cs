@@ -1,5 +1,8 @@
 ﻿using Application.DTOs.Comapny;
+using Application.DTOs.Comapny.RefactorCompany;
+using Application.DTOs.Comapny.RefactorCompany.RecordDto;
 using Application.Interfaces.Company;
+using Application.Interfaces.PublicCompany;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,53 +14,46 @@ namespace Jobify.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyService _companyService;
+        private readonly IPublicCompanyService _publiccompanyservice;
 
-        public CompanyController(ICompanyService companyService)
+        public CompanyController(ICompanyService companyService, IPublicCompanyService service)
         {
             _companyService = companyService;
+            _publiccompanyservice = service;
         }
 
-        [HttpPost]
-        [Authorize(Roles = "Employer")]
-        public async Task<IActionResult> CreateCompany([FromForm] CreateCompanyDto dto)
+
+        // GET api/companies?q=tech&industry=IT&location=Cairo
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(string? q, string? industry, string? location)
         {
-            var result = await _companyService.CreateCompany(dto);
+            return Ok(await _publiccompanyservice.SearchAsync(q, industry, location));
+        }
+        // GET api/companies/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _publiccompanyservice.GetByIdAsync(id);
+
+            if (result == null)
+                return NotFound("Company not found.");
+
             return Ok(result);
         }
 
-        [HttpPut("{companyId}")]
-        [Authorize(Roles = "Employer")]
-        public async Task<IActionResult> UpdateCompany(int companyId, [FromForm] UpdateCompanyDto dto)
+        [HttpGet("hiring-snapshot")]
+        public async Task<IActionResult> GetHiringSnapshot()
         {
-            var result = await _companyService.UpdateCompany(companyId, dto);
+            var result = await _companyService.GetHiringSnapshotAsync();
+
+            if (result == null)
+                return NotFound("You do not belong to a company.");
+
             return Ok(result);
         }
 
-        [HttpDelete("{companyId}")]
-        [Authorize(Roles = "Employer")]
-        public async Task<IActionResult> DeleteCompany(int companyId)
-        {
-            var result = await _companyService.DeleteCompany(companyId);
-            return Ok(result);
-        }
 
-        [HttpGet("my")]
-        [Authorize(Roles = "Employer")]
-        public async Task<IActionResult> GetMyCompany()
-        {
-            var result = await _companyService.GetMyCompany();
-            return Ok(result);
-        }
-
-        [HttpGet("{companyId}")]
-
-        public async Task<IActionResult> GetCompanyById(int companyId)
-        {
-            var result = await _companyService.GetCompanyById(companyId);
-            return Ok(result);
-        }
-
-        [HttpGet]
+        [HttpGet("allcompanies")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllCompanies()
         {
@@ -71,7 +67,14 @@ namespace Jobify.Controllers
             var result = await _companyService.PrivateCompany();
             return Ok(result);
         }
- 
+        [HttpGet("top-hiring")]
+        [ProducesResponseType(typeof(IReadOnlyList<TopHiringCompanyDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<TopHiringCompanyDto>>> GetTopHiring(
+              [FromQuery] int count = 8, CancellationToken ct = default)
+        {
+            var companies = await _companyService.GetTopHiringCompaniesAsync(count, ct);
+            return Ok(companies);
+        }
 
     }
 }

@@ -1,4 +1,6 @@
-﻿using Application.DTOs.SavedJobDto;
+﻿using Application.DTOs.Auth.AuthResponse;
+using Application.DTOs.JobPost.JobDTO;
+using Application.DTOs.SavedJobDto;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,9 +12,14 @@ namespace Application.Interfaces.SavedJob
 {
     public interface ISavedJob
     {
-        Task SaveJobAsync( int jobId);
-        Task UnsaveJobAsync( int jobId);
+        Task<PagedResult<SavedJobDto>> GetSavedJobsAsync(int pageNumber, int pageSize);
         Task<bool> IsJobSavedAsync(int jobId);
-        Task<List<SavedJobDto>> GetSavedJobsAsync();
+        Task SaveJobAsync(int jobId);
+        Task UnsaveJobAsync(int jobId);
+
+
+        ////////////////
+        ///
+
     }
 }

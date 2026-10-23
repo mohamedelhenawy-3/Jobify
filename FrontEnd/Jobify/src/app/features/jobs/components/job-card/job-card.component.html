@@ -1,0 +1,30 @@
+<div class="card">
+  <a class="card-link" [routerLink]="['/Jobify/jobs', job.id]">
+    <img *ngIf="job.logo" [src]="job.logo" class="logo" alt="" />
+    <div *ngIf="!job.logo" class="logo placeholder">{{ job.title.charAt(0) }}</div>
+
+    <div class="main">
+      <strong>{{ job.title }}</strong>
+      <small>{{ job.location }}</small>
+      <div class="chips">
+        <span class="chip">{{ job.employmentType }}</span>
+        <span class="chip">{{ job.experienceLevel }}</span>
+        <span class="chip" *ngIf="salary">{{ salary }}</span>
+        <span class="chip" *ngIf="job.isOwnerView">By {{ job.postedByName }}</span>
+      </div>
+    </div>
+  </a>
+
+  <div class="side">
+    <span class="status" [ngClass]="job.status">{{ job.status }}</span>
+    <small *ngIf="job.totalApplications !== undefined && job.totalApplications !== null">
+      {{ job.totalApplications }} applicants
+    </small>
+    <small>{{ job.postedAge }}</small>
+
+    <div class="actions">
+      <button type="button" class="btn-secondary" [routerLink]="['/Jobify/jobs', job.id]">View Job</button>
+      <button type="button" class="btn-primary"*ngIf="job.isOwnerView" [routerLink]="['/Jobify/update', job.id]">Edit</button>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 ﻿using Domain.Entities;
-using Infrastructure.DBContext;
+using Infrastructure.Implementation.AuthService;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using System;
 using System.Collections.Generic;

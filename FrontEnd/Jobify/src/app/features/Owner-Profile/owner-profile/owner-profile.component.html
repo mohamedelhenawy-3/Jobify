@@ -3,7 +3,7 @@
 
 <main class="profile-page" *ngIf="!loading && !error && profile as p">
 
-  <!-- Header -->
+  <!-- Header: basic info card (photo, name, position, company, location, LinkedIn) -->
   <section class="header">
     <img [src]="p.photoUrl || 'assets/default-avatar.png'" alt="Profile photo" class="avatar" />
     <div class="header-text">
@@ -12,10 +12,21 @@
         <span class="badge">{{ p.role }}</span>
         <button type="button" class="btn-outline" (click)="openEditProfile()">Edit profile</button>
       </div>
-      <p class="headline" *ngIf="p.headline">{{ p.headline }}</p>
-      <p class="headline" *ngIf="p.companyName">
-        <i class="fas fa-building"></i> {{ p.companyName }}
-      </p>
+
+      <p class="position" *ngIf="p.position">{{ p.position }}</p>
+
+      <ul class="header-meta">
+        <li *ngIf="p.companyName">
+          <i class="fas fa-building"></i> {{ p.companyName }}
+        </li>
+        <li *ngIf="p.location">
+          <i class="fas fa-location-dot"></i> {{ p.location }}
+        </li>
+        <li *ngIf="linkedInHref(p.linkedIn) as li">
+          <i class="fab fa-linkedin"></i>
+          <a [href]="li" target="_blank" rel="noopener noreferrer">LinkedIn profile</a>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -31,8 +42,16 @@
   </nav>
 
   <!-- ================= OVERVIEW ================= -->
-  <!-- ================= OVERVIEW ================= -->
   <ng-container *ngIf="activeTab === 'overview'">
+
+    <!-- About (now lives in the overview tab) -->
+    <section class="about">
+      <h2>About</h2>
+      <p *ngIf="p.bio; else noBio">{{ p.bio }}</p>
+      <ng-template #noBio>
+        <p class="about-empty">No bio yet. Use “Edit profile” to add a short introduction.</p>
+      </ng-template>
+    </section>
 
     <section class="stats">
       <div class="stat-card">
@@ -49,7 +68,7 @@
       </div>
     </section>
 
-    <!-- NEW: Hiring pipeline + Recent applicants (side by side) -->
+    <!-- Hiring pipeline + Recent applicants -->
     <section class="layout" *ngIf="hasPermission('ManageApplicants')">
 
       <div class="panel">
@@ -97,12 +116,12 @@
       </div>
     </section>
 
+    <!-- Contact + Company (location and LinkedIn are now in the header card) -->
     <section class="layout">
       <aside class="panel">
         <h2>Contact info</h2>
         <div class="info-row"><span>Email</span><p>{{ p.email }}</p></div>
         <div class="info-row" *ngIf="p.phone"><span>Phone</span><p>{{ p.phone }}</p></div>
-        <div class="info-row" *ngIf="p.location"><span>Location</span><p>{{ p.location }}</p></div>
       </aside>
 
       <aside class="panel">
@@ -111,16 +130,14 @@
         <p class="company-industry" *ngIf="p.companyIndustry">{{ p.companyIndustry }}</p>
         <p class="company-website" *ngIf="p.companyWebsite">{{ p.companyWebsite }}</p>
 
-        <button routerLink="/Jobify/mycompany">
+        <button type="button" routerLink="/Jobify/mycompany">
           {{ hasPermission('ManageCompanyProfile') ? 'Edit company profile' : 'View company profile' }}
         </button>
       </aside>
     </section>
-
-    <!-- Your access, Team management, About: unchanged -->
   </ng-container>
 
-  <!-- ================= JOBS ================= -->
+  <!-- ================= JOBS (disabled until the tab is enabled in tabs) =================
   <section class="panel" *ngIf="activeTab === 'jobs'">
     <div class="panel-head">
       <h2>{{ isOwnerOrAdmin ? 'Company jobs' : 'My jobs' }}</h2>
@@ -137,9 +154,7 @@
 
     <p class="state" *ngIf="jobsLoading">Loading jobs...</p>
     <p class="state error" *ngIf="jobsError">{{ jobsError }}</p>
-    <p class="state" *ngIf="!jobsLoading && !jobsError && filteredJobs.length === 0">
-      No jobs here yet.
-    </p>
+    <p class="state" *ngIf="!jobsLoading && !jobsError && filteredJobs.length === 0">No jobs here yet.</p>
 
     <a class="row" *ngFor="let j of filteredJobs" [routerLink]="['/Jobify/jobs', j.id]">
       <div class="row-main">
@@ -157,6 +172,7 @@
       </div>
     </a>
   </section>
+  -->
 
   <!-- ================= PERMISSIONS ================= -->
   <section class="panel" *ngIf="activeTab === 'permissions'">
@@ -181,6 +197,75 @@
           {{ hasPermission(perm.key) ? 'Allowed' : 'Not allowed' }}
         </span>
       </div>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITY ================= -->
+  <section class="panel" *ngIf="activeTab === 'activity'">
+    <div class="panel-head">
+      <h2>My activity</h2>
+      <span class="muted" *ngIf="activity">{{ activityTotal }} total</span>
+    </div>
+
+    <div class="act-filters">
+      <input type="search" class="act-input act-search" placeholder="Search activity"
+             aria-label="Search activity"
+             [ngModel]="activityFilter.search"
+             (ngModelChange)="onActivitySearch($event)" />
+
+      <select class="act-input" aria-label="Category"
+              [(ngModel)]="activityFilter.category"
+              (ngModelChange)="applyActivityFilters()">
+        <option value="">All categories</option>
+        <option *ngFor="let c of activityCategories" [value]="c">{{ c }}</option>
+      </select>
+
+      <label class="act-date">From
+        <input type="date" class="act-input"
+               [(ngModel)]="activityFilter.from" (ngModelChange)="applyActivityFilters()" />
+      </label>
+      <label class="act-date">To
+        <input type="date" class="act-input"
+               [(ngModel)]="activityFilter.to" (ngModelChange)="applyActivityFilters()" />
+      </label>
+
+      <button type="button" class="btn-outline" *ngIf="hasActivityFilters" (click)="clearActivityFilters()">
+        Clear filters
+      </button>
+    </div>
+
+    <p class="state" *ngIf="activityLoading && !activity">Loading activity...</p>
+    <p class="state error" *ngIf="activityError">
+      {{ activityError }}
+      <button type="button" class="link-btn" (click)="loadActivity()">Retry</button>
+    </p>
+    <p class="state" *ngIf="activity && activity.length === 0 && !activityError">
+      {{ hasActivityFilters ? 'No activity matches these filters.' : 'No activity yet. It shows up here as things happen.' }}
+    </p>
+
+    <ul class="act-list" [class.loading]="activityLoading" *ngIf="activity?.length">
+      <li class="act-item" *ngFor="let a of activity">
+        <span class="act-avatar" aria-hidden="true">{{ initials(a.actorName) }}</span>
+        <div class="act-body">
+          <p>{{ a.message }}</p>
+          <small>
+            <span class="act-cat">{{ a.category }}</span>
+            <time [attr.datetime]="a.createdAt" [title]="toDate(a.createdAt) | date: 'medium'">
+              {{ timeAgo(a.createdAt) }}
+            </time>
+          </small>
+        </div>
+      </li>
+    </ul>
+
+    <div class="act-pager" *ngIf="activityTotal > activityFilter.pageSize">
+      <button type="button" class="btn-outline"
+              [disabled]="activityFilter.pageNumber <= 1"
+              (click)="goToActivityPage(activityFilter.pageNumber - 1)">Previous</button>
+      <span class="muted">Page {{ activityFilter.pageNumber }} of {{ activityPages }}</span>
+      <button type="button" class="btn-outline"
+              [disabled]="activityFilter.pageNumber >= activityPages"
+              (click)="goToActivityPage(activityFilter.pageNumber + 1)">Next</button>
     </div>
   </section>
 
@@ -210,7 +295,7 @@
       </label>
 
       <label class="field">
-        <span>Position / headline</span>
+        <span>Position</span>
         <input name="position" [(ngModel)]="profileForm.position" maxlength="100" />
       </label>
 
@@ -222,6 +307,12 @@
       <label class="field">
         <span>Location</span>
         <input name="location" [(ngModel)]="profileForm.location" maxlength="100" />
+      </label>
+
+      <label class="field">
+        <span>LinkedIn URL</span>
+        <input name="linkedInUrl" type="url" [(ngModel)]="profileForm.linkedIn" maxlength="200"
+               placeholder="https://www.linkedin.com/in/your-name" />
       </label>
 
       <label class="field">

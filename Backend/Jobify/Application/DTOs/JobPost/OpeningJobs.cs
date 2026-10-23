@@ -15,8 +15,8 @@ namespace Application.DTOs.JobPost
             public string Description { get; set; }
             public string Location { get; set; }
 
-            public decimal MinSalary { get; set; }
-            public decimal MaxSalary { get; set; }
+            public decimal? MinSalary { get; set; }
+            public decimal? MaxSalary { get; set; }
             public int WorkModeId { get; set; }
             public int IndustryId { get; set; }
             public int EmploymentTypeId { get; set; }

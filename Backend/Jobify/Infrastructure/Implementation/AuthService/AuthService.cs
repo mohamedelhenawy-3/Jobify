@@ -4,10 +4,12 @@ using Application.Interfaces.Auth;
 using Application.Interfaces.Token;
 using Domain.Entities;
 using Domain.Identity;
-using Infrastructure.DBContext;
+using Infrastructure.CurrentUserService;
+using Infrastructure.Implementation.CompanyMembersService.CurrentUserService;
 using Infrastructure.Reposoitory.AuthRepository.Interface;
 using Infrastructure.Reposoitory.UserRepository.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -27,6 +29,7 @@ namespace Infrastructure.Implementation.AuthService
         private readonly IEmployeer _employerRepo;
         private readonly IAuthRepository _authrepo;
         private readonly ITokenService _jwtService;
+        private readonly ICurrentUser _currentUserService;
 
 
 
@@ -37,7 +40,8 @@ namespace Infrastructure.Implementation.AuthService
             , IJobSeeker jobSeekerRepo, IEmployeer employerRepo,
             IAuthRepository authrepo,
             ITokenService jwtService,
-            IConfiguration config)
+            IConfiguration config,
+            ICurrentUser Currentuser)
         {
             _jobSeekerRepo = jobSeekerRepo;
             _employerRepo = employerRepo;
@@ -47,7 +51,10 @@ namespace Infrastructure.Implementation.AuthService
             _config = config;
             _authrepo = authrepo;
             _jwtService = jwtService;
+            _currentUserService = Currentuser;
         }
+
+   
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
         {
@@ -87,8 +94,6 @@ namespace Infrastructure.Implementation.AuthService
                 UserName = dto.Email,
                 Email = dto.Email,
                 FullName = dto.FullName,
-                PhoneNumber = dto.PhoneNumber,
-                Location = dto.location,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -110,32 +115,15 @@ namespace Infrastructure.Implementation.AuthService
             }
             else if (dto.Role == "Employer")
             {
-                if (string.IsNullOrWhiteSpace(dto.CompanyName))
-                    throw new Exception("Company name is required");
-
-                // ✅ Step 1 - Add employer and save FIRST
                 var employer = new EmployerProfile
                 {
                     UserId = user.Id,
-                    Position = dto.Position,
-                    Bio = null,
+                    CompanyId = null,
+                    Bio = null
                 };
 
                 _context.EmployerProfiles.Add(employer);
-                await _context.SaveChangesAsync(); // employer.Id is now real
-
-                var company = new Company
-                {
-                    CompanyName = dto.CompanyName,
-                    CompanyWebsite = dto.CompanyWebsite,
-                    Industry = dto.Industry,
-                    Location = dto.CompanyLocation,
-                    EmployerProfileId = employer.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Companies.Add(company);
-                await _context.SaveChangesAsync(); // company saved with correct Id
+                await _context.SaveChangesAsync();
             }
 
             return new SuccessResponseDto

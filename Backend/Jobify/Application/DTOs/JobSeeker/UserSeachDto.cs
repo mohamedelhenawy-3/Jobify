@@ -15,5 +15,7 @@ namespace Application.DTOs.JobSeeker
         public string? Headline { get; set; }
         public string? Summary { get; set; }
         public string? ProfileImageUrl { get; set; }
+
+        public string UserRole { get; set; }
     }
 }

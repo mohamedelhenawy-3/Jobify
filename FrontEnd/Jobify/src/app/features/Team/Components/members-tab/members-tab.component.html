@@ -1,0 +1,26 @@
+<p *ngIf="meLoading">Loading...</p>
+
+<app-access-blocked *ngIf="!meLoading && me && !canUse" [me]="me" (left)="onLeft()" />
+
+<p *ngIf="!meLoading && !me && error" class="error">{{ error }}</p>
+
+<ng-container *ngIf="!meLoading && canUse">
+  <app-members-filter (filterChange)="onFilter($event)" />
+
+  <p *ngIf="loading">Loading...</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <ng-container *ngIf="result">
+    <app-members-table
+      [members]="result.items"
+      [me]="me"
+      (changed)="reload()"
+      (left)="onLeft()" />
+
+    <app-pager
+      [page]="filter.pageNumber"
+      [totalPages]="result.totalPages"
+      [totalCount]="result.totalCount"
+      (pageChange)="onPage($event)" />
+  </ng-container>
+</ng-container>

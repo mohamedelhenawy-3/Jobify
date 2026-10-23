@@ -30,15 +30,12 @@ export class RegisterComponent {
      this.registerForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    role: ['JobSeeker'],
+    confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
 
+    role: ['JobSeeker'],
     // JobSeeker
     fullName: [''],
-    phoneNumber: [''],
 
-    // Employer
-    companyName: [''],
-    companyWebsite: ['']
   });
 
   }
@@ -46,12 +43,8 @@ export class RegisterComponent {
     this.userType = type;
     this.registerForm.patchValue({ role: type });
 
-    if (type === 'JobSeeker') {
-      this.registerForm.get('companyName')?.reset();
-      this.registerForm.get('companyWebsite')?.reset();
-    } else {
+    if (type === 'JobSeeker' || type === 'Employer') {
       this.registerForm.get('fullName')?.reset();
-      this.registerForm.get('phoneNumber')?.reset();
     }
   }
 
@@ -65,8 +58,13 @@ export class RegisterComponent {
       next: () => {
         this.loading = false;
         console.log(this.registerForm.value);
-        this.router.navigate(['/login']);
-        alert('Suucefully registeration');
+       
+       
+       alert('Suucefully registeration');
+            this.router.navigate(['/login']);
+        
+     
+
       },
       error: (err) => {
                 console.log(err);

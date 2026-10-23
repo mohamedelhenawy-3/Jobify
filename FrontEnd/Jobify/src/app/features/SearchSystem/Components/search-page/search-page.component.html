@@ -1,0 +1,154 @@
+<div class="search-page">
+<div class="alert-bar" *ngIf="keyword">
+  <p>
+    Get an email when new <strong>{{ keyword }}</strong> jobs are posted
+  </p>
+  <button type="button" (click)="saveAlert()" [disabled]="alertSaving || !!alertMsg">
+    {{ alertMsg ? 'Alert saved' : alertSaving ? 'Saving…' : 'Create alert' }}
+  </button>
+</div>
+
+<p class="ok" *ngIf="alertMsg">{{ alertMsg }}</p>
+<p class="error" *ngIf="alertError">{{ alertError }}</p>
+
+<!-- your existing results list below -->
+  <!-- Tabs: All / Jobs / People / Companies -->
+  <div class="tabs">
+    <button
+      *ngFor="let tab of tabs"
+      class="tab"
+      [class.active]="activeType === tab.value"
+      (click)="setType(tab.value)"
+    >
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <p class="keyword-line" *ngIf="keyword">
+    Showing results for <strong>"{{ keyword }}"</strong>
+  </p>
+
+  <!-- Job filters: only shown when looking at jobs -->
+  <div class="filter-bar" *ngIf="activeType === 'job'">
+    <select [(ngModel)]="employmentType" (ngModelChange)="onFilterChange()">
+      <option value="">Employment type</option>
+      <option *ngFor="let opt of employmentTypeOptions" [value]="opt">{{ opt }}</option>
+    </select>
+
+    <select [(ngModel)]="experienceLevel" (ngModelChange)="onFilterChange()">
+      <option value="">Experience level</option>
+      <option *ngFor="let opt of experienceLevelOptions" [value]="opt">{{ opt }}</option>
+    </select>
+
+    <select [(ngModel)]="postedWithinDays" (ngModelChange)="onFilterChange()">
+      <option *ngFor="let opt of postedWithinDaysOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+    </select>
+
+    <button
+      class="clear-filters"
+      *ngIf="employmentType || experienceLevel || postedWithinDays"
+      (click)="clearFilters()"
+    >
+      Clear filters ✕
+    </button>
+  </div>
+
+  <!-- Company filters: only shown when looking at companies -->
+  <div class="filter-bar" *ngIf="activeType === 'company'">
+    <select [(ngModel)]="industry" (ngModelChange)="onFilterChange()">
+      <option value="">Industry</option>
+      <option *ngFor="let opt of industryOptions" [value]="opt">{{ opt }}</option>
+    </select>
+
+    <select [(ngModel)]="companySize" (ngModelChange)="onFilterChange()">
+      <option value="">Company size</option>
+      <option *ngFor="let opt of companySizeOptions" [value]="opt">{{ opt }}</option>
+    </select>
+
+    <button
+      class="clear-filters"
+      *ngIf="industry || companySize"
+      (click)="clearFilters()"
+    >
+      Clear filters ✕
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="state-message" *ngIf="loading">Searching...</div>
+
+  <!-- Error -->
+  <div class="state-message error" *ngIf="error">{{ error }}</div>
+
+  <!-- Results -->
+  <ng-container *ngIf="!loading && !error && results as r">
+
+    <!-- No results -->
+    <div class="state-message" *ngIf="noResults">
+      No results found for "{{ keyword }}"
+    </div>
+
+    <!-- Jobs -->
+    <section class="result-section" *ngIf="r.jobs.length">
+      <h2 class="section-title">Jobs ({{ r.jobs.length }})</h2>
+
+  <div class="card" *ngFor="let job of r.jobs" [routerLink]="['/Jobify/jobs', job.id]">
+  <img *ngIf="job.logo" [src]="job.logo" class="card-logo" alt="" />
+  <div class="card-body">
+    <h3 class="card-title">{{ job.title }}</h3>
+
+    <div class="chips">
+      <span class="chip" *ngIf="job.location">
+        <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+      </span>
+      <span class="chip" *ngIf="job.jobType">
+        <i class="fas fa-briefcase"></i> {{ job.jobType }}
+      </span>
+      <span class="chip" *ngIf="job.experienceLevel">
+        <i class="fas fa-layer-group"></i> {{ job.experienceLevel }}
+      </span>
+      <span class="chip" *ngIf="job.minSalary || job.maxSalary">
+        <i class="fas fa-money-bill-wave"></i> {{ job.minSalary }} - {{ job.maxSalary }}
+      </span>
+    </div>
+
+    <p class="card-desc">{{ job.description }}</p>
+  </div>
+</div>
+    </section>
+
+    <!-- People -->
+    <section class="result-section" *ngIf="r.users.length">
+      <h2 class="section-title">People ({{ r.users.length }})</h2>
+
+      <div class="card" *ngFor="let user of r.users" [routerLink]="['/Jobify/public-profiles', user.id]">
+        <img
+          [src]="user.profileImageUrl || user.profileImage || '/assets/images/avatar-placeholder.png'"
+          class="card-avatar"
+          alt=""
+        />
+        <div class="card-body">
+          <h3 class="card-title">{{ user.fullName }}</h3>
+          <p class="card-meta">{{ user.headline }}</p>
+          <p class="card-meta" *ngIf="user.location">📍 {{ user.location }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Companies -->
+    <section class="result-section" *ngIf="r.companies.length">
+      <h2 class="section-title">Companies ({{ r.companies.length }})</h2>
+
+      <div class="card" *ngFor="let company of r.companies" [routerLink]="['/Jobify/public-Profiles-Comapny', company.id]">
+        <img *ngIf="company.logo" [src]="company.logo" class="card-logo" alt="" />
+        <div class="card-body">
+          <h3 class="card-title">{{ company.companyName }}</h3>
+          <p class="card-meta">{{ company.location }} · {{ company.companySize }}</p>
+          <p class="card-desc" *ngIf="company.description">{{ company.description }}</p>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
+
+</div>

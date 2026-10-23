@@ -1,0 +1,124 @@
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+
+    <!-- Header -->
+    <h2 class="formbold-form-title">Create Your Company</h2>
+    <p class="formbold-form-subtitle">Tell us about your company so job seekers can learn more about your team.</p>
+
+    <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+
+      <!-- Company Name -->
+      <div class="formbold-mb-5" [class.formbold-error]="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched">
+        <label for="companyName" class="formbold-form-label">Company Name *</label>
+        <input
+          type="text"
+          id="companyName"
+          formControlName="companyName"
+          placeholder="e.g. TechPulse Solutions"
+          class="formbold-form-input"
+        />
+        <div *ngIf="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched" class="formbold-error-msg">
+          Company name is required (minimum 2 characters).
+        </div>
+      </div>
+
+      <!-- Industry & Location -->
+      <div class="formbold-flex-row">
+        <div class="formbold-mb-5" [class.formbold-error]="companyForm.get('industry')?.invalid && companyForm.get('industry')?.touched">
+          <label for="industry" class="formbold-form-label">Industry *</label>
+          <input
+            type="text"
+            id="industry"
+            formControlName="industry"
+            placeholder="e.g. Software Development"
+            class="formbold-form-input"
+          />
+          <div *ngIf="companyForm.get('industry')?.invalid && companyForm.get('industry')?.touched" class="formbold-error-msg">
+            Industry is required.
+          </div>
+        </div>
+
+        <div class="formbold-mb-5" [class.formbold-error]="companyForm.get('location')?.invalid && companyForm.get('location')?.touched">
+          <label for="location" class="formbold-form-label">Location *</label>
+          <input
+            type="text"
+            id="location"
+            formControlName="location"
+            placeholder="e.g. Cairo, Egypt"
+            class="formbold-form-input"
+          />
+          <div *ngIf="companyForm.get('location')?.invalid && companyForm.get('location')?.touched" class="formbold-error-msg">
+            Location is required.
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Size & Founded -->
+      <div class="formbold-flex-row">
+        <div class="formbold-mb-5" [class.formbold-error]="companyForm.get('companySize')?.invalid && companyForm.get('companySize')?.touched">
+          <label for="companySize" class="formbold-form-label">Company Size *</label>
+          <select id="companySize" formControlName="companySize" class="formbold-form-input">
+            <option value="" disabled>Select company size</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-200">51-200 employees</option>
+            <option value="201-500">201-500 employees</option>
+            <option value="501+">501+ employees</option>
+          </select>
+          <div *ngIf="companyForm.get('companySize')?.invalid && companyForm.get('companySize')?.touched" class="formbold-error-msg">
+            Company size is required.
+          </div>
+        </div>
+
+        <div class="formbold-mb-5" [class.formbold-error]="companyForm.get('founded')?.invalid && companyForm.get('founded')?.touched">
+          <label for="founded" class="formbold-form-label">Founded *</label>
+          <input
+            type="number"
+            id="founded"
+            formControlName="founded"
+            placeholder="e.g. 2020"
+            class="formbold-form-input"
+          />
+          <div *ngIf="companyForm.get('founded')?.invalid && companyForm.get('founded')?.touched" class="formbold-error-msg">
+            Founded year is required.
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Website -->
+      <div class="formbold-mb-5" [class.formbold-error]="companyForm.get('companyWebsite')?.invalid && companyForm.get('companyWebsite')?.touched">
+        <label for="companyWebsite" class="formbold-form-label">Company Website (Optional)</label>
+        <input
+          type="url"
+          id="companyWebsite"
+          formControlName="companyWebsite"
+          placeholder="https://company.com"
+          class="formbold-form-input"
+        />
+        <div *ngIf="companyForm.get('companyWebsite')?.invalid && companyForm.get('companyWebsite')?.touched" class="formbold-error-msg">
+          Please enter a valid URL starting with http:// or https://
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="formbold-mb-5">
+        <label for="description" class="formbold-form-label">Company Description (Optional)</label>
+        <textarea
+          rows="5"
+          id="description"
+          formControlName="description"
+          placeholder="Briefly describe what your company does..."
+          class="formbold-form-input"
+        ></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="formbold-btn-wrapper">
+        <button type="submit" [disabled]="isSaving" class="formbold-btn">
+          {{ isSaving ? 'Saving...' : 'Create Company' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
