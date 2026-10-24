@@ -15,7 +15,7 @@ namespace Application.SearchFeature.Dtos
 
         public int? PostedWithinDays { get; set; }
 
-        public string? Industry { get; set; }
+        public int? IndustryId { get; set; }      // ✅ the new dynamic filter
         public string? CompanySize { get; set; }
 
         // Shared

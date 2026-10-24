@@ -12,8 +12,11 @@ namespace Application.DTOs.JobPost.JobDTO
         public string? Keyword { get; set; }
         public JobType? EmploymentType { get; set; }
         public ExperienceLevel? ExperienceLevel { get; set; }
+        public string? Industry { get; set; }        
+        public string? PostedWithin { get; set; }   
         public string? SortBy { get; set; } = "newest";
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+
     }
 }

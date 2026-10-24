@@ -17,13 +17,12 @@ namespace Application.DTOs.Comapny.RefactorCompany
         public string? Description { get; set; }
         public string? Location { get; set; }
         public string? Industry { get; set; }
+        public int? IndustryId { get; set; }     // ✅ add (to preselect the dropdown)
         public string? CompanySize { get; set; }
         public string? Founded { get; set; }
 
-        //admin Verification & Admin Queue Properties
         public List<string> Permissions { get; set; } = new();
         public bool IsVerified { get; set; } = false;
-        //public bool IsPublic { get; set; }
         public string MyRole { get; set; }
         public bool CanEdit { get; set; }
     }

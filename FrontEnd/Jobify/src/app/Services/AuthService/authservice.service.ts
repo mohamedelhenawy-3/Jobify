@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import {
   Inject,
   Injectable,
-  PLATFORM_ID
+  PLATFORM_ID, computed, signal
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -13,6 +13,7 @@ import { login } from '../../Models/Auth/login';
 import { loginresponse } from '../../Models/Auth/LoginResponse';
 import { refreshtoken } from '../../Models/Auth/refreshreq';
 import { DeviceserviceService } from '../DeviceService/deviceservice.service';
+export type UserRole = 'JobSeeker' | 'Employer';
 
 export interface JwtPayload {
   exp: number;
@@ -27,6 +28,8 @@ export class AuthserviceService {
   private accessTokenKey = 'access_token';
   private refreshTokenKey = 'refresh_token';
 
+  
+
   private loggedIn = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.loggedIn.asObservable();
 
@@ -39,7 +42,29 @@ export class AuthserviceService {
       this.loggedIn.next(this.checkIsLoggedIn());
     }
   }
+ private roleSignal = signal<UserRole | null>(this.readRoleFromToken());
 
+  role = computed(() => this.roleSignal());
+  isLoggedIn = computed(() => this.roleSignal() !== null);
+
+  // call this after login / logout
+  refresh(): void {
+    this.roleSignal.set(this.readRoleFromToken());
+  }
+
+  private readRoleFromToken(): UserRole | null {
+    try {
+      const token = localStorage.getItem('token'); // use your real key
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role =
+        payload['role'] ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      return role === 'Employer' || role === 'JobSeeker' ? role : null;
+    } catch {
+      return null;
+    }
+  }
   /* ===================== AUTH STATE ===================== */
 
   private checkIsLoggedIn(): boolean {
@@ -50,9 +75,7 @@ export class AuthserviceService {
     return payload.exp > currentTime;
   }
 
-  isLoggedIn(): boolean {
-    return this.checkIsLoggedIn();
-  }
+
 
   /* ===================== JWT ===================== */
 

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { EmployerJobsFilter, JobSearchFilter } from '../models/job-search-filter.model';
 import { PagedResult } from '../../../Shared/models/paged-result.model';
-import { CreateJobRequest, EmployerJobCard, Job, JobCard, JobDetails, JobMatch } from '../models/Job';
+import { CreateJobRequest, EmployerJobCard, Job, JobCard, JobDetails, JobMatch, LatestJob } from '../models/Job';
 import { SuccessResponse } from '../../../Models/Job/SuccessResponse';
 import { EmployerJob } from '../../Owner-Profile/Models/OwnerProfile';
 
@@ -40,12 +40,10 @@ export class JobService {
   return this.http.get<EmployerJob[]>(`${this.baseUrl}/EmpJobs`);
 }
 
-private toParams(filter: object): HttpParams {
+private toParams(f: EmployerJobsFilter): HttpParams {
   let params = new HttpParams();
-  Object.entries(filter).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '') {
-      params = params.set(key, String(value));
-    }
+  Object.entries(f).forEach(([k, v]) => {
+    if (v !== null && v !== undefined && v !== '') params = params.set(k, String(v));
   });
   return params;
 }
@@ -60,4 +58,9 @@ getJobs(filter: EmployerJobsFilter) {
 getSimilar(id: number, take = 5) {
   return this.http.get<JobMatch[]>(`${this.baseUrl}/${id}/similar?take=${take}`);
 }
+
+  getLatest(count = 6): Observable<LatestJob[]> {
+    const params = new HttpParams().set('count', count);
+    return this.http.get<LatestJob[]>(`${this.baseUrl}/latest`, { params });
+  }
 }

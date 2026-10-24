@@ -1,27 +1,48 @@
-<form class="filters" (ngSubmit)="apply()">
-  <input name="keyword" [(ngModel)]="form.keyword" placeholder="Search title or location" />
+<div class="filters">
+  <input name="keyword" type="search"
+         [(ngModel)]="form.keyword"
+         (ngModelChange)="onKeywordChange($event)"
+         (keyup.enter)="apply()"
+         placeholder="Search title or location" />
 
-  <select name="status" [(ngModel)]="form.status" *ngIf="employerMode">
+  <select name="status" *ngIf="employerMode"
+          [(ngModel)]="form.status" (ngModelChange)="apply()">
     <option [ngValue]="null">All statuses</option>
     <option *ngFor="let s of statuses" [ngValue]="s">{{ s }}</option>
   </select>
 
-  <select name="employmentType" [(ngModel)]="form.employmentType">
+  <select name="employmentType"
+          [(ngModel)]="form.employmentType" (ngModelChange)="apply()">
     <option [ngValue]="null">All job types</option>
     <option *ngFor="let t of jobTypes" [ngValue]="t">{{ t }}</option>
   </select>
 
-  <select name="experienceLevel" [(ngModel)]="form.experienceLevel">
+  <select name="experienceLevel"
+          [(ngModel)]="form.experienceLevel" (ngModelChange)="apply()">
     <option [ngValue]="null">All levels</option>
     <option *ngFor="let l of levels" [ngValue]="l">{{ l }}</option>
   </select>
 
-  <select name="sortBy" [(ngModel)]="form.sortBy">
+  <select name="industry"
+          [(ngModel)]="form.industry" (ngModelChange)="apply()">
+    <option [ngValue]="null">All industries</option>
+    <option *ngFor="let i of industries" [ngValue]="i.slug">{{ i.name }}</option>
+  </select>
+
+  <select name="postedWithin"
+          [(ngModel)]="form.postedWithin" (ngModelChange)="apply()">
+    <option [ngValue]="null">Any time</option>
+    <option *ngFor="let p of postedOptions" [ngValue]="p.value">{{ p.label }}</option>
+  </select>
+
+  <select name="sortBy"
+          [(ngModel)]="form.sortBy" (ngModelChange)="apply()">
     <option value="newest">Newest</option>
     <option value="oldest">Oldest</option>
     <option value="applicants_desc" *ngIf="employerMode">Most applicants</option>
   </select>
 
-  <button type="submit" class="apply">Apply</button>
-  <button type="button" class="reset" (click)="reset()">Reset</button>
-</form>
+  <button type="button" class="reset" *ngIf="hasActiveFilters" (click)="reset()">
+    ✕ Reset filters
+  </button>
+</div>

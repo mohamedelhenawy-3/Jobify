@@ -1,0 +1,24 @@
+<!-- stats-section.component.html -->
+@if (!error()) {
+  <section class="stats">
+    <div class="stat">
+      <h2>{{ stats() ? (stats()!.activeJobs | number) + '+' : '—' }}</h2>
+      <p>Active Jobs</p>
+    </div>
+
+    <div class="stat">
+      <h2>{{ stats() ? (stats()!.companies | number) + '+' : '—' }}</h2>
+      <p>Companies</p>
+    </div>
+
+    <div class="stat">
+      <h2>{{ stats() ? (stats()!.registeredUsers | number) : '—' }}</h2>
+      <p>Registered Users</p>
+    </div>
+
+    <div class="stat">
+      <h2>{{ stats() ? (stats()!.successfulHires | number) + '+' : '—' }}</h2>
+      <p>Successful Hires</p>
+    </div>
+  </section>
+}

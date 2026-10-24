@@ -120,9 +120,9 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
             target.Role = dto.NewRole;
             target.Permissions = dto.NewRole.DefaultPermissions()
-                                 .Where(p => CanGrant(actor, p))      
+                                 .Where(p => CanGrant(actor, p))
                                    .ToList();
-            await _activity.LogAsync(actor.CompanyId!.Value, actor, target, ActivityType.RoleChanged,(a, t) => $"{a} changed {t}'s role from {target.Role} to {dto.NewRole}.");
+            await _activity.LogAsync(actor.CompanyId!.Value, actor, target, ActivityType.RoleChanged, (a, t) => $"{a} changed {t}'s role from {target.Role} to {dto.NewRole}.");
             await _context.SaveChangesAsync();
 
             return new SuccessResponseDto { Message = $"Role changed to {dto.NewRole}." };
@@ -131,19 +131,19 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
         public async Task<SuccessResponseDto> RemoveMemberAsync(int targetEmployerId, RemoveMemberDto dto)
         {
-            var actor = await GetActorAsync();                     
-            var target = await GetTargetAsync(actor, targetEmployerId); 
+            var actor = await GetActorAsync();
+            var target = await GetTargetAsync(actor, targetEmployerId);
 
 
             var newPosterId = dto.ReassignToEmployerId ?? actor.Id;
-          
+
 
 
             var newPoster = await _context.EmployerProfiles.FirstOrDefaultAsync(e =>
                     e.Id == newPosterId &&
                     e.Id != target.Id &&
                     e.CompanyId == actor.CompanyId &&
-                    e.IsActive&&e.HasAccess)
+                    e.IsActive && e.HasAccess)
                 ?? throw new InvalidOperationException("Choose a valid active member to take over the jobs.");
 
             await using var tx = await _context.Database.BeginTransactionAsync();
@@ -162,7 +162,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
             return new SuccessResponseDto { Message = "Member removed and their jobs were reassigned." };
         }
-        
+
 
         public async Task<SuccessResponseDto> LeaveCompanyAsync(RemoveMemberDto dto)
         {
@@ -265,6 +265,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
             var company = await _context.Companies
                 .Include(x => x.Logo)
+                .Include(x => x.Industry)                  // ✅ added
                 .FirstOrDefaultAsync(c => c.Id == me.CompanyId);
 
             if (company == null)
@@ -276,7 +277,8 @@ namespace Infrastructure.Implementation.CompanyMembersService
                 CompanyName = company.CompanyName,
                 Description = company.Description,
                 Founded = company.Founded,
-                Industry = company.Industry,
+                IndustryId = company.IndustryId,           // ✅ added (property needed on CompanyProfileDto)
+                Industry = company.Industry?.Name,         // ✅ was company.Industry
                 CompanySize = company.CompanySize,
                 Location = company.Location,
                 CompanyWebsite = company.CompanyWebsite,
@@ -292,7 +294,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
         public async Task<CompanyProfileDto> UpdateMyCompanyAsync(UpdateCompanyDto dto)
         {
             var employerProfile = await _context.EmployerProfiles
-                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId && e.IsActive && e.HasAccess) ;
+                .FirstOrDefaultAsync(e => e.UserId == _currentUser.UserId && e.IsActive && e.HasAccess);
 
             if (employerProfile == null || employerProfile.CompanyId == null)
                 throw new KeyNotFoundException("You do not belong to a company.");
@@ -315,7 +317,19 @@ namespace Infrastructure.Implementation.CompanyMembersService
             company.CompanyWebsite = dto.CompanyWebsite;   // direct assignment so they can be cleared
             company.Description = dto.Description;
             company.Location = dto.Location;
-            company.Industry = dto.Industry;
+
+            // ✅ industry: validate the id (a company may keep its current industry even if deactivated later)
+            if (dto.IndustryId != company.IndustryId)
+            {
+                if (dto.IndustryId.HasValue)
+                {
+                    var ok = await _context.Industries
+                        .AnyAsync(i => i.Id == dto.IndustryId && i.IsActive);
+                    if (!ok) throw new ArgumentException("Invalid industry.");
+                }
+                company.IndustryId = dto.IndustryId;
+            }
+
             company.CompanySize = dto.CompanySize;
             company.Founded = dto.Founded;
             await _activity.LogAsync(company.Id, employerProfile, null, ActivityType.CompanyUpdated,
@@ -363,8 +377,8 @@ namespace Infrastructure.Implementation.CompanyMembersService
             {
                 await _context.SaveChangesAsync();
             }
-            await LogAsync(company.Id, employerProfile, null, ActivityType.CompanyUpdated,
-                            (a, _) => $"{a} updated the company profile.");
+
+            // ✅ removed the duplicate LogAsync(...CompanyUpdated...) that was here (it was never saved)
             return await GetMyCompanyAsync();
         }
 
@@ -452,7 +466,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
                 {
                     Id = e.Id,
                     FullName = e.User.FullName,
-                    HasAccessed=e.HasAccess,
+                    HasAccessed = e.HasAccess,
                     Email = e.User.Email,
                     Role = e.Role.Value,
                     IsActive = e.IsActive,
@@ -482,7 +496,7 @@ namespace Infrastructure.Implementation.CompanyMembersService
 
             target.HasAccess = dto.HasAccessed;
             await LogAsync(actor.CompanyId!.Value, actor, target, ActivityType.AccessChanged,
-            (a, t) => dto.HasAccessed? $"{a} restored {t}'s access to the company.": $"{a} denied {t}'s access to the company.");
+            (a, t) => dto.HasAccessed ? $"{a} restored {t}'s access to the company." : $"{a} denied {t}'s access to the company.");
             await _context.SaveChangesAsync();
 
 
@@ -606,21 +620,6 @@ namespace Infrastructure.Implementation.CompanyMembersService
             };
         }
 
-       
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         public Task<PagedResult<ActivityDto>> GetActivityAsync(ActivityFilterDto f)
         {
             throw new NotImplementedException();

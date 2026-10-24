@@ -9,7 +9,7 @@ namespace Application.Interfaces.PublicCompany
 {
     public interface IPublicCompanyService
     {
-        Task<List<PublicCompanyDto>> SearchAsync(string? q, string? industry, string? location);
+        Task<List<PublicCompanyDto>> SearchAsync(string? q, int? industryId, string? location);
         Task<PublicCompanyDto> GetByIdAsync(int id);
     }
 }

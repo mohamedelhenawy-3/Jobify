@@ -7,8 +7,8 @@ export interface MyCompany {
   description?: string;
   location?: string;
   permissions: string[];
-  industry?: string;
-  companySize?: string;
+  industryId: number | null;   
+  industry: string | null;    companySize?: string;
   founded?: string;
   isVerified: boolean;
   myRole: string;
@@ -23,7 +23,14 @@ export interface HiringSnapshot {
 export type UpdateCompany = Omit<MyCompany,
   'id' | 'isVerified' | 'verificationStatus' | 'myRole' | 'canEdit'>;
 
-
+export interface TopHiringCompany {
+  id: number;
+  name: string;
+  logoUrl: string | null;
+  industry: string | null;
+  location: string | null;
+  openJobs: number;
+}
 
 export interface CompanyMember {
   logo:string

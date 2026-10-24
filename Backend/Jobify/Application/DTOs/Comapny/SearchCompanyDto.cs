@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Application.DTOs.Comapny
         
          public string Description { get; set; }
         public string CompanyName { get; set; }
+        public int? IndustryId { get; set; }     // ✅ add
         public string? Industry { get; set; }
         public string? Location { get; set; }
         public string? CompanySize { get; set; }

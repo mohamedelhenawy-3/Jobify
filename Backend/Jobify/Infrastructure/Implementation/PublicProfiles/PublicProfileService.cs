@@ -35,7 +35,7 @@ namespace Infrastructure.Implementation.PublicProfiles
                     Id = x.Id,
                     CompanyName = x.CompanyName,
                     Logo = x.Logo.ImageUrl,
-                    Industry = x.Industry,
+                    Industry = x.Industry.Name,
                     Location = x.Location,
                     Description = x.Description,
                     CompanySize = x.CompanySize,

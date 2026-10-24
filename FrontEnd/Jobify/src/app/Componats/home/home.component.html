@@ -1,105 +1,86 @@
 <div class="page-content">
-      <section class="hero-container">
-        <div class="hero-content">
-          <p class="description">Search & Apply For Your New Job</p>
-          <h3>Find jobs that match your skills and grow your career with Jobify</h3>
-        
-        </div>
-      </section>
+<section class="hero">
+  <div class="wrap hero-g">
+    <div class="hero-content">
+      <p class="description">Search &amp; Apply For Your New Job</p>
+      <h1>Find jobs that match your skills and grow your career with Jobify</h1>
 
-  <section class="top-categories">
-  <h2>Top Categories</h2>
-  <div class="industries-grid">
-    <div *ngFor="let ind of indstries" class="industry-card">
-      <!-- Use image instead of Font Awesome -->
-      <img [src]="getIcon(ind.industryName)" class="industry-icon" alt="{{ind.industryName}} icon">
-      <h4>{{ ind.industryName }}</h4>
-      <p>{{ ind.industrycount }} Jobs</p>
+      <div class="chips">
+     @if (popular().length > 0) {
+  <div class="chips">
+    <span class="meta">Popular:</span>
+    @for (p of popular(); track p.id) {
+      <a class="chip" [routerLink]="['/jobs']" [queryParams]="{ industry: p.slug }">
+        {{ p.name }}
+      </a>
+    }
+  </div>
+}
+      </div>
+
+      <div class="ctas">
+        <a class="btn btn-primary" routerLink="/signup/seeker">I'm looking for a job</a>
+        <a class="btn btn-accent" routerLink="/signup/employer">I want to hire</a>
+      </div>
+    </div>
+
+    <div class="art" role="img" aria-label="Illustration of a briefcase with a magnifying glass">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="200" cy="200" r="175" fill="#DBEAFE"/>
+        <circle cx="200" cy="200" r="130" fill="#BFDBFE" opacity=".6"/>
+        <rect x="162" y="112" width="76" height="40" rx="14" fill="none" stroke="#1D4ED8" stroke-width="14"/>
+        <rect x="105" y="140" width="190" height="135" rx="24" fill="#2563EB"/>
+        <rect x="105" y="196" width="190" height="12" fill="#1D4ED8"/>
+        <rect x="184" y="188" width="32" height="28" rx="7" fill="#fff"/>
+        <g class="mag">
+          <circle cx="285" cy="270" r="46" fill="#fff" fill-opacity=".92" stroke="#10B981" stroke-width="14"/>
+          <path d="M318 304l36 36" stroke="#10B981" stroke-width="18" stroke-linecap="round"/>
+        </g>
+        <circle cx="105" cy="108" r="30" fill="#10B981"/>
+        <path d="M92 108l9 9 17-18" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="335" cy="115" r="10" fill="#F59E0B"/><circle cx="68" cy="300" r="8" fill="#8B5CF6"/><circle cx="352" cy="205" r="6" fill="#2563EB"/>
+      </svg>
     </div>
   </div>
 </section>
 
-      <section class="dual-cta">
-        <div class="cta-container">
-          <div class="cta-card seeker-card">
-            <div class="cta-content">
-              <h2>Find Your Dream Job</h2>
-              <p>Build your profile, upload your resume, and let top recruiters find you.</p>
-              <button class="btn btn-primary">Upload Resume</button>
-            </div>
-          </div>
+    <app-stats-section />
 
-          <div class="cta-card employer-card">
-            <div class="cta-content">
-              <h2>Hire Top Talent</h2>
-              <p>Post your job openings and reach thousands of qualified candidates today.</p>
-              <button class="btn btn-secondary">Post a Job</button>
-            </div>
-          </div>
-        </div>
-      </section>
+    <section class="industries-section">
+    <div class="wrap">
+      <h2 class="section-title">Browse by Industry</h2>
 
-      <section class="featured-jobs">
-        <div class="section-header">
-          <h2>Featured Opportunities</h2>
-          <a href="/jobs" class="view-all">View All Jobs →</a>
+      @if (loading()) {
+        <p>Loading...</p>
+      } @else if (error()) {
+        <p class="error">{{ error() }}</p>
+      } @else {
+        <div class="industries">
+          @for (industry of industries(); track industry.id) {
+            <a class="industry-card" [routerLink]="['/jobs']" [queryParams]="{ industry: industry.slug }">
+              <span class="industry-icon">
+                <i class="bi" [ngClass]="getIcon(industry.slug)"></i>
+              </span>
+              <span class="industry-name">{{ industry.name }}</span>
+            </a>
+          }
         </div>
-        <div class="jobs-grid">
-          <div class="job-card">
-            <div class="job-type remote">Remote</div>
-            <h4>Senior Frontend Developer</h4>
-            <p class="company-name">TechFlow Inc.</p>
-            <div class="job-meta">
-              <span>📍 New York, NY</span>
-              <span>💰 $80k - $120k</span>
-            </div>
-            <button class="apply-btn">Apply Now</button>
-          </div>
-          </div>
-      </section>
+      }
+    </div>
+  </section>
+    <app-latest-jobs />
+    <app-top-hiring-companies />
+     <app-join-section/>
+<app-how-it-works></app-how-it-works>
+<section class="cta">
+  <div class="cta-inner">
+    <h2>Ready to take the next step?</h2>
+    <p>Join thousands of job seekers and employers already on CareerBridge.</p>
 
-      <section class="how-it-works">
-        <h2>Getting started is easy</h2>
-        <div class="steps-grid">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h4>Create Account</h4>
-            <p>Set up your profile in less than 2 minutes.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <h4>Post or Search</h4>
-            <p>Employers post jobs; Seekers find them.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <h4>Connect</h4>
-            <p>Interview and get hired directly through the platform.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="why-us">
-        <div class="why-container">
-          <div class="why-image">
-            <div class="image-placeholder">🚀</div>
-          </div>
-          <div class="why-text">
-            <h2>Why Jobify?</h2>
-            <ul class="benefit-list">
-              <li>
-                <strong>Direct Messaging</strong>
-                <p>Talk directly to hiring managers without the "middle man."</p>
-              </li>
-              <li>
-                <strong>Fast Application</strong>
-                <p>Apply to any job in seconds with our "One-Click" resume tool.</p>
-              </li>
-              <li>
-                <strong>Verified Employers</strong>
-                <p>We manually check every company to ensure your safety.</p>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+    <div class="cta-actions">
+      <a class="cta-btn primary" routerLink="/jobs">Find Jobs</a>
+      <a class="cta-btn ghost" [routerLink]="postJobLink">Post a Job</a>
+    </div>
+  </div>
+</section>
+</div>
