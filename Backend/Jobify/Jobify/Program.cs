@@ -6,6 +6,7 @@ using Application.Interfaces.Company;
 using Application.Interfaces.CompanyMembers;
 using Application.Interfaces.Email;
 using Application.Interfaces.Employer;
+using Application.Interfaces.Industry;
 using Application.Interfaces.Job;
 using Application.Interfaces.JobApplication;
 using Application.Interfaces.JobsAlert;
@@ -34,6 +35,7 @@ using Infrastructure.Implementation.CompanyService;
 using Infrastructure.Implementation.Email;
 using Infrastructure.Implementation.EmployerService;
 using Infrastructure.Implementation.FileUploadService;
+using Infrastructure.Implementation.Industy;
 using Infrastructure.Implementation.JobApplicationSrevice;
 using Infrastructure.Implementation.JobService;
 using Infrastructure.Implementation.Logger;
@@ -141,6 +143,7 @@ builder.Services.AddScoped<IEmployerPermissionService, EmployerPermissionService
 builder.Services.AddScoped<ICompanyMemberService, CompanyMemberService>();
 builder.Services.AddScoped<IPublicCompanyService, PublicCompanyService>();
 builder.Services.AddScoped<IAlertJobs, AlertJobsService>();
+builder.Services.AddScoped<IIndustryService, IndustryService>();
 builder.Services.AddMemoryCache();
 
 builder.Services.Configure<SupabaseSettings>(

@@ -1,4 +1,3 @@
-/* ================= RESET ================= */
 *,
 *::before,
 *::after {
@@ -8,75 +7,51 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   width: 100%;
-  overflow: hidden; /* prevent page scroll */
+  /* no height, no overflow: the browser scrolls normally */
 }
 
-/* ================= APP LAYOUT ================= */
 .app-layout {
-  display: flex;
   width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
 }
 
-/* ================= SIDEBAR ================= */
-app-side-bar {
-  width: 200px;
-  height: 100vh;
-  flex-shrink: 0;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  background: #1e1e2f; /* optional */
-}
-
-/* ================= MAIN CONTENT ================= */
 .main-content {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* ================= NAVBAR ================= */
+/* navbar stays visible at the top while the page scrolls */
 app-navbar {
-  height: 60px;
-  min-height: 60px;
-  width: 100%;
-  margin-left: 0;
-  /* padding: 0 16px; */
-  background-color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-shrink: 0;
-  z-index: 10;
+  width: 100%;
+  height: 60px;
+  min-height: 60px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
 }
 
-/* ================= PAGE CONTENT ================= */
+/* grows to fill the screen, so the footer is pushed to the bottom */
 .page-content {
-  flex: 1;
-  min-width: 100%;
-  margin: 0;
-  /* padding: 16px; */
-  overflow-y: auto;      /* scroll only here */
-  background-color: #f5f6fa;
+  flex: 1 0 auto;
+  width: 100%;
+  background: #f5f6fa;
 }
 
-/* ================= ROUTER PAGES FIX ================= */
-.page-content > * {
-  min-height: 100%;
+/* footer: full width, last on the page */
+app-footer {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
 }
-
-/* ================= DEBUG (REMOVE AFTER TEST) ================= */
-/*
-app-side-bar { border: 2px solid red; }
-.main-content { border: 2px solid blue; }
-*/

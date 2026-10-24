@@ -70,18 +70,26 @@ namespace Infrastructure.Implementation.EmployerService
                 totalApplicants = await _context.JobApplications.CountAsync(a => a.JobPost!.PostedByEmployerId == employer.Id);
             }
 
+            // ✅ read the industry name directly, so it works even if
+            // GetCurrentEmployerAsync() doesn't include Company.Industry
+            var industryName = await _context.Companies
+                .AsNoTracking()
+                .Where(c => c.Id == employer.CompanyId)
+                .Select(c => c.Industry != null ? c.Industry.Name : null)
+                .FirstOrDefaultAsync();
+
             return new EmployerProfileDto
             {
                 FullName = employer.User.FullName,
-                LinkedIn =employer.User.LinkedInUrl,
-                position=employer.Position,
+                LinkedIn = employer.User.LinkedInUrl,
+                position = employer.Position,
                 Bio = employer.Bio,
                 Email = employer.User.Email,
                 Phone = employer.User.PhoneNumber,
                 Location = employer.User.Location,
                 PhotoUrl = employer.ProfileImage?.ImageUrl,
                 CompanyName = employer.Company.CompanyName,
-                CompanyIndustry = employer.Company.Industry,
+                CompanyIndustry = industryName,          // ✅ was employer.Company.Industry
                 CompanyWebsite = employer.Company.CompanyWebsite,
                 JobsPostedCount = jobsPostedCount,
                 ActiveJobsCount = activeJobsCount,

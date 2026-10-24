@@ -35,6 +35,7 @@ namespace Infrastructure.Implementation.AuthService
         public DbSet<ProfileImage> ProfileImages { get; set; }
         public DbSet<Pdf> Pdfs { get; set; }
         public DbSet<SavedJobAlert> SavedJobAlerts { get; set; }
+        public DbSet<Industry> Industries => Set<Industry>();
 
         public DbSet<JobPost> JobPosts { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
@@ -83,6 +84,15 @@ namespace Infrastructure.Implementation.AuthService
                       .HasForeignKey<EmployerProfile>(ep => ep.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+            builder.Entity<Industry>(e =>
+            {
+                e.Property(i => i.Name).HasMaxLength(100).IsRequired();
+                e.Property(i => i.Slug).HasMaxLength(120).IsRequired();
+                e.HasIndex(i => i.Name).IsUnique();
+                e.HasIndex(i => i.Slug).IsUnique();
+            });
+
+
             builder.Entity<CompanyActivity>(b =>
             {
                 b.Property(x => x.Type).HasConversion<string>().HasMaxLength(40);
@@ -245,9 +255,6 @@ namespace Infrastructure.Implementation.AuthService
                 entity.Property(c => c.Location)
                     .HasMaxLength(100);
 
-                entity.Property(c => c.Industry)
-                    .HasMaxLength(100);
-
                 entity.Property(c => c.CompanySize)
                     .HasMaxLength(50);
 
@@ -275,6 +282,12 @@ namespace Infrastructure.Implementation.AuthService
                     .HasForeignKey(j => j.CompanyId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+
+                entity.HasOne(c => c.Industry)
+                   .WithMany(i => i.Companies)
+                   .HasForeignKey(c => c.IndustryId)
+                   .OnDelete(DeleteBehavior.Restrict);
+ 
                 // Company -> Logo
                 entity.HasOne(c => c.Logo)
                     .WithOne(p => p.Company)

@@ -46,13 +46,23 @@ namespace Infrastructure.Implementation.OnBoardingService
             if (employer.CompanyId != null)
                 throw new Exception("You already belong to a company.");
 
+            // validate the industry before creating anything
+            if (dto.IndustryId.HasValue)
+            {
+                var industryOk = await _context.Industries
+                    .AnyAsync(i => i.Id == dto.IndustryId && i.IsActive, cancellationToken);
+
+                if (!industryOk)
+                    throw new ArgumentException("Invalid industry.");
+            }
+
             var company = new Company
             {
                 CompanyName = dto.CompanyName,
                 CompanyWebsite = dto.CompanyWebsite,
                 Description = dto.Description,
                 Location = dto.Location,
-                Industry = dto.Industry,
+                IndustryId = dto.IndustryId,          // ✅ was missing
                 CompanySize = dto.CompanySize,
                 Founded = dto.Founded,
                 CreatedByEmployerId = employer.Id,
@@ -60,6 +70,9 @@ namespace Infrastructure.Implementation.OnBoardingService
                 VerificationStatus = CompanyVerificationStatus.Pending,
                 VerificationSubmittedAt = DateTime.UtcNow
             };
+
+            // one transaction: never a company without an owner
+            await using var tx = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             _context.Companies.Add(company);
             await _context.SaveChangesAsync(cancellationToken);
@@ -71,6 +84,7 @@ namespace Infrastructure.Implementation.OnBoardingService
             employer.HasAccess = true;
 
             await _context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
 
             return new CreateCompanyResponseDto
             {
@@ -261,13 +275,14 @@ namespace Infrastructure.Implementation.OnBoardingService
             if (string.IsNullOrWhiteSpace(query)) return new List<CompanySearchDto>();
 
             return await _context.Companies
+                .AsNoTracking()
                 .Where(x => x.IsVerified && x.CompanyName.Contains(query))
                 .Select(c => new CompanySearchDto
                 {
                     CompanyId = c.Id,
                     CompanyName = c.CompanyName,
                     Location = c.Location,
-                    Industry = c.Industry,
+                    Industry = c.Industry != null ? c.Industry.Name : null,   // ✅ was c.Industry
                     IsVerified = c.IsVerified
                 })
                 .Take(10)

@@ -357,6 +357,8 @@ namespace Infrastructure.Implementation.JobService
                     j.Title.ToLower().Contains(keyword) ||
                     (j.Company != null && j.Company.CompanyName.ToLower().Contains(keyword)));
             }
+            if (dto.IndustryId.HasValue)
+                query = query.Where(j => j.Company.IndustryId == dto.IndustryId);
 
             if (!string.IsNullOrWhiteSpace(dto.EmploymentType))
             {
@@ -401,10 +403,18 @@ namespace Infrastructure.Implementation.JobService
                     ExperienceLevel = j.ExperienceLevel,
                     JobType = j.JobType,
                     MaxSalary = j.SalaryMax,
-                    MinSalary = j.SalaryMin
+                    MinSalary = j.SalaryMin,
+                    IndustryId = j.Company.IndustryId,
+                    Industry = j.Company.Industry != null ? j.Company.Industry.Name : null,
                 })
                 .ToListAsync();
         }
+
+
+
+
+
+
 
         private static string CalculateAgeText(DateTime startDate, DateTime endDate)
         {
@@ -469,7 +479,6 @@ namespace Infrastructure.Implementation.JobService
             };
         }
 
-        // ───────────────────────── GET JOB (JOB SEEKER VIEW) ─────────────────────────
         public async Task<JobDetailsForJobseekerDto> GetJobDetailsForJobseeker(int jobId)
         {
             var userId = GetCurrentUserId();
@@ -527,6 +536,9 @@ namespace Infrastructure.Implementation.JobService
             };
         }
 
+
+
+
         private string GetTimeAgo(DateTime date)
         {
             var span = DateTime.UtcNow - date;
@@ -543,6 +555,7 @@ namespace Infrastructure.Implementation.JobService
             var years = (DateTime.UtcNow - foundedDate).TotalDays / 365;
             return years < 1 ? "Less than a year old" : $"{(int)years} year(s) old";
         }
+      
 
         public async Task<IEnumerable<JobDto>> AllJobs()
         {
@@ -561,6 +574,14 @@ namespace Infrastructure.Implementation.JobService
                 })
                 .ToListAsync();
         }
+
+
+
+
+
+
+
+
 
         public async Task<JobDto> GetJob(int id)
         {
@@ -658,8 +679,6 @@ namespace Infrastructure.Implementation.JobService
                 .Where(j => j.Title.Contains(alert.Keyword) && j.CreatedAt > alert.LastChecked)
                 .ToListAsync();
         }
-
-        // ───────────────────────── EMPLOYER: PAGED JOB CARDS ─────────────────────────
         public async Task<PagedResult<EmployerJobCardDto>?> GetEmployerJobsAsync(EmployerJobsFilterDto filter)
         {
             var employer = await _Ipermision.GetCurrentEmployerWithPermissionAsync(EmployerPermissions.PostJobs);
@@ -767,14 +786,11 @@ namespace Infrastructure.Implementation.JobService
                 PageSize = pageSize
             };
         }
-
-        // ───────────────────────── PUBLIC: ACTIVE JOBS ─────────────────────────
         public async Task<PagedResult<JobCardDto>> GetActiveJobsAsync(JobsFilterDto filter)
         {
             var now = DateTime.UtcNow;
 
-            var query = _db.JobPosts.Include(x => x.Company)
-                                      .ThenInclude(x => x.Logo)
+            var query = _db.JobPosts
                 .AsNoTracking()
                 .Where(j => j.IsActive && j.ExpirationDate > now);
 
@@ -789,6 +805,24 @@ namespace Infrastructure.Implementation.JobService
 
             if (filter.ExperienceLevel.HasValue)
                 query = query.Where(j => j.ExperienceLevel == filter.ExperienceLevel.Value);
+
+            if (!string.IsNullOrWhiteSpace(filter.Industry))
+            {
+                var slug = filter.Industry.Trim().ToLower();
+                query = query.Where(j => j.Company.Industry != null
+                                      && j.Company.Industry.Slug.ToLower() == slug);
+            }
+
+            var since = filter.PostedWithin?.Trim().ToLower() switch
+            {
+                "day" => now.AddDays(-1),
+                "3days" => now.AddDays(-3),
+                "week" => now.AddDays(-7),
+                "month" => now.AddMonths(-1),
+                _ => (DateTime?)null
+            };
+            if (since.HasValue)
+                query = query.Where(j => j.CreatedAt >= since.Value);
 
             query = filter.SortBy == "oldest"
                 ? query.OrderBy(j => j.CreatedAt)
@@ -807,6 +841,7 @@ namespace Infrastructure.Implementation.JobService
                     j.Title,
                     LogoUrl = j.Company.Logo != null ? j.Company.Logo.ImageUrl : null,
                     CompanyName = j.Company.CompanyName,
+                    IndustryName = j.Company.Industry != null ? j.Company.Industry.Name : null,
                     j.Location,
                     j.JobType,
                     j.ExperienceLevel,
@@ -824,6 +859,7 @@ namespace Infrastructure.Implementation.JobService
                 Title = j.Title,
                 Logo = j.LogoUrl,
                 CompanyName = j.CompanyName,
+                IndustryName = j.IndustryName ?? string.Empty,
                 Location = j.Location,
                 EmploymentType = j.JobType,
                 ExperienceLevel = j.ExperienceLevel,
@@ -843,7 +879,6 @@ namespace Infrastructure.Implementation.JobService
                 PageSize = pageSize
             };
         }
-
         public async Task<Application.DTOs.JobPost.JobDTO.RecordsDTO.RecordPagedResult<Application.DTOs.JobPost.JobDTO.RecordsDTO.RecommendedJobDto>?> RecommendAsync(int page, int size, CancellationToken ct)
         {
 

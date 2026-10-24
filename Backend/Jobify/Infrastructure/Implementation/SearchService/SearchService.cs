@@ -38,8 +38,8 @@ namespace Infrastructure.Implementation.SearchService
                                || !string.IsNullOrWhiteSpace(dto.ExperienceLevel)
                                || dto.PostedWithinDays.HasValue;
 
-                bool companyFilters = !string.IsNullOrWhiteSpace(dto.Industry)
-                                   || !string.IsNullOrWhiteSpace(dto.CompanySize);
+                bool companyFilters = 
+                                   !string.IsNullOrWhiteSpace(dto.CompanySize);
 
                 bool includeJobs = !companyFilters || jobFilters;
                 bool includeCompanies = !jobFilters || companyFilters;

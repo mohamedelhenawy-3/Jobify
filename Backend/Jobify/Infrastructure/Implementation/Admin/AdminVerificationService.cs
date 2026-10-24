@@ -23,9 +23,10 @@ namespace Infrastructure.Implementation.Admin
         public async Task<CompanyPendingTriageDto> GetCompanyDetailsForReviewAsync(int companyId)
         {
             var company = await _context.Companies
-                .Include(c => c.CreatedByEmployer)
-                    .ThenInclude(e => e.User)
-                .FirstOrDefaultAsync(c => c.Id == companyId);
+    .Include(c => c.Industry)                 // ✅ add
+    .Include(c => c.CreatedByEmployer)
+        .ThenInclude(e => e.User)
+    .FirstOrDefaultAsync(c => c.Id == companyId);
 
             if (company == null)
             {
@@ -36,10 +37,11 @@ namespace Infrastructure.Implementation.Admin
             {
                 CompanyId = company.Id,
                 CompanyName = company.CompanyName,
-                Industry = company.Industry ?? string.Empty,
                 SubmittedByEmployerName = company.CreatedByEmployer?.User?.FullName ?? string.Empty,
                 SubmittedByEmail = company.CreatedByEmployer?.User?.Email ?? string.Empty,
                 VerificationSubmittedAt = company.VerificationSubmittedAt
+                ,
+                Industry = company.Industry?.Name ?? string.Empty,   // ✅ was company.Industry ?? string.Empty
             };
         }
 
@@ -52,10 +54,10 @@ namespace Infrastructure.Implementation.Admin
                 {
                     CompanyId = c.Id,
                     CompanyName = c.CompanyName,
-                    Industry = c.Industry ?? string.Empty,
                     SubmittedByEmployerName = c.CreatedByEmployer.User.FullName ?? string.Empty,
                     SubmittedByEmail = c.CreatedByEmployer.User.Email ?? string.Empty,
-                    VerificationSubmittedAt = c.VerificationSubmittedAt
+                    VerificationSubmittedAt = c.VerificationSubmittedAt,
+                    Industry = c.Industry != null ? c.Industry.Name : string.Empty,   
                 })
                 .ToListAsync();
         }

@@ -409,10 +409,15 @@
         </div>
 
         <div class="grid-2">
-          <div class="field">
-            <label>Industry</label>
-            <input formControlName="industry" placeholder="e.g. Software" />
-          </div>
+         <div class="field">
+  <label for="industry">Industry</label>
+  <select id="industry" formControlName="industryId">
+    <option [ngValue]="null">Select industry</option>
+    @for (i of industries; track i.id) {
+      <option [ngValue]="i.id">{{ i.name }}</option>
+    }
+  </select>
+</div>
           <div class="field">
             <label>Company size</label>
             <select formControlName="companySize">

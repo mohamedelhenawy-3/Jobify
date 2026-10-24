@@ -9,6 +9,8 @@ import { CompanyService } from '../../services/company.service';
 import { CompanyMember, HiringSnapshot, MyCompany } from '../../models/company';
 import { ActivityDto, ActivityFilter } from '../../../Activity/avrvity';
 import { TeamService } from '../../../Team/Services/team.service';
+import { IndustryService } from '../../../Imdustry/Services/industry.service';
+import { Industry } from '../../../Imdustry/Model/industry.model';
 
 type CompanyTab = 'overview' | 'team' | 'activity';
 
@@ -23,6 +25,7 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
   private service = inject(CompanyService);
   private teamService = inject(TeamService);
   private fb = inject(FormBuilder);
+  private industryService = inject(IndustryService);
 
   company: MyCompany | null = null;
   loading = true;
@@ -33,7 +36,7 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
   error = '';
 
   activeTab: CompanyTab = 'overview';
-
+industries: Industry[] = [];
   // team
   members: CompanyMember[] | null = null;
   membersTotal = 0;
@@ -76,7 +79,8 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
       { label: 'Choose a company size',                done: !!c.companySize?.trim() },
       { label: 'Add your location',                    done: !!c.location?.trim() },
       { label: 'Add the year you were founded',        done: !!c.founded?.trim() },
-      { label: 'Add your website',                     done: !!c.companyWebsite?.trim() }
+      { label: 'Add your website',                     done: !!c.companyWebsite?.trim() },
+      { label: 'Add your industry', done: !!c.industryId },
     ];
 
     const doneCount = items.filter(i => i.done).length;
@@ -91,21 +95,22 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
 
   sizes = ['1-10', '11-50', '51-200', '201-500', '500+'];
 
-  form = this.fb.group({
-    companyName: ['', [Validators.required, Validators.maxLength(200)]],
-    companyWebsite: [''],
-    description: ['', Validators.maxLength(5000)],
-    location: [''],
-    industry: [''],
-    companySize: [''],
-    founded: ['']
-  });
+form = this.fb.group({
+  companyName: ['', [Validators.required, Validators.maxLength(200)]],
+  companyWebsite: [''],
+  description: ['', Validators.maxLength(5000)],
+  location: [''],
+  industryId: [null as number | null],
+  companySize: [''],
+  founded: ['']
+});
 
   snapshot: HiringSnapshot | null = null;
 
   ngOnInit() {
     this.load();
     this.loadSnapshot();
+  this.loadIndustries();
 
     this.searchSub = this.search$
       .pipe(debounceTime(350), distinctUntilChanged())
@@ -183,7 +188,12 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+private loadIndustries() {
+  this.industryService.getAll(false).subscribe({
+    next: (list) => (this.industries = list),
+    error: () => (this.industries = [])
+  });
+}
   // ---------- Company activity ----------
   loadActivity() {
     const req = ++this.activityReq;   // ignore out-of-order responses
@@ -269,7 +279,7 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
       companyWebsite: this.company.companyWebsite ?? '',
       description: this.company.description ?? '',
       location: this.company.location ?? '',
-      industry: this.company.industry ?? '',
+      industryId: this.company.industryId ?? null,
       companySize: this.company.companySize ?? '',
       founded: this.company.founded ?? ''
     });
@@ -308,8 +318,10 @@ export class MyCompanyComponent implements OnInit, OnDestroy {
 
     this.saving = true;
     this.error = '';
+const raw = this.form.getRawValue();
+const payload = { ...raw, industryId: raw.industryId ? Number(raw.industryId) : null };
 
-    this.service.updateMyCompany(this.form.getRawValue(), this.logoFile).subscribe({
+    this.service.updateMyCompany(payload, this.logoFile).subscribe({
       next: (c) => {
         this.company = c;
         this.saving = false;

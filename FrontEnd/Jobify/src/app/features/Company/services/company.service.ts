@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { SuccessResponse } from '../../../Models/Job/SuccessResponse';
 import { CreateJobRequest } from '../../jobs/models/Job';
-import { CompanyMembersPreview, HiringSnapshot, MyCompany, UpdateCompany } from '../models/company';
+import { CompanyMembersPreview, HiringSnapshot, MyCompany, TopHiringCompany, UpdateCompany } from '../models/company';
 
 
 @Injectable({ providedIn: 'root' })
@@ -24,8 +24,9 @@ updateMyCompany(formValue: any, logo?: File | null): Observable<MyCompany> {
   fd.append('CompanyWebsite', formValue.companyWebsite ?? '');
   fd.append('Description', formValue.description ?? '');
   fd.append('Location', formValue.location ?? '');
-  fd.append('Industry', formValue.industry ?? '');
-  fd.append('CompanySize', formValue.companySize ?? '');
+ if (formValue.industryId != null) {
+    fd.append('industryId', String(formValue.industryId));   
+  }  fd.append('CompanySize', formValue.companySize ?? '');
   fd.append('Founded', formValue.founded ?? '');
   if (logo) fd.append('Logo', logo);
 
@@ -40,4 +41,9 @@ getMembersPreview(take = 5): Observable<CompanyMembersPreview> {
   return this.http.get<CompanyMembersPreview>(
     `${this.baseUrl}/CompanyMembers/members`, { params: { take } });
 }
+
+  getTopHiring(count = 8): Observable<TopHiringCompany[]> {
+    const params = new HttpParams().set('count', count);
+    return this.http.get<TopHiringCompany[]>(`${this.baseUrl}/company/top-hiring`, { params });
+  }
 }

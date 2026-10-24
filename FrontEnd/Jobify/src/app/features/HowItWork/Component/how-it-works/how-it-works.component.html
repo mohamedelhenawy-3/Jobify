@@ -1,0 +1,29 @@
+<section class="how">
+  <header class="head">
+    <span class="eyebrow">Simple process</span>
+    <h2>How It Works</h2>
+    <p>Three simple steps to your next chapter.</p>
+
+    <div class="tabs">
+      <button type="button" class="tab"
+              [class.active]="active === 'seekers'"
+              (click)="active = 'seekers'">
+        For Job Seekers
+      </button>
+
+      <button type="button" class="tab"
+              [class.active]="active === 'employers'"
+              (click)="active = 'employers'">
+        For Employers
+      </button>
+    </div>
+  </header>
+
+  <ol class="steps">
+    <li class="step" *ngFor="let s of steps; let i = index">
+      <span class="num">{{ i + 1 }}</span>
+      <h3>{{ s.title }}</h3>
+      <p>{{ s.text }}</p>
+    </li>
+  </ol>
+</section>

@@ -1,0 +1,63 @@
+<!-- top-hiring-companies.component.html -->
+<section class="top-companies" aria-labelledby="top-companies-title">
+  <header class="section-head">
+    <div>
+      <span class="eyebrow">Trusted employers</span>
+      <h2 id="top-companies-title">Top Hiring Companies</h2>
+      <p class="subtitle">Companies with the most open positions right now.</p>
+    </div>
+    <a class="view-all" [routerLink]="['/companies']">
+      View all companies
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+  </header>
+
+  @if (loading()) {
+    <div class="companies-grid" aria-busy="true">
+      @for (s of skeletons; track s) {
+        <div class="company-card skeleton">
+          <div class="sk sk-logo"></div>
+          <div class="sk sk-line w70"></div>
+          <div class="sk sk-line w40"></div>
+          <div class="sk sk-pill"></div>
+        </div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="state-box">
+      <h3>Couldn't load companies</h3>
+      <p>Something went wrong while fetching the top hiring companies.</p>
+      <button type="button" class="btn-retry" (click)="load()">Try again</button>
+    </div>
+  } @else if (companies().length === 0) {
+    <div class="state-box">
+      <h3>No companies hiring yet</h3>
+      <p>Check back soon for new employers.</p>
+    </div>
+  } @else {
+    <div class="companies-grid">
+      @for (c of companies(); track c.id) {
+        <a class="company-card" [routerLink]="['/companies', c.id]">
+          @if (c.logoUrl) {
+            <img class="logo" [src]="c.logoUrl" [alt]="c.name + ' logo'" />
+          } @else {
+            <div class="logo placeholder" aria-hidden="true">{{ c.name.charAt(0) }}</div>
+          }
+
+          <h3>{{ c.name }}</h3>
+          <p class="meta">
+            {{ c.industry || 'Company' }}@if (c.location) { · {{ c.location }} }
+          </p>
+
+          <span class="open-jobs">
+            <span class="dot"></span>
+            {{ c.openJobs }} open {{ c.openJobs === 1 ? 'job' : 'jobs' }}
+          </span>
+        </a>
+      }
+    </div>
+  }
+</section>

@@ -14,7 +14,8 @@ namespace Domain.Entities
         public string? CompanyWebsite { get; set; }
         public string? Description { get; set; }
         public string? Location { get; set; }
-        public string? Industry { get; set; }
+        public int? IndustryId { get; set; }
+        public Industry? Industry { get; set; }
         public string? CompanySize { get; set; }
         public string? Founded { get; set; }
 

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Implementation.CompanyService
@@ -34,23 +35,21 @@ namespace Infrastructure.Implementation.CompanyService
 
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IMemoryCache _cache;
+
         public CompanyService(
-             IMemoryCache cache,
-          AppDBContext db,
-          CloudinaryService cloudinaryService,
-          ICurrentUser user)
+            IMemoryCache cache,
+            AppDBContext db,
+            CloudinaryService cloudinaryService,
+            ICurrentUser user)
         {
             _db = db;
             _cache = cache;
-
             _cloudinaryService = cloudinaryService;
             _user = user;
         }
-    
 
         //public async Task<SuccessResponse> DeleteCompany(int companyId)
         //{
-
         //    var profile = await GetCurrentEmployerProfile();
 
         //    var company = await _db.Companies
@@ -79,8 +78,10 @@ namespace Infrastructure.Implementation.CompanyService
         public async Task<IEnumerable<CompanyResponseDto>> GetAllCompanies()
         {
             var companies = await _db.Companies
-                           .Include(c => c.Logo)
-                           .ToListAsync();
+                .AsNoTracking()
+                .Include(c => c.Logo)
+                .Include(c => c.Industry)   // needed for MapToResponseDto
+                .ToListAsync();
 
             return companies.Select(MapToResponseDto);
         }
@@ -88,8 +89,9 @@ namespace Infrastructure.Implementation.CompanyService
         public async Task<CompanyResponseDto> GetCompanyById(int companyId)
         {
             var company = await _db.Companies
-                          .Include(c => c.Logo)
-                          .FirstOrDefaultAsync(c => c.Id == companyId);
+                .Include(c => c.Logo)
+                .Include(c => c.Industry)   // needed for MapToResponseDto
+                .FirstOrDefaultAsync(c => c.Id == companyId);
 
             if (company == null)
                 throw new Exception("Company not found.");
@@ -103,6 +105,7 @@ namespace Infrastructure.Implementation.CompanyService
 
         //    var company = await _db.Companies
         //        .Include(c => c.Logo)
+        //        .Include(c => c.Industry)
         //        .FirstOrDefaultAsync(c => c.EmployerProfileId == profile.Id);
 
         //    if (company == null)
@@ -113,7 +116,6 @@ namespace Infrastructure.Implementation.CompanyService
 
         //public async Task<SuccessResponse> UpdateCompany(int companyId, UpdateCompanyDto dto)
         //{
-
         //    var profile = await GetCurrentEmployerProfile();
 
         //    var company = await _db.Companies
@@ -137,8 +139,13 @@ namespace Infrastructure.Implementation.CompanyService
         //    if (!string.IsNullOrWhiteSpace(dto.Location))
         //        company.Location = dto.Location;
 
-        //    if (!string.IsNullOrWhiteSpace(dto.Industry))
-        //        company.Industry = dto.Industry;
+        //    // Industry is now an id, validated against active industries
+        //    if (dto.IndustryId.HasValue)
+        //    {
+        //        var ok = await _db.Industries.AnyAsync(i => i.Id == dto.IndustryId && i.IsActive);
+        //        if (!ok) throw new Exception("Invalid industry.");
+        //        company.IndustryId = dto.IndustryId;
+        //    }
 
         //    if (!string.IsNullOrWhiteSpace(dto.CompanySize))
         //        company.CompanySize = dto.CompanySize;
@@ -179,12 +186,9 @@ namespace Infrastructure.Implementation.CompanyService
 
         //    return new SuccessResponse
         //    {
-        //        Message = "Company deleted successfully."
+        //        Message = "Company updated successfully."
         //    };
-
         //}
-
-
 
         private CompanyResponseDto MapToResponseDto(Company company)
         {
@@ -195,7 +199,8 @@ namespace Infrastructure.Implementation.CompanyService
                 CompanyWebsite = company.CompanyWebsite,
                 Description = company.Description,
                 Location = company.Location,
-                Industry = company.Industry,
+                IndustryId = company.IndustryId,       // add this property to CompanyResponseDto (int?)
+                Industry = company.Industry?.Name,     // name for display (string?)
                 CompanySize = company.CompanySize,
                 Founded = company.Founded,
                 LogoUrl = company.Logo?.ImageUrl,
@@ -203,114 +208,106 @@ namespace Infrastructure.Implementation.CompanyService
             };
         }
 
-    //    public async Task<CompanyOwnerDto> PrivateCompany()
-    //    {
-    //        var userId = GetCurrentUserId();
-    //        if (string.IsNullOrEmpty(userId))
-    //            throw new Exception("Unauthorized");
+        //    public async Task<CompanyOwnerDto> PrivateCompany()
+        //    {
+        //        var userId = GetCurrentUserId();
+        //        if (string.IsNullOrEmpty(userId))
+        //            throw new Exception("Unauthorized");
 
-    //        var profile = await _db.EmployerProfiles
-    //            .FirstOrDefaultAsync(e => e.UserId == userId);
+        //        var profile = await _db.EmployerProfiles
+        //            .FirstOrDefaultAsync(e => e.UserId == userId);
 
-    //        if (profile == null)
-    //            throw new Exception("Employer profile not found");
-    //        var company = await _db.Companies
-    //.Include(c => c.Logo)
-    //.Include(c => c.JobPosts)
-    //    .ThenInclude(j => j.Applications)
-    //.FirstOrDefaultAsync(c => c.EmployerProfileId == profile.Id);
+        //        if (profile == null)
+        //            throw new Exception("Employer profile not found");
 
-    //        if (company == null)
-    //            throw new Exception("Company not found");
+        //        var company = await _db.Companies
+        //            .Include(c => c.Logo)
+        //            .Include(c => c.Industry)
+        //            .Include(c => c.JobPosts)
+        //                .ThenInclude(j => j.Applications)
+        //            .FirstOrDefaultAsync(c => c.EmployerProfileId == profile.Id);
 
-    //        var allApplications = company.JobPosts
-    // .SelectMany(j => j.Applications)
-    // .ToList();
+        //        if (company == null)
+        //            throw new Exception("Company not found");
 
-    //        return new CompanyOwnerDto
-    //        {
-    //            // ===== PUBLIC =====
-    //            Id = company.Id,
-    //            CompanyName = company.CompanyName,
-    //            CompanyWebsite = company.CompanyWebsite,
-    //            Description = company.Description,
-    //            Industry = company.Industry,
-    //            Location = company.Location,
-    //            CompanySize = company.CompanySize,
-    //            Founded = company.Founded,
-    //            LogoUrl = company.Logo?.ImageUrl,
-    //            CreatedAt = company.CreatedAt,
+        //        var allApplications = company.JobPosts
+        //            .SelectMany(j => j.Applications)
+        //            .ToList();
 
-    //            // ===== PRIVATE STATS =====
-    //            TotalJobsPosted = company.JobPosts.Count,
-    //            ActiveJobs = company.JobPosts
-    //      .Count(j => j.isActive == true),
-    //            DraftJobs = company.JobPosts
-    //      .Count(j => j.StatusId == 2),
-    //            ClosedJobs = company.JobPosts
-    //      .Count(j => j.StatusId == 3),
+        //        return new CompanyOwnerDto
+        //        {
+        //            // ===== PUBLIC =====
+        //            Id = company.Id,
+        //            CompanyName = company.CompanyName,
+        //            CompanyWebsite = company.CompanyWebsite,
+        //            Description = company.Description,
+        //            Industry = company.Industry?.Name,
+        //            Location = company.Location,
+        //            CompanySize = company.CompanySize,
+        //            Founded = company.Founded,
+        //            LogoUrl = company.Logo?.ImageUrl,
+        //            CreatedAt = company.CreatedAt,
 
-    //            TotalApplicationsReceived = allApplications.Count,
-    //            PendingApplications = allApplications
-    //      .Count(a => a.Status == ApplicationStatus.Applied),
-    //            AcceptedApplications = allApplications
-    //      .Count(a => a.Status == ApplicationStatus.Shortlisted),
-    //            RejectedApplications = allApplications
-    //      .Count(a => a.Status == ApplicationStatus.Rejected),
-    //            InterviewScheduled = allApplications
-    //      .Count(a => a.Status == ApplicationStatus.Interviewed)
-    //        };
-    //    }
+        //            // ===== PRIVATE STATS =====
+        //            TotalJobsPosted = company.JobPosts.Count,
+        //            ActiveJobs = company.JobPosts.Count(j => j.isActive == true),
+        //            DraftJobs = company.JobPosts.Count(j => j.StatusId == 2),
+        //            ClosedJobs = company.JobPosts.Count(j => j.StatusId == 3),
+
+        //            TotalApplicationsReceived = allApplications.Count,
+        //            PendingApplications = allApplications.Count(a => a.Status == ApplicationStatus.Applied),
+        //            AcceptedApplications = allApplications.Count(a => a.Status == ApplicationStatus.Shortlisted),
+        //            RejectedApplications = allApplications.Count(a => a.Status == ApplicationStatus.Rejected),
+        //            InterviewScheduled = allApplications.Count(a => a.Status == ApplicationStatus.Interviewed)
+        //        };
+        //    }
 
         public async Task<List<SearchCompanyDto>> SearchCompaniesAsync(GlobalSearchDto dto)
         {
             var query = _db.Companies
-                   .AsNoTracking().AsQueryable();
+                .AsNoTracking()
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(dto.Keyword))
             {
                 var keyword = dto.Keyword.Trim().ToLower();
                 query = query.Where(c =>
                     c.CompanyName.ToLower().Contains(keyword) ||
-                    (c.Industry != null && c.Industry.ToLower().Contains(keyword)));
+                    (c.Industry != null && c.Industry.Name.ToLower().Contains(keyword)));
             }
 
-            if (!string.IsNullOrWhiteSpace(dto.Industry))
-            {
-                var industry = dto.Industry.Trim().ToLower();
-                query = query.Where(c => c.Industry != null && c.Industry.ToLower().Contains(industry));
-            }
+            // ✅ filter by the selected industry (the id from the dropdown)
+            if (dto.IndustryId.HasValue)
+                query = query.Where(c => c.IndustryId == dto.IndustryId);
+
+          
 
             if (!string.IsNullOrWhiteSpace(dto.CompanySize))
                 query = query.Where(c => c.CompanySize == dto.CompanySize);
-
 
             if (!string.IsNullOrWhiteSpace(dto.Location))
             {
                 var location = dto.Location.Trim().ToLower();
                 query = query.Where(c => c.Location != null && c.Location.ToLower().Contains(location));
             }
-          
 
-          return await query
-      .OrderByDescending(c => c.IsVerified)
-      .ThenBy(c => c.CompanyName)
-      .Take(50)
-      .Select(c => new SearchCompanyDto
-      {
-          Id = c.Id,
-          Logo = c.Logo != null ? c.Logo.ImageUrl : null,
-          CompanyName = c.CompanyName,
-          Industry = c.Industry,
-          Location = c.Location,
-          Description=c.Description,
-          CompanySize = c.CompanySize,
-          IsVerified = c.IsVerified
-      })
-      .ToListAsync();
-
+            return await query
+                .OrderByDescending(c => c.IsVerified)
+                .ThenBy(c => c.CompanyName)
+                .Take(50)
+                .Select(c => new SearchCompanyDto
+                {
+                    Id = c.Id,
+                    Logo = c.Logo != null ? c.Logo.ImageUrl : null,
+                    CompanyName = c.CompanyName,
+                    Industry = c.Industry != null ? c.Industry.Name : null,
+                    Location = c.Location,
+                    Description = c.Description,
+                    CompanySize = c.CompanySize,
+                    IsVerified = c.IsVerified
+                })
+                .ToListAsync();
         }
-
         public Task<CompanyOwnerDto> PrivateCompany()
         {
             throw new NotImplementedException();
@@ -321,18 +318,16 @@ namespace Infrastructure.Implementation.CompanyService
             throw new NotImplementedException();
         }
 
-      
-
         public Task<PublicCompanyDto> GetByIdAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public async  Task<HiringSnapshotDto?> GetHiringSnapshotAsync()
+        public async Task<HiringSnapshotDto?> GetHiringSnapshotAsync()
         {
             var me = await _db.EmployerProfiles
-                  .AsNoTracking()
-                  .FirstOrDefaultAsync(e => e.UserId == _user.UserId);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.UserId == _user.UserId);
             if (me?.CompanyId == null)
                 return null;
 
@@ -341,10 +336,9 @@ namespace Infrastructure.Implementation.CompanyService
             var weekAgo = now.AddDays(-7);
             var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
-
             var applications = _db.JobApplications
-                    .AsNoTracking()
-                    .Where(a => a.JobPost.CompanyId == companyId);
+                .AsNoTracking()
+                .Where(a => a.JobPost.CompanyId == companyId);
 
             // run one after another because they share a single DbContext
             var openJobs = await _db.JobPosts
@@ -359,7 +353,6 @@ namespace Infrastructure.Implementation.CompanyService
             var hires = await applications
                 .CountAsync(a => a.Status == ApplicationStatus.Hired);
 
-
             return new HiringSnapshotDto
             {
                 OpenJobs = openJobs,
@@ -367,7 +360,6 @@ namespace Infrastructure.Implementation.CompanyService
                 InterviewsScheduled = interviews,
                 HiresThisMonth = hires
             };
-
         }
 
         public async Task<IReadOnlyList<TopHiringCompanyDto>> GetTopHiringCompaniesAsync(int count = 8, CancellationToken ct = default)
@@ -378,7 +370,8 @@ namespace Infrastructure.Implementation.CompanyService
             if (_cache.TryGetValue(cacheKey, out IReadOnlyList<TopHiringCompanyDto>? cached) && cached is not null)
                 return cached;
 
-            var companies = await _db.Companies.Include(X=>X.Logo)
+            // No Include needed: Select projections load what they use
+            var companies = await _db.Companies
                 .AsNoTracking()
                 .Where(c => c.JobPosts.Any(j => j.IsActive))
                 .Select(c => new
@@ -392,8 +385,8 @@ namespace Infrastructure.Implementation.CompanyService
                 .Select(x => new TopHiringCompanyDto(
                     x.Company.Id,
                     x.Company.CompanyName,
-                    x.Company.Logo.ImageUrl,
-                    x.Company.Industry,
+                    x.Company.Logo != null ? x.Company.Logo.ImageUrl : null,
+                    x.Company.Industry != null ? x.Company.Industry.Name : null,
                     x.Company.Location,
                     x.OpenJobs))
                 .ToListAsync(ct);
@@ -401,7 +394,5 @@ namespace Infrastructure.Implementation.CompanyService
             _cache.Set(cacheKey, companies, CacheDuration);
             return companies;
         }
-    
     }
 }
-

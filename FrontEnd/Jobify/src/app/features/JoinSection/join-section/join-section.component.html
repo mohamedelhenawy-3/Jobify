@@ -1,0 +1,73 @@
+<!-- join-section.component.html -->
+<section class="join" aria-labelledby="join-title">
+  <header class="head">
+    <span class="eyebrow">Get started</span>
+    <h2 id="join-title">Whether you're hiring or job hunting</h2>
+    <p>Join the platform that connects talent with opportunity.</p>
+  </header>
+
+  <div class="cards">
+    <!-- Job seekers -->
+    <article class="panel">
+      <div class="icon seeker" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+        </svg>
+      </div>
+      <h3>For Job Seekers</h3>
+      <ul>
+        @for (p of seekerPoints; track p) {
+          <li>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+            {{ p }}
+          </li>
+        }
+      </ul>
+
+   @if (seekerCta().link) {
+  <a class="btn" [routerLink]="seekerCta().link!">{{ seekerCta().label }}</a>
+} @else {
+  <button type="button" class="btn" disabled aria-disabled="true">{{ seekerCta().label }}</button>
+}
+@if (seekerCta().hint) {
+  <p class="hint">{{ seekerCta().hint }}</p>
+}
+    </article>
+
+    <!-- Employers -->
+    <article class="panel dark">
+      <div class="icon employer" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+      </div>
+      <h3>For Employers</h3>
+      <ul>
+        @for (p of employerPoints; track p) {
+          <li>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+            {{ p }}
+          </li>
+        }
+      </ul>
+
+    @if (employerCta().link) {
+  <a class="btn" [routerLink]="employerCta().link!">{{ employerCta().label }}</a>
+} @else {
+  <button type="button" class="btn" disabled aria-disabled="true">{{ employerCta().label }}</button>
+}
+@if (employerCta().hint) {
+  <p class="hint">
+    {{ employerCta().hint }}
+    @if (employerCta().hintLink; as hl) {
+      <a [routerLink]="hl.url">{{ hl.label }}</a>
+    }
+  </p>
+}
+    </article>
+  </div>
+</section>

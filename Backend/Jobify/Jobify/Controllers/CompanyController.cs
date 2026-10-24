@@ -25,7 +25,7 @@ namespace Jobify.Controllers
 
         // GET api/companies?q=tech&industry=IT&location=Cairo
         [HttpGet("search")]
-        public async Task<IActionResult> Search(string? q, string? industry, string? location)
+        public async Task<IActionResult> Search(string? q, int? industry, string? location)
         {
             return Ok(await _publiccompanyservice.SearchAsync(q, industry, location));
         }

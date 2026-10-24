@@ -13,6 +13,7 @@ namespace Application.DTOs.JobPost.JobDTO
         public string Title { get; set; } = string.Empty;
         public string? Logo { get; set; }
         public string CompanyName { get; set; } = string.Empty;
+        public string IndustryName { get; set; } = string.Empty;  
         public string Location { get; set; } = string.Empty;
         public JobType EmploymentType { get; set; }
         public ExperienceLevel ExperienceLevel { get; set; }

@@ -1,4 +1,5 @@
 import { EmploymentType ,ExperianceLevel, JobStatus} from "./job-enums";
+import { PostedWithin } from "./job-search-filter.model";
 
 export interface Job {
   id: number;
@@ -109,3 +110,35 @@ export interface JobAlert {
    isActive: boolean;
    createdAt: string; 
   }
+
+
+
+  export interface RecommendedJob {
+  jobId: number;
+  title: string;
+  logoUrl: string | null;
+  companyName: string | null;
+  location: string | null;
+  employmentType: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  currency: string | null;
+  matchScore: number;
+  matchedSkills: string[];
+  postedAtUtc: string;
+}
+
+
+export interface LatestJob {
+  id: number;
+  title: string;
+  companyName: string;
+  companyLogoUrl: string | null;
+  location: string;
+  jobType: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  createdAt: string;
+}
+
+

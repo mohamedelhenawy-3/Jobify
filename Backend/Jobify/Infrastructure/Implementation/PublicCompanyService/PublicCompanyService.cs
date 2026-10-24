@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Comapny.RefactorCompany;
 using Application.Interfaces.PublicCompany;
+using Domain.Entities;
 using Infrastructure.Implementation.AuthService;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,15 +20,43 @@ namespace Infrastructure.Implementation.PublicCompanyService
             _context = context;
         }
 
-        public async Task<List<PublicCompanyDto>> SearchAsync(string? q, string? industry, string? location)
+        // industryId replaces the old industry string (the dropdown sends the id)
+    
+
+        public async Task<PublicCompanyDto> GetByIdAsync(int id)
         {
-            var query = _context.Companies.Where(c => c.IsVerified);
+            return await _context.Companies
+                .AsNoTracking()
+                .Where(c => c.Id == id && c.IsVerified)
+                .Select(c => new PublicCompanyDto
+                {
+                    Id = c.Id,
+                    CompanyName = c.CompanyName,
+                    Description = c.Description,
+                    CompanySize = c.CompanySize,
+                    IndustryId = c.IndustryId,
+                    Industry = c.Industry != null ? c.Industry.Name : null,
+                    Founded = c.Founded,
+                    Location = c.Location,
+                    CompanyWebsite = c.CompanyWebsite,
+                    Logo = c.Logo != null ? c.Logo.ImageUrl : null,
+                    IsVerified = c.IsVerified
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<PublicCompanyDto>> SearchAsync(string? q, int? industryId, string? location)
+        {
+            var query = _context.Companies
+               .AsNoTracking()
+               .Where(c => c.IsVerified);
 
             if (!string.IsNullOrEmpty(q))
-                query = query.Where(c => c.CompanyName.Contains(q) || c.Description.Contains(q));
+                query = query.Where(c => c.CompanyName.Contains(q) ||
+                                         (c.Description != null && c.Description.Contains(q)));
 
-            if (!string.IsNullOrEmpty(industry))
-                query = query.Where(c => c.Industry == industry);
+            if (industryId.HasValue)
+                query = query.Where(c => c.IndustryId == industryId);
 
             if (!string.IsNullOrEmpty(location))
                 query = query.Where(c => c.Location == location);
@@ -40,36 +69,16 @@ namespace Infrastructure.Implementation.PublicCompanyService
                     Id = c.Id,
                     CompanyName = c.CompanyName,
                     Description = c.Description,
-                   CompanySize=c.CompanySize,
-                    Industry = c.Industry,
+                    CompanySize = c.CompanySize,
+                    IndustryId = c.IndustryId,
+                    Industry = c.Industry != null ? c.Industry.Name : null,
                     Founded = c.Founded,
                     Location = c.Location,
                     CompanyWebsite = c.CompanyWebsite,
-                    Logo = c.Logo.ImageUrl,
-                    IsVerified = c.IsVerified
-                }).ToListAsync
-                ();
-        }
-
-        public async Task<PublicCompanyDto> GetByIdAsync(int id)
-        {
-            return await _context.Companies
-                .Where(c => c.Id == id && c.IsVerified)
-                .Select(c => new PublicCompanyDto
-                {
-                    Id = c.Id,
-                    CompanyName = c.CompanyName,
-                    Description = c.Description,
-
-                    Industry = c.Industry,
-                    Founded = c.Founded,
-                    Location = c.Location,
-                    CompanyWebsite = c.CompanyWebsite,
-                    Logo = c.Logo.ImageUrl,
+                    Logo = c.Logo != null ? c.Logo.ImageUrl : null,
                     IsVerified = c.IsVerified
                 })
-                .FirstOrDefaultAsync();
+                .ToListAsync();
         }
-         
     }
 }
